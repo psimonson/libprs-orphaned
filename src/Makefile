@@ -50,12 +50,16 @@ ifeq ($(BITS),64)
 	install $(SRCDIR)/$(TRGT).a \
 		$(SRCDIR)/$(TRGT).so \
 		$(DESTDIR)/$(PREFIX)/lib$(BITS)/prs_cfile
+	mkdir -p $(DESTDIR)/$(PREFIX)/include/prs_headers
+	install $(SRCDIR)/file.h $(DESTDIR)/$(PREFIX)/include/prs_headers
 	ldconfig
 else ifeq ($(BITS),32)
 	mkdir -p $(DESTDIR)/$(PREFIX)/lib/prs_cfile
 	install $(SRCDIR)/$(TRGT).a \
 		$(SRCDIR)/$(TRGT).so \
 		$(DESTDIR)/$(PREFIX)/lib/prs_cfile
+	mkdir -p $(DESTDIR)/$(PREFIX)/include/prs_headers
+	install $(SRCDIR)/file.h $(DESTDIR)/$(PREFIX)/include/prs_headers
 	ldconfig
 else
 	echo "Cannot install for $(BITS) bit architecture." || die
@@ -66,10 +70,14 @@ ifeq ($(BITS),64)
 	rm -f $(DESTDIR)/$(PREFIX)/lib$(BITS)/prs_cfile/$(TRGT).a \
 	$(DESTDIR)/$(PREFIX)/lib$(BITS)/prs_cfile/$(TRGT).so
 	rmdir $(DESTDIR)/$(PREFIX)/lib$(BITS)/prs_cfile
+	rm -f $(DESTDIR)/$(PREFIX)/include/prs_headers/*.h
+	rmdir $(DESTDIR)/$(PREFIX)/include/prs_headers
 else ifeq ($(BITS),32)
 	rm -f $(DESTDIR)/$(PREFIX)/lib/prs_cfile/$(TRGT).a \
 	$(DESTDIR)/$(PREFIX)/lib/prs_cfile/$(TRGT).so
 	rmdir $(DESTDIR)/$(PREFIX)/lib/prs_cfile
+	rm -f $(DESTDIR)/$(PREFIX)/include/prs_headers/*.h
+	rmdir $(DESTDIR)/$(PREFIX)/include/prs_headers
 else
 	echo "Cannot build for $(BITS) bit architecture." || die
 endif
