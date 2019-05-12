@@ -1,6 +1,7 @@
 CC?=gcc
 CFLAGS?=-std=c89 -Wall -Wextra -Wno-unused-parameter -g
-CFLAGS+=-I../include -D_XOPEN_SOURCE=600
+BITS?=$(shell getconf LONG_BIT)
+CFLAGS+=-I../include -D_XOPEN_SOURCE=600 -m$(BITS)
 LDFLAGS=
 
 BUILD_MAJOR=0
@@ -8,12 +9,13 @@ BUILD_MINOR=1
 BUILD_VERSION="$(BUILD_MAJOR).$(BUILD_MINOR)"
 
 SRCDIR=$(shell pwd)
-DESTDIR=
-PREFIX=usr/local
+DESTDIR?=
+PREFIX?=usr/local
 
 SRCS=$(SRCDIR)/file.c
 OBJS=$(SRCS:.c=.c.o)
 TRGT=libcfile
+
 
 .PHONY: all clean dist dist-clean install uninstall
 all: $(SRCDIR)/$(TRGT)
@@ -43,12 +45,34 @@ dist-clean: clean
 #	rm -f $(SRCDIR)/config.h
 
 install:
-	mkdir -p $(DESTDIR)/$(PREFIX)/lib
-	install $(SRCDIR)/$(TRGT) $(DESTDIR)/$(PREFIX)/lib
+ifeq ($(BITS),64)
+	mkdir -p $(DESTDIR)/$(PREFIX)/lib$(BITS)/prs_cfile
+	install $(SRCDIR)/$(TRGT).a \
+		$(SRCDIR)/$(TRGT).so \
+		$(DESTDIR)/$(PREFIX)/lib$(BITS)/prs_cfile
 	ldconfig
+else ifeq ($(BITS),32)
+	mkdir -p $(DESTDIR)/$(PREFIX)/lib/prs_cfile
+	install $(SRCDIR)/$(TRGT).a \
+		$(SRCDIR)/$(TRGT).so \
+		$(DESTDIR)/$(PREFIX)/lib/prs_cfile
+	ldconfig
+else
+	echo "Cannot install for $(BITS) bit architecture." || die
+endif
 
 uninstall:
-	rm -f $(DESTDIR)/$(PREFIX)/lib/$(TRGT)
+ifeq ($(BITS),64)
+	rm -f $(DESTDIR)/$(PREFIX)/lib$(BITS)/prs_cfile/$(TRGT).a \
+	$(DESTDIR)/$(PREFIX)/lib$(BITS)/prs_cfile/$(TRGT).so
+	rmdir $(DESTDIR)/$(PREFIX)/lib$(BITS)/prs_cfile
+else ifeq ($(BITS),32)
+	rm -f $(DESTDIR)/$(PREFIX)/lib/prs_cfile/$(TRGT).a \
+	$(DESTDIR)/$(PREFIX)/lib/prs_cfile/$(TRGT).so
+	rmdir $(DESTDIR)/$(PREFIX)/lib/prs_cfile
+else
+	echo "Cannot build for $(BITS) bit architecture." || die
+endif
 
 version:
 	@echo $(BUILD_VERSION)

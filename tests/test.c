@@ -22,6 +22,7 @@ main ()
     }
     if(get_errori_file(&file) != FILE_ERROR_OKAY)
         goto error;
+    printf("Lines: %ld\nSize: %ld\n", file.lines, file.size);
     close_file(&file);
     return 0;
 
