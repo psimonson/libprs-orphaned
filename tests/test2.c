@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <string.h>
+
+#include "file.h"
+
+int
+main ()
+{
+    char buf[32];
+    file_t file1;
+    file_t file2;
+    int bytes;
+    
+    init_file(&file1);
+    init_file(&file2);
+    
+    /* open files */
+    open_file(&file1, "test.c", "rt");
+    if(get_errori_file(&file1) != FILE_ERROR_OKAY)
+        return 1;
+    open_file(&file2, "test.txt", "wt");
+    if(get_errori_file(&file2) != FILE_ERROR_OKAY) {
+        close_file(&file1);
+        return 1;
+    }
+    
+    /* copy file */
+    while((bytes = read_file(&file1, buf, 32)) > 0) {
+        write_file(&file2, buf, bytes);
+    }
+    close_file(&file1);
+    close_file(&file2);
+    if(get_errori_file(&file2) != FILE_ERROR_OKAY)
+        return 1;
+    printf("File was written successfully.\n");
+    return 0;
+}

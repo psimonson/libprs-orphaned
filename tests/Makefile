@@ -3,7 +3,7 @@ CFLAGS+=-I../include -I../src
 LDFLAGS=-static -L../src -lcfile
 
 .PHONY: all clean
-all: test
+all: test test2
 
 %.c.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -11,5 +11,8 @@ all: test
 test: test.c.o
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
+test2: test2.c.o
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+
 clean:
-	rm -f *~ *.c.o test
+	rm -f *~ *.c.o test test2

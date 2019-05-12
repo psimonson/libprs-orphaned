@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 
 #include "file.h"
 
@@ -14,11 +13,10 @@ main ()
     open_file(&file, "test.c", "rt");
     if(get_errori_file(&file) != FILE_ERROR_OKAY)
         goto error;
-    memset(buf, 0, BUFSIZ);
-    while((bytes = read_file(&file, buf, BUFSIZ)) > 0) {
+    while((bytes = read_file(&file, buf, sizeof(buf))) > 0) {
         buf[bytes] = 0;
         puts(buf);
-        memset(buf, 0, BUFSIZ);
+        fflush(stdout);
     }
     if(get_errori_file(&file) != FILE_ERROR_OKAY)
         goto error;
