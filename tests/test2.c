@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-
 #include "file.h"
 
 int
@@ -28,10 +27,16 @@ main ()
     while((bytes = read_file(&file1, buf, 32)) > 0) {
         write_file(&file2, buf, bytes);
     }
-    close_file(&file1);
-    close_file(&file2);
-    if(get_errori_file(&file2) != FILE_ERROR_OKAY)
+    if(get_errori_file(&file1) != FILE_ERROR_OKAY) {
+        printf("Error: %s\n", get_error_file(&file1));
+        close_file(&file1);
         return 1;
+    }
+    if(get_errori_file(&file2) != FILE_ERROR_OKAY) {
+        printf("Error: %s\n", get_error_file(&file2));
+        close_file(&file2);
+        return 1;
+    }
     printf("File was written successfully.\n");
     return 0;
 }

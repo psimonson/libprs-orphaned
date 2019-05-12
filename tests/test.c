@@ -1,23 +1,18 @@
 #include <stdio.h>
-
 #include "file.h"
 
 int
 main ()
 {
-    char buf[BUFSIZ];
     file_t file;
-    int bytes;
+    int c;
     
     init_file(&file);
     open_file(&file, "test.c", "rt");
     if(get_errori_file(&file) != FILE_ERROR_OKAY)
         goto error;
-    while((bytes = read_file(&file, buf, sizeof(buf))) > 0) {
-        buf[bytes] = 0;
-        puts(buf);
-        fflush(stdout);
-    }
+    while((c = getc_file(&file)) != EOF)
+        putchar(c);
     if(get_errori_file(&file) != FILE_ERROR_OKAY)
         goto error;
     printf("Lines: %ld\nSize: %ld\n", file.lines, file.size);

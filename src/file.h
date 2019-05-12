@@ -41,3 +41,4 @@ int read_file(file_t* file, char* buf, int size);
 int write_file(file_t* file, const char* buf, int size);
 int writef_file(file_t* file, const char* buf, ...);
 int readf_file(file_t* file, const char* buf, ...);
+int getc_file(file_t* file);

@@ -76,19 +76,24 @@ open_file (file_t* file, const char* filename, const char* mode)
         return;
     }
     strncpy(file->name, filename, strlen(filename));
-    file->size = get_size_file(file);
-    if(file->size < 0) {
-        close_file(file);
-        file->error = FILE_ERROR_SIZE;
-        return;
-    }
-    if(strchr(mode, 'b') == NULL) {
-        file->lines = get_lines_file(file);
-        if(file->lines < 0) {
+    if(strchr(mode, 'w') == NULL) {
+        file->size = get_size_file(file);
+        if(file->size < 0) {
             close_file(file);
-            file->error = FILE_ERROR_LINE;
+            file->error = FILE_ERROR_SIZE;
             return;
         }
+        if(strchr(mode, 'b') == NULL) {
+            file->lines = get_lines_file(file);
+            if(file->lines < 0) {
+                close_file(file);
+                file->error = FILE_ERROR_LINE;
+                return;
+            }
+        }
+    } else {
+        file->size = 0;
+        file->lines = 0;
     }
     file->error = FILE_ERROR_OKAY;
     fseek(file->fp, 0, SEEK_SET);
@@ -167,4 +172,11 @@ readf_file (file_t* file, const char* buf, ...)
     if(res < 0)
         file->error = FILE_ERROR_READ;
     return res;
+}
+
+/* getc_file:  gets one byte from the file */
+int
+getc_file (file_t* file)
+{
+    return fgetc(file->fp);
 }
