@@ -37,6 +37,8 @@ main ()
         close_file(&file2);
         return 1;
     }
+    close_file(&file1);
+    close_file(&file2);
     printf("File was written successfully.\n");
     return 0;
 }
