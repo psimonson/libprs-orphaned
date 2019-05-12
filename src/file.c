@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <errno.h>
 
 #include "file.h"
 
@@ -178,5 +179,21 @@ readf_file (file_t* file, const char* buf, ...)
 int
 getc_file (file_t* file)
 {
-    return fgetc(file->fp);
+    int c;
+    
+    errno = 0;
+    c = fgetc(file->fp);
+    if(errno != 0)
+        file->error = FILE_ERROR_READ;
+    return c;
+}
+
+/* putc_file:  puts one byte into the file */
+void
+putc_file (file_t* file, int c)
+{
+    errno = 0;
+    fputc(c, file->fp);
+    if(errno != 0)
+        file->error = FILE_ERROR_WRITE;
 }
