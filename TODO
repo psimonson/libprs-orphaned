@@ -2,7 +2,11 @@
           .:[CFile library]:.
 ========================================
  * Make initial library.
- - Make reading/writing better.
+ * Make reading/writing better.
+========================================
+NOTE: Not much else to do with it really
+just adding more functionality and what
+not. Other than that it's done.
 ========================================
            .:[END OF FILE]:.
 ========================================

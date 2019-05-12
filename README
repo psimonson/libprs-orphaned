@@ -1,7 +1,25 @@
 ========================================
           .:[CFile library]:.
 ========================================
-Nothing yet.
+init_file()  - initialize the structure.
+open_file()  - opens a file with the
+               structure.
+close_file() - cleanup and close file.
+========================================
+get_error_file()  - get error string.
+get_errori_file() - get error number.
+========================================
+read_file()   - read from file using
+                buffer.
+readf_file()  - read formatted from file
+                like fscanf.
+write_file()  - write to file using
+                buffer.
+writef_file() - write formatted to file
+                like fprintf.
+========================================
+getc_file() - get next byte from file.
+putc_file() - put a byte to the file.
 ========================================
            .:[END OF FILE]:.
 ========================================
