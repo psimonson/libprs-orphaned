@@ -5,6 +5,8 @@
  ********************************************************************
  */
 
+#include <stdarg.h>
+
 #ifndef MAX_PATH
 #define MAX_PATH 260                /* needed for unix/linux */
 #endif
@@ -48,6 +50,8 @@ extern int
 write_file (file_t* file, const char* buf, int size);
 extern int
 writef_file (file_t* file, const char* buf, ...);
+extern int
+vwritef_file (file_t* file, const char* buf, va_list ap);
 extern int
 readf_file (file_t* file, const char* buf, ...);
 extern int

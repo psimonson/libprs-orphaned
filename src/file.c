@@ -7,7 +7,6 @@
  */
 
 #include <stdio.h>
-#include <stdarg.h>
 #include <string.h>
 #include <errno.h>
 
@@ -129,6 +128,13 @@ writef_file (file_t* file, const char* buf, ...)
     if(res < 0)
         file->error = FILE_ERROR_WRITE;
     return res;
+}
+
+/* vwritef_file:  write formatted into file; using va_list */
+int
+vwritef_file (file_t* file, const char* buf, va_list ap)
+{
+    return vfprintf(file->fp, buf, ap);
 }
 
 /* readf_file:  read formatted from file */

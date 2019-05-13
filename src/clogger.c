@@ -115,7 +115,7 @@ write_log (int logNum, const char *data, ...)
 				_logs[logNum].write_pos,
 				SEEK_SET);
 			va_start(ap, data);
-			vfprintf(_logs[logNum].file.fp, data, ap);
+			vwritef_file(&_logs[logNum].file, data, ap);
 			va_end(ap);
 			_logs[logNum].write_pos =
 				tell_file(&_logs[logNum].file);

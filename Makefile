@@ -13,7 +13,7 @@ clean:
 
 dist: dist-clean
 	cd $(SRCDIR)/.. && tar --exclude=.git -cvjpf \
-	Sed-$$(date +'%Y-%m-%d').tar.bz2 $$(basename $(SRCDIR))
+	libcfile-$$(date +'%Y-%m-%d').tar.bz2 $$(basename $(SRCDIR))
 
 dist-clean: clean
 	cd src && $(MAKE) dist-clean
