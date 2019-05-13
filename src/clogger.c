@@ -21,7 +21,7 @@ struct CLOG {
 	long write_pos;
 };
 
-struct CLOG log_files[MAX_LOGS];
+struct CLOG _logs[MAX_LOGS];
 char init_var;
 
 void close_log(int);
@@ -44,8 +44,10 @@ init_logger ()
 		int i;
 
 		init_var = 1;
-		for(i=0; i<MAX_LOGS; i++)
-			memset(&log_files[i], 0, sizeof(struct CLOG));
+		for(i=0; i<MAX_LOGS; i++) {
+			memset(&_logs[i], 0, sizeof(struct CLOG));
+			init_file(&_logs[i].file);
+		}
 		atexit(_logger_exit_func);
 	} else {
 		printf("C_Logger is already initialized!\n");
@@ -57,10 +59,11 @@ open_log (int logNum, const char *name)
 {
 	if(init_var) {
 		if(!get_status(logNum)) {
-			open_file(&log_files[logNum].file, name, "a+t");
-			if(get_errori_file(&log_files[logNum].file) != FILE_ERROR_OKAY)
+			open_file(&_logs[logNum].file, name, "a+t");
+			if(get_errori_file(&_logs[logNum].file)
+				!= FILE_ERROR_OKAY)
 				return;
-			log_files[logNum].status = 1;
+			_logs[logNum].status = 1;
 			return;
 		}
 		return;
@@ -75,19 +78,27 @@ read_log (int logNum, char *buf, int size)
 		if(get_status(logNum)) {
 			int c, pos;
 
-			if(fseek(log_files[logNum].file.fp, log_files[logNum].read_pos, SEEK_SET) < 0) {
-				printf("Error: seeking through log file.\n");
+			seek_file(&_logs[logNum].file,
+				_logs[logNum].read_pos, SEEK_SET);
+			if(get_errori_file(&_logs[logNum].file)
+				!= FILE_ERROR_OKAY) {
+				printf("Error: %s\n",
+					get_error_file(&_logs[logNum].file));
 				return -1;
 			}
 			pos = 0;
 			memset(buf, 0, size);
-			while(pos < size && ((c = getc_file(&log_files[logNum].file)) != '\n'))
+			while(pos < size &&
+				((c = getc_file(&_logs[logNum].file))
+				!= '\n'))
 				buf[pos++] = c;
-			log_files[logNum].read_pos = ftell(log_files[logNum].file.fp);
+			_logs[logNum].read_pos =
+				tell_file(&_logs[logNum].file);
 			buf[pos] = '\0';
 			return c;
 		}
-		printf("Warning: Could not read, log CLOG%d not open.\n", logNum);
+		printf("Warning: Could not read, log CLOG%d not open.\n",
+			logNum);
 		return -1;
 	}
 	printf("Please use init_logger() first.\n");
@@ -100,12 +111,15 @@ write_log (int logNum, const char *data, ...)
 	if(init_var) {
 		if(get_status(logNum)) {
 			va_list ap;
-			fseek(log_files[logNum].file.fp, log_files[logNum].write_pos, SEEK_SET);
+			seek_file(&_logs[logNum].file,
+				_logs[logNum].write_pos,
+				SEEK_SET);
 			va_start(ap, data);
-			vfprintf(log_files[logNum].file.fp, data, ap);
+			vfprintf(_logs[logNum].file.fp, data, ap);
 			va_end(ap);
-			log_files[logNum].write_pos = ftell(log_files[logNum].file.fp);
-			fflush(log_files[logNum].file.fp);
+			_logs[logNum].write_pos =
+				tell_file(&_logs[logNum].file);
+			flush_file(&_logs[logNum].file);
 			return;
 		}
 		printf("Warning: Not writing, log CLOG%d not open.\n", logNum);
@@ -119,10 +133,10 @@ close_log (int logNum)
 {
 	if(init_var) {
 		if(get_status(logNum)) {
-			close_file(&log_files[logNum].file);
-			log_files[logNum].status = 0;
-			log_files[logNum].read_pos = 0;
-			log_files[logNum].write_pos = 0;
+			close_file(&_logs[logNum].file);
+			_logs[logNum].status = 0;
+			_logs[logNum].read_pos = 0;
+			_logs[logNum].write_pos = 0;
 			return;
 		}
 		return;
@@ -145,16 +159,16 @@ int
 get_status (int logNum)
 {
 	if(init_var)
-		return log_files[logNum].status;
+		return _logs[logNum].status;
 	printf("Please use init_logger() first.\n");
 	return 0;
 }
 
-char*
-get_name (int logNum)
+const char*
+get_log_name (int logNum)
 {
 	if(init_var)
-		return log_files[logNum].file.name;
+		return _logs[logNum].file.name;
 	printf("Please use init_logger() first.\n");
 	return 0;
 }

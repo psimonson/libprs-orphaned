@@ -20,38 +20,10 @@ static const char *_prs_file_errors[] = {
     "Cannot get lines count from file.",
     "File was unable to be read.",
     "File was unable to be written to.",
+    "File was unable to seek.",
+    "Cannot tell size of file.",
     "File was closed."
 };
-
-/* --------------------------- helper funtions ------------------------- */
-
-/* get_size_file:  gets the size of the current file */
-long
-get_size_file (file_t* file)
-{
-    long size,cur_pos;
-    cur_pos = ftell(file->fp);
-    fseek(file->fp, 0, SEEK_END);
-    size = ftell(file->fp);
-    fseek(file->fp, cur_pos, SEEK_SET);
-    if(size < 0)
-        file->error = FILE_ERROR_SIZE;
-    return size;
-}
-
-/* get_lines_file:  gets the line count of the current file */
-long
-get_lines_file (file_t* file)
-{
-    long nl;
-    int c;
-    fseek(file->fp, 0, SEEK_SET);
-    for(nl=0; (c = fgetc(file->fp)) != EOF;)
-        if(c == '\n')
-            nl++;
-    fseek(file->fp, 0, SEEK_SET);
-    return nl;
-}
 
 /* ------------------------- standard functions ------------------------ */
 
@@ -194,4 +166,72 @@ putc_file (file_t* file, int c)
     fputc(c, file->fp);
     if(errno != 0)
         file->error = FILE_ERROR_WRITE;
+}
+
+/* seek_file:  seek through file by bytes */
+int
+seek_file (file_t* file, long bytes, int seek)
+{
+    int res;
+    errno = 0;
+    res = fseek(file->fp, bytes, seek);
+    if(errno != 0)
+        file->error = FILE_ERROR_SEEK;
+    return res;
+}
+
+/* tell_file:  tell size of file; returns size in long */
+long
+tell_file (file_t* file)
+{
+    long size;
+    errno = 0;
+    size = ftell(file->fp);
+    if(errno != 0)
+        file->error = FILE_ERROR_TELL;
+    return size;
+}
+
+/* flush_file:  flushs a file */
+int
+flush_file (file_t* file)
+{
+    return fflush(file->fp);
+}
+
+/* --------------------------- helper funtions ------------------------- */
+
+/* get_name_file:  gets the name of the file passed in */
+const char*
+get_name_file (file_t* file)
+{
+    return file->name;
+}
+
+/* get_size_file:  gets the size of the current file */
+long
+get_size_file (file_t* file)
+{
+    long size,cur_pos;
+    cur_pos = ftell(file->fp);
+    fseek(file->fp, 0, SEEK_END);
+    size = ftell(file->fp);
+    fseek(file->fp, cur_pos, SEEK_SET);
+    if(size < 0)
+        file->error = FILE_ERROR_SIZE;
+    return size;
+}
+
+/* get_lines_file:  gets the line count of the current file */
+long
+get_lines_file (file_t* file)
+{
+    long nl;
+    int c;
+    fseek(file->fp, 0, SEEK_SET);
+    for(nl=0; (c = fgetc(file->fp)) != EOF;)
+        if(c == '\n')
+            nl++;
+    fseek(file->fp, 0, SEEK_SET);
+    return nl;
 }

@@ -41,5 +41,5 @@ print_status (int logNum);
 extern int
 get_status (int logNum);
 
-extern char*
-get_name (int logNum);
+extern const char*
+get_log_name (int logNum);

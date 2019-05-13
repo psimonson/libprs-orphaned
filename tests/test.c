@@ -19,7 +19,8 @@ main ()
         putchar(c);
     if(get_errori_file(&file) != FILE_ERROR_OKAY)
         goto error;
-    write_log(CLOG0, "Lines: %ld\nSize: %ld\n", file.lines, file.size);
+    write_log(CLOG0, "File: %s\nLines: %ld\nSize: %ld\n",
+        get_log_name(CLOG0), file.lines, file.size);
     close_file(&file);
     close_log(CLOG0);
     return 0;
