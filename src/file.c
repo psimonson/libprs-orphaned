@@ -20,8 +20,6 @@ static const char *_prs_file_errors[] = {
     "Cannot get lines count from file.",
     "File was unable to be read.",
     "File was unable to be written to.",
-    "Cannot uninitialize file structure.",
-    "Cannot initialize file structure.",
     "File was closed."
 };
 

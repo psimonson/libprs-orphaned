@@ -1,7 +1,7 @@
 CC?=gcc
 CFLAGS?=-std=c89 -Wall -Wextra -Wno-unused-parameter -g
 BITS?=$(shell getconf LONG_BIT)
-CFLAGS+=-I../include -D_XOPEN_SOURCE=600 -m$(BITS)
+CFLAGS+=-D_XOPEN_SOURCE=600 -m$(BITS)
 LDFLAGS=
 
 BUILD_MAJOR=0
@@ -12,7 +12,7 @@ SRCDIR=$(shell pwd)
 DESTDIR?=
 PREFIX?=usr/local
 
-SRCS=$(SRCDIR)/file.c
+SRCS=$(SRCDIR)/file.c $(SRCDIR)/clogger.c
 OBJS=$(SRCS:.c=.c.o)
 TRGT=libcfile
 
@@ -24,6 +24,7 @@ $(SRCDIR)/%.c.o: $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -fPIC -c $< -o $@
 
 $(SRCDIR)/file.c.o: $(SRCDIR)/file.h
+$(SRCDIR)/clogger.c.o: $(SRCDIR)/file.h $(SRCDIR)/clogger.h
 
 $(SRCDIR)/$(TRGT): $(OBJS)
 	$(CC) $(CFLAGS) -shared -o $@.so $(OBJS) $(LDFLAGS)

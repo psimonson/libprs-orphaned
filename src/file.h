@@ -16,8 +16,6 @@ enum {
     FILE_ERROR_LINE,
     FILE_ERROR_READ,
     FILE_ERROR_WRITE,
-    FILE_ERROR_UINIT,
-    FILE_ERROR_INIT,
     FILE_ERROR_CLOSED
 };
 
@@ -30,16 +28,22 @@ typedef struct file {
 } file_t;
 
 /* standard file funtions */
-void init_file(file_t* file);
-void open_file(file_t* file, const char* filename, const char* mode);
-const char* get_error_file(file_t* file);
-int get_errori_file(file_t* file);
-void close_file(file_t* file);
+extern void init_file(file_t* file);
+extern void open_file(file_t* file, const char* filename, const char* mode);
+extern const char* get_error_file(file_t* file);
+extern int get_errori_file(file_t* file);
+extern void close_file(file_t* file);
 
 /* standard handling functions */
-int read_file(file_t* file, char* buf, int size);
-int write_file(file_t* file, const char* buf, int size);
-int writef_file(file_t* file, const char* buf, ...);
-int readf_file(file_t* file, const char* buf, ...);
-int getc_file(file_t* file);
-void putc_file(file_t* file, int c);
+extern int
+read_file (file_t* file, char* buf, int size);
+extern int
+write_file (file_t* file, const char* buf, int size);
+extern int
+writef_file (file_t* file, const char* buf, ...);
+extern int
+readf_file (file_t* file, const char* buf, ...);
+extern int
+getc_file (file_t* file);
+extern void
+putc_file (file_t* file, int c);

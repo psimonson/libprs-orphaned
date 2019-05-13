@@ -11,41 +11,23 @@
 #include <string.h>
 #include <stdarg.h>
 
-#ifndef MAX_PATH
-#define MAX_PATH 260
-#endif
+#include "file.h"
+#include "clogger.h"
 
-#define MAX_LOGS 5
-
-#define ERRMSG "[ERROR]: "
-#define DBGMSG "[DEBUG]: "
-#define WRNMSG "[DEBUG]: "
-
-#pragma pack(push, 1)
 struct CLOG {
-	char name[MAX_PATH];
-	FILE *log_file;
+	file_t file;
 	int status;
 	long read_pos;
 	long write_pos;
-};
-#pragma pack(pop)
-
-enum CLOG_ENUM {
-	CLOG0,
-	CLOG1,
-	CLOG2,
-	CLOG3,
-	CLOG4
 };
 
 struct CLOG log_files[MAX_LOGS];
 char init_var;
 
-static void close_log(int);
-static int get_status(int);
+void close_log(int);
+int get_status(int);
 
-static void
+void
 _logger_exit_func ()
 {
 	int i;
@@ -55,10 +37,10 @@ _logger_exit_func ()
 			close_log(i);
 }
 
-static void
+void
 init_logger ()
 {
-	if (!init_var) {
+	if(init_var == 0) {
 		int i;
 
 		init_var = 1;
@@ -70,17 +52,14 @@ init_logger ()
 	}
 }
 
-static void
+void
 open_log (int logNum, const char *name)
 {
-	if (init_var) {
-		if (!get_status(logNum)) {
-			strncpy(log_files[logNum].name, name, MAX_PATH);
-			if ((log_files[logNum].log_file = fopen(log_files[logNum].name, "a+t")) == NULL) {
-				fprintf(stderr, "Error: Cannot open %s for writing.\n",
-					log_files[logNum].name);
+	if(init_var) {
+		if(!get_status(logNum)) {
+			open_file(&log_files[logNum].file, name, "a+t");
+			if(get_errori_file(&log_files[logNum].file) != FILE_ERROR_OKAY)
 				return;
-			}
 			log_files[logNum].status = 1;
 			return;
 		}
@@ -89,23 +68,22 @@ open_log (int logNum, const char *name)
 	printf("Please use init_logger() first.\n");
 }
 
-static int
+int
 read_log (int logNum, char *buf, int size)
 {
-	if (init_var) {
-		if (get_status(logNum)) {
+	if(init_var) {
+		if(get_status(logNum)) {
 			int c, pos;
 
-			if (fseek(log_files[logNum].log_file, log_files[logNum].read_pos, SEEK_SET) < 0) {
+			if(fseek(log_files[logNum].file.fp, log_files[logNum].read_pos, SEEK_SET) < 0) {
 				printf("Error: seeking through log file.\n");
 				return -1;
 			}
-
 			pos = 0;
 			memset(buf, 0, size);
-			while(pos < size && ((c = fgetc(log_files[logNum].log_file)) != '\n'))
+			while(pos < size && ((c = getc_file(&log_files[logNum].file)) != '\n'))
 				buf[pos++] = c;
-			log_files[logNum].read_pos = ftell(log_files[logNum].log_file);
+			log_files[logNum].read_pos = ftell(log_files[logNum].file.fp);
 			buf[pos] = '\0';
 			return c;
 		}
@@ -116,19 +94,18 @@ read_log (int logNum, char *buf, int size)
 	return -1;
 }
 
-static void
+void
 write_log (int logNum, const char *data, ...)
 {
-	if (init_var) {
-		if (get_status(logNum)) {
+	if(init_var) {
+		if(get_status(logNum)) {
 			va_list ap;
-
-			fseek(log_files[logNum].log_file, log_files[logNum].write_pos, SEEK_SET);
+			fseek(log_files[logNum].file.fp, log_files[logNum].write_pos, SEEK_SET);
 			va_start(ap, data);
-			vfprintf(log_files[logNum].log_file, data, ap);
+			vfprintf(log_files[logNum].file.fp, data, ap);
 			va_end(ap);
-			log_files[logNum].write_pos = ftell(log_files[logNum].log_file);
-			fflush(log_files[logNum].log_file);
+			log_files[logNum].write_pos = ftell(log_files[logNum].file.fp);
+			fflush(log_files[logNum].file.fp);
 			return;
 		}
 		printf("Warning: Not writing, log CLOG%d not open.\n", logNum);
@@ -137,13 +114,12 @@ write_log (int logNum, const char *data, ...)
 	printf("Please use init_logger() first.\n");
 }
 
-static void
+void
 close_log (int logNum)
 {
-	if (init_var) {
-		if (get_status(logNum)) {
-			fclose(log_files[logNum].log_file);
-			strncpy(log_files[logNum].name, "", 1);
+	if(init_var) {
+		if(get_status(logNum)) {
+			close_file(&log_files[logNum].file);
 			log_files[logNum].status = 0;
 			log_files[logNum].read_pos = 0;
 			log_files[logNum].write_pos = 0;
@@ -154,30 +130,31 @@ close_log (int logNum)
 	printf("Please use init_logger() first.\n");
 }
 
-static void
+void
 print_status (int logNum)
 {
-	if (init_var) {
-		printf("CLOG%d: Log %s\n", logNum, (get_status(logNum) == 1) ? "open" : "closed");
+	if(init_var) {
+		printf("CLOG%d: Log %s\n", logNum,
+			(get_status(logNum) == 1) ? "open" : "closed");
 		return;
 	}
 	printf("Please use init_logger() first.\n");
 }
 
-static int
+int
 get_status (int logNum)
 {
-	if (init_var)
+	if(init_var)
 		return log_files[logNum].status;
 	printf("Please use init_logger() first.\n");
 	return 0;
 }
 
-static char*
+char*
 get_name (int logNum)
 {
-	if (init_var)
-		return log_files[logNum].name;
+	if(init_var)
+		return log_files[logNum].file.name;
 	printf("Please use init_logger() first.\n");
 	return 0;
 }
