@@ -5,6 +5,8 @@
  ********************************************************************
  */
 
+#define PRS_CFILE_H
+
 #include <stdarg.h>
 
 #ifndef MAX_PATH

@@ -6,6 +6,8 @@
  ******************************************************************************
  */
 
+#define PRS_CLOGGER_H
+
 #ifndef MAX_PATH
 #define MAX_PATH 260
 #endif
