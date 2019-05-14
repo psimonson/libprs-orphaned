@@ -1,6 +1,6 @@
 CFLAGS?=-std=c89 -Wall -Wextra -Werror -Wno-unused-parameter
 CFLAGS+=-I../src
-LDFLAGS=-static -L../src -lcfile
+LDFLAGS=-static -L../src -lprs
 
 .PHONY: all clean
 all: test test2

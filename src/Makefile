@@ -11,11 +11,11 @@ BUILD_VERSION="$(BUILD_MAJOR).$(BUILD_MINOR)"
 SRCDIR=$(shell pwd)
 DESTDIR?=
 PREFIX?=usr/local
+TRGTDIR=prslib
 
 SRCS=$(SRCDIR)/file.c $(SRCDIR)/clogger.c
 OBJS=$(SRCS:.c=.c.o)
-TRGT=libcfile
-
+TRGT=libprs
 
 .PHONY: all clean dist dist-clean install uninstall
 all: $(SRCDIR)/$(TRGT)
@@ -47,20 +47,20 @@ dist-clean: clean
 
 install:
 ifeq ($(BITS),64)
-	mkdir -p $(DESTDIR)/$(PREFIX)/lib$(BITS)/prs_cfile
+	mkdir -p $(DESTDIR)/$(PREFIX)/lib$(BITS)/$(TRGTDIR)
 	install $(SRCDIR)/$(TRGT).a \
 		$(SRCDIR)/$(TRGT).so \
-		$(DESTDIR)/$(PREFIX)/lib$(BITS)/prs_cfile
-	mkdir -p $(DESTDIR)/$(PREFIX)/include/prs_headers
-	install $(SRCDIR)/file.h $(DESTDIR)/$(PREFIX)/include/prs_headers
+		$(DESTDIR)/$(PREFIX)/lib$(BITS)/$(TRGTDIR)
+	mkdir -p $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
+	install $(SRCDIR)/file.h $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
 	ldconfig
 else ifeq ($(BITS),32)
-	mkdir -p $(DESTDIR)/$(PREFIX)/lib/prs_cfile
+	mkdir -p $(DESTDIR)/$(PREFIX)/lib/$(TRGTDIR)
 	install $(SRCDIR)/$(TRGT).a \
 		$(SRCDIR)/$(TRGT).so \
-		$(DESTDIR)/$(PREFIX)/lib/prs_cfile
-	mkdir -p $(DESTDIR)/$(PREFIX)/include/prs_headers
-	install $(SRCDIR)/file.h $(DESTDIR)/$(PREFIX)/include/prs_headers
+		$(DESTDIR)/$(PREFIX)/lib/$(TRGTDIR)
+	mkdir -p $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
+	install $(SRCDIR)/file.h $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
 	ldconfig
 else
 	echo "Cannot install for $(BITS) bit architecture." || die
@@ -68,17 +68,17 @@ endif
 
 uninstall:
 ifeq ($(BITS),64)
-	rm -f $(DESTDIR)/$(PREFIX)/lib$(BITS)/prs_cfile/$(TRGT).a \
-	$(DESTDIR)/$(PREFIX)/lib$(BITS)/prs_cfile/$(TRGT).so
-	rmdir $(DESTDIR)/$(PREFIX)/lib$(BITS)/prs_cfile
-	rm -f $(DESTDIR)/$(PREFIX)/include/prs_headers/*.h
-	rmdir $(DESTDIR)/$(PREFIX)/include/prs_headers
+	rm -f $(DESTDIR)/$(PREFIX)/lib$(BITS)/$(TRGTDIR)/$(TRGT).a \
+	$(DESTDIR)/$(PREFIX)/lib$(BITS)/$(TRGTDIR)/$(TRGT).so
+	rmdir $(DESTDIR)/$(PREFIX)/lib$(BITS)/$(TRGTDIR)
+	rm -f $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)/*.h
+	rmdir $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
 else ifeq ($(BITS),32)
-	rm -f $(DESTDIR)/$(PREFIX)/lib/prs_cfile/$(TRGT).a \
-	$(DESTDIR)/$(PREFIX)/lib/prs_cfile/$(TRGT).so
-	rmdir $(DESTDIR)/$(PREFIX)/lib/prs_cfile
-	rm -f $(DESTDIR)/$(PREFIX)/include/prs_headers/*.h
-	rmdir $(DESTDIR)/$(PREFIX)/include/prs_headers
+	rm -f $(DESTDIR)/$(PREFIX)/lib/$(TRGTDIR)/$(TRGT).a \
+	$(DESTDIR)/$(PREFIX)/lib/$(TRGTDIR)/$(TRGT).so
+	rmdir $(DESTDIR)/$(PREFIX)/lib/$(TRGTDIR)
+	rm -f $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)/*.h
+	rmdir $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
 else
 	echo "Cannot build for $(BITS) bit architecture." || die
 endif

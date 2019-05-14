@@ -1,5 +1,7 @@
 ========================================
-          .:[CFile library]:.
+           .:[PRS Library]:.
+========================================
+             CFile Header
 ========================================
 init_file()  - initialize the structure.
 open_file()  - opens a file with the
@@ -20,6 +22,19 @@ writef_file() - write formatted to file
 ========================================
 getc_file() - get next byte from file.
 putc_file() - put a byte to the file.
+========================================
+             CLogger Header
+========================================
+init_logger() - initialize logger.
+open_log()    - create a log file.
+close_log()   - close a log file.
+========================================
+read_log()    - read back entire log.
+write_log()   - append to end of log.
+========================================
+get_status()   - get current status.
+get_log_name() - get name of log file.
+print_status() - print if open/closed.
 ========================================
            .:[END OF FILE]:.
 ========================================
