@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include "prslib.h"
-#include PRS_CLOGGER
 #include PRS_CFILE
+#include PRS_CLOGGER
 
 int
 main ()
 {
     file_t file;
     int c;
-    
+
     init_logger();
     init_file(&file);
     open_log(CLOG0, "test.log");

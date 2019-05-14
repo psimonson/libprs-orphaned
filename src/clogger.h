@@ -8,6 +8,12 @@
 
 #define PRS_CLOGGER_H
 
+#ifndef PRS_CFILE_H
+  #ifdef PRS_CLOGGER_H
+  #error "You must include cfile before clogger, clogger depends on this."
+  #endif
+#endif
+
 #ifndef MAX_PATH
 #define MAX_PATH 260
 #endif
