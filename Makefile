@@ -1,3 +1,4 @@
+SRCDIR=$(shell pwd)
 CFLAGS=-std=c89 -Wall -Wextra -Werror -Wno-unused-parameter
 LDFLAGS=
 
