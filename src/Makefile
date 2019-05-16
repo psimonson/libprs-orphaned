@@ -54,6 +54,7 @@ ifeq ($(BITS),64)
 		$(DESTDIR)/$(PREFIX)/lib$(BITS)/$(TRGTDIR)
 	mkdir -p $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
 	install $(HDRS) $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
+	mkdir -p $(DESTDIR)/$(PREFIX)/lib$(BITS)/pkgconfig
 	cp prs.pc $(DESTDIR)/$(PREFIX)/lib$(BITS)/pkgconfig
 else ifeq ($(BITS),32)
 	mkdir -p $(DESTDIR)/$(PREFIX)/lib/$(TRGTDIR)
@@ -62,6 +63,7 @@ else ifeq ($(BITS),32)
 		$(DESTDIR)/$(PREFIX)/lib/$(TRGTDIR)
 	mkdir -p $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
 	install $(HDRS) $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
+	mkdir -p $(DESTDIR)/$(PREFIX)/lib/pkgconfig
 	sed 's/\/usr\/lib64/\/usr\/lib' prs.pc > \
 		$(DESTDIR)/$(PREFIX)/lib/pkgconfig/prs.pc
 else
