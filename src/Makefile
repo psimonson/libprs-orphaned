@@ -55,7 +55,6 @@ ifeq ($(BITS),64)
 	mkdir -p $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
 	install $(HDRS) $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
 	cp prs.pc $(DESTDIR)/$(PREFIX)/lib$(BITS)/pkgconfig
-	ldconfig
 else ifeq ($(BITS),32)
 	mkdir -p $(DESTDIR)/$(PREFIX)/lib/$(TRGTDIR)
 	install $(SRCDIR)/$(TRGT).a \
@@ -65,7 +64,6 @@ else ifeq ($(BITS),32)
 	install $(HDRS) $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
 	sed 's/\/usr\/lib64/\/usr\/lib' prs.pc > \
 		$(DESTDIR)/$(PREFIX)/lib/pkgconfig/prs.pc
-	ldconfig
 else
 	echo "Cannot install for $(BITS) bit architecture." || die
 endif
