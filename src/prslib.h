@@ -6,5 +6,5 @@
  ********************************************************************
  */
 
-#define PRS_CFILE <file.h>
-#define PRS_CLOGGER <clogger.h>
+#define PRS_CFILE <prslib/file.h>
+#define PRS_CLOGGER <prslib/clogger.h>

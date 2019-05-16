@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "prslib.h"
-#include PRS_CFILE
+#include "file.h"
 
 int
 main ()

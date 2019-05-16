@@ -1,7 +1,6 @@
 #include <stdio.h>
-#include "prslib.h"
-#include PRS_CFILE
-#include PRS_CLOGGER
+#include "file.h"
+#include "clogger.h"
 
 int
 main ()
