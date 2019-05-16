@@ -1,0 +1,16 @@
+# prs pkg-config source file
+
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=/usr/lib64
+includedir=${prefix}/include
+
+Name: prs
+Description: A small library designed to make file and logging easier for C.
+Also, cross-platform.
+Version: 0.1
+Requires:
+Conflicts:
+Libs: -L${libdir} -lprs
+Libs.private:
+Cflags: -I${includedir}/prs_lib -D_XOPEN_SOURCE=600

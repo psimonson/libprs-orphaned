@@ -13,7 +13,7 @@ DESTDIR?=
 PREFIX?=usr/local
 TRGTDIR=prslib
 
-HDRS=$(SRCDIR)/file.h $(SRCDIR)/clogger.h $(SRCDIR)/prslib.h
+HDRS=$(SRCDIR)/file.h $(SRCDIR)/clogger.h
 SRCS=$(SRCDIR)/file.c $(SRCDIR)/clogger.c
 OBJS=$(SRCS:.c=.c.o)
 TRGT=libprs
@@ -54,6 +54,7 @@ ifeq ($(BITS),64)
 		$(DESTDIR)/$(PREFIX)/lib$(BITS)/$(TRGTDIR)
 	mkdir -p $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
 	install $(HDRS) $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
+	cp prs.pc $(DESTDIR)/$(PREFIX)/lib$(BITS)/pkgconfig
 	ldconfig
 else ifeq ($(BITS),32)
 	mkdir -p $(DESTDIR)/$(PREFIX)/lib/$(TRGTDIR)
@@ -62,6 +63,8 @@ else ifeq ($(BITS),32)
 		$(DESTDIR)/$(PREFIX)/lib/$(TRGTDIR)
 	mkdir -p $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
 	install $(HDRS) $(DESTDIR)/$(PREFIX)/include/$(TRGTDIR)
+	sed 's/\/usr\/lib64/\/usr\/lib' prs.pc > \
+		$(DESTDIR)/$(PREFIX)/lib/pkgconfig/prs.pc
 	ldconfig
 else
 	echo "Cannot install for $(BITS) bit architecture." || die
