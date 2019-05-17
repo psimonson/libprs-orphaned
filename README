@@ -1,6 +1,18 @@
 ========================================
            .:[PRS Library]:.
 ========================================
+To build this library run the commands
+below...
+========================================
+  autoreconf -vfi
+  ./configure --prefix=/usr/local
+  make
+  sudo make install
+========================================
+That should configure for your build
+environment, then build and finally
+install to your system.
+========================================
              CFile Header
 ========================================
 init_file()  - initialize the structure.
