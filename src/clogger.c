@@ -86,7 +86,7 @@ read_log (int logNum, char *buf, int size)
 					get_error_file(&_logs[logNum].file));
 				return -1;
 			}
-			pos = 0;
+			c = pos = 0;
 			memset(buf, 0, size);
 			while(pos < size &&
 				((c = getc_file(&_logs[logNum].file))
