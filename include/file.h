@@ -60,6 +60,8 @@ extern int
 getc_file (file_t* file);
 extern void
 putc_file (file_t* file, int c);
+extern void
+ungetc_file (file_t* file, int c);
 extern int
 seek_file (file_t* file, long bytes, int seek);
 extern long

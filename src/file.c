@@ -174,6 +174,16 @@ putc_file (file_t* file, int c)
         file->error = FILE_ERROR_WRITE;
 }
 
+/* ungetc_file:  puts one byte back onto buffer */
+void
+ungetc_file (file_t* file, int c)
+{
+    errno = 0;
+    ungetc(c, file->fp);
+    if(errno != 0)
+        file->error = FILE_ERROR_WRITE;
+}
+
 /* seek_file:  seek through file by bytes */
 int
 seek_file (file_t* file, long bytes, int seek)
