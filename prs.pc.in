@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: @PACKAGE_NAME@
+Description: Simple library for handling files easier, also my custom 
+logger (clogger) is in this library.
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lprs
+Cflags: -I{includedir}/prslib
+Requires:
+Requires.private:
