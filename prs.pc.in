@@ -8,6 +8,6 @@ Description: Simple library for handling files easier, also my custom
 logger (clogger) is in this library.
 Version: @PACKAGE_VERSION@
 Libs: -L${libdir} -lprs
-Cflags: -I{includedir}/prslib
+Cflags: -I${includedir}/prslib
 Requires:
 Requires.private:
