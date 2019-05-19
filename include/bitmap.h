@@ -89,5 +89,6 @@ void encode_steganograph(Bitmap *bitmap, const char *msg);
 char* decode_steganograph(Bitmap *bitmap);
 void destroy_bitmap(Bitmap *bitmap);
 int get_last_error_bitmap();
-
+#ifdef __cplusplus
+}
 #endif

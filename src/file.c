@@ -98,20 +98,20 @@ close_file (file_t* file)
 
 /* read_file:  read file into buf; of size */
 int
-read_file (file_t* file, char* buf, int size)
+read_file (file_t* file, void* buf, size_t nmem, size_t size)
 {
     int bytes;
-    if((bytes = fread(buf, 1, size, file->fp)) < 0)
+    if((bytes = fread(buf, nmem, size, file->fp)) < 0)
         file->error = FILE_ERROR_READ;
     return bytes;
 }
 
 /* write_file:  write into file from buf; of size */
 int
-write_file (file_t* file, const char* buf, int size)
+write_file (file_t* file, const void* buf, size_t nmem, size_t size)
 {
     int bytes;
-    if((bytes = fwrite(buf, 1, size, file->fp)) < 0)
+    if((bytes = fwrite(buf, nmem, size, file->fp)) < 0)
         file->error = FILE_ERROR_WRITE;
     return bytes;
 }

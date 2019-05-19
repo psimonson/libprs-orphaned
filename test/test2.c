@@ -24,8 +24,8 @@ main ()
     }
     
     /* copy file */
-    while((bytes = read_file(&file1, buf, 32)) > 0) {
-        write_file(&file2, buf, bytes);
+    while((bytes = read_file(&file1, buf, 1, 32)) > 0) {
+        write_file(&file2, buf, 1, bytes);
     }
     if(get_errori_file(&file1) != FILE_ERROR_OKAY) {
         printf("Error: %s\n", get_error_file(&file1));

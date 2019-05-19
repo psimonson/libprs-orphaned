@@ -47,9 +47,9 @@ close_file (file_t* file);
 
 /* standard handling functions */
 extern int
-read_file (file_t* file, char* buf, int size);
+read_file (file_t* file, void* buf, size_t nmem, size_t size);
 extern int
-write_file (file_t* file, const char* buf, int size);
+write_file (file_t* file, const void* buf, size_t nmem, size_t size);
 extern int
 writef_file (file_t* file, const char* buf, ...);
 extern int
