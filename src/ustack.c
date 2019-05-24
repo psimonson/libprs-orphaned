@@ -33,6 +33,7 @@ init_stack ()
     stack->data = NULL;
     stack->size = STACKSIZE;
     stack->top = 0;
+    stack->cur = 0;
     return stack;
 }
 
@@ -55,6 +56,7 @@ push_stack (ustack_t* stack, void* data)
         stack = grow_stack(stack);
     }
     stack[stack->top++].data = data;
+    stack->cur++;
 }
 
 void*
@@ -83,11 +85,13 @@ void
 free_stack (ustack_t* stack, void (*func)(void*))
 {
     if(func != NULL) {
+        stack->top = stack->cur;
         while(stack->top > 0) {
             void* data = pop_stack(stack);
             if(data == NULL) break;
             (*func)(data);
         }
+        stack->cur = 0;
     }
     free(stack);
 }

@@ -11,15 +11,11 @@
 
 #define STACKSIZE 255
 
-typedef struct data {
-    char *data;
-    int slen;
-} data_t;
-
 typedef struct ustack {
     void* data;
     int size;
     int top;
+    int cur;
 } ustack_t;
 
 #ifdef __cplusplus
