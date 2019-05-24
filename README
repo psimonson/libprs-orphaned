@@ -48,5 +48,25 @@ get_status()   - get current status.
 get_log_name() - get name of log file.
 print_status() - print if open/closed.
 ========================================
+             UStack Header
+========================================
+init_stack()  - initialize a stack.
+free_stack()  - cleanup memory of stack.
+========================================
+push_stack()  - push element on top.
+pop_stack()   - pop element off top.
+peek_stack()  - check element on top.
+========================================
+reset_top()   - reset top back to cur-
+                rent element on top of
+                stack.
+========================================
+NOTE: If you need to know how to use
+ustack, then look at the two test cases.
+test4.c and test5.c inside the test
+folder. test4 shows usage with a single
+data type. test5 shows usage with a
+structure.
+========================================
            .:[END OF FILE]:.
 ========================================
