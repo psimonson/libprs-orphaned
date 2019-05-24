@@ -42,7 +42,7 @@ main ()
         
         while(stack->top > 0)
             printf("%s\n", (char*)((data_t*)pop_stack(stack))->line);
-        printf("%p: stack pointer.\n", ((data_t*)peek_stack(stack)));
+        printf("%p: stack pointer.\n", peek_stack(stack));
         free_stack(stack, data_free);
         return 0;
     }
