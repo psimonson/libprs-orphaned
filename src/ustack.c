@@ -13,6 +13,7 @@
  * push_stack() - push element on top of stack.
  * pop_stack()  - pop element off top of stack.
  * peek_stack() - peek at top of stack.
+ * reset_top()  - reset top of stack to last element.
  * free_stack() - free all memory and cleanup.
  ******************************************************************************
  * Author   : Philip R. Simonson
@@ -82,6 +83,12 @@ peek_stack (ustack_t* stack)
 }
 
 void
+reset_top (ustack_t* stack)
+{
+    stack->top = stack->cur > 0 ? stack->cur : 0;
+}
+
+void
 free_stack (ustack_t* stack, void (*func)(void*))
 {
     if(func != NULL) {
@@ -91,6 +98,7 @@ free_stack (ustack_t* stack, void (*func)(void*))
             if(data == NULL) break;
             (*func)(data);
         }
+        free(stack[stack->top].data);
         stack->cur = 0;
     }
     free(stack);

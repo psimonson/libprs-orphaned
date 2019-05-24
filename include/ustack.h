@@ -26,9 +26,8 @@ ustack_t* init_stack();
 void push_stack(ustack_t* stack, void* data);
 void* pop_stack(ustack_t* stack);
 void* peek_stack(ustack_t* stack);
+void reset_top(ustack_t* stack);
 void free_stack(ustack_t* stack, void (*)(void*));
-
-#define FREE_DATA(data) free_data(data);
 
 #ifdef __cplusplus
 }
