@@ -69,6 +69,38 @@ open_file (file_t* file, const char* filename, const char* mode)
     fseek(file->fp, 0, SEEK_SET);
 }
 
+/* reopen_file:  reopen file with different mode */
+void
+reopen_file (file_t* file, const char* filename, const char* mode)
+{
+    if((file->fp = freopen(filename, mode, file->fp)) == NULL) {
+        file->error = FILE_ERROR_OPEN;
+        return;
+    }
+    strncpy(file->name, filename, strlen(filename));
+    if(strchr(mode, 'w') == NULL) {
+        file->size = get_size_file(file);
+        if(file->size < 0) {
+            close_file(file);
+            file->error = FILE_ERROR_SIZE;
+            return;
+        }
+        if(strchr(mode, 'b') == NULL) {
+            file->lines = get_lines_file(file);
+            if(file->lines < 0) {
+                close_file(file);
+                file->error = FILE_ERROR_LINE;
+                return;
+            }
+        }
+    } else {
+        file->size = 0;
+        file->lines = 0;
+    }
+    file->error = FILE_ERROR_OKAY;
+    fseek(file->fp, 0, SEEK_SET);
+}
+
 /* get_error_file:  gets the error string associated with error code */
 const char*
 get_error_file (file_t* file)
@@ -217,6 +249,13 @@ flush_file (file_t* file)
 
 /* --------------------------- helper funtions ------------------------- */
 
+/* get_handle_file:  gets the handle for a given file; returns FILE pointer */
+FILE*
+get_handle_file (file_t* file)
+{
+    return (file->fp == NULL) ? NULL : file->fp;
+}
+
 /* get_name_file:  gets the name of the file passed in */
 const char*
 get_name_file (file_t* file)
@@ -239,11 +278,10 @@ get_size_file (file_t* file)
 }
 
 /* get_lines_file:  gets the line count of the current file */
-long
+int
 get_lines_file (file_t* file)
 {
-    long nl;
-    int c;
+    int nl,c;
     fseek(file->fp, 0, SEEK_SET);
     for(nl=0; (c = fgetc(file->fp)) != EOF;)
         if(c == '\n')

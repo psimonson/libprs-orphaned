@@ -38,6 +38,8 @@ extern void
 init_file (file_t* file);
 extern void
 open_file (file_t* file, const char* filename, const char* mode);
+extern void
+reopen_file (file_t* file, const char* filename, const char* mode);
 extern const char*
 get_error_file (file_t* file);
 extern int
@@ -74,5 +76,7 @@ extern const char*
 get_name_file (file_t* file);
 extern long
 get_size_file (file_t* file);
-extern long
+extern int
 get_lines_file (file_t* file);
+extern FILE*
+get_handle_file (file_t* file);
