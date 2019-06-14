@@ -11,5 +11,6 @@ main ()
         return 1;
     write_bitmap(bmp, "test.bmp");
     destroy_bitmap(bmp);
+    remove("test.bmp");
     return 0;
 }

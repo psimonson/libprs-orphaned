@@ -37,6 +37,7 @@ main ()
         close_file(&file2);
         return 1;
     }
+    remove(file2.name);
     close_file(&file1);
     close_file(&file2);
     printf("File was written successfully.\n");

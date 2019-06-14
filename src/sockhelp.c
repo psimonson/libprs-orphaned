@@ -15,7 +15,12 @@
 #include <string.h>
 
 /* Headers for socket programming */
-#ifdef __linux
+#ifdef _WIN32
+#define _WINVER 0x600
+#include <windows.h>
+#include <ws2tcpip.h>
+#include <winsock2.h>
+#else
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -27,6 +32,36 @@
 #include "sockhelp.h"
 
 #define BACKLOG 100
+
+/* ------------------------- Init Functions --------------------- */
+
+/* Initialize sockets in windows linux.
+ */
+int socket_startup()
+{
+#ifdef _WIN32
+	WSAData wsaData;
+	int res;
+	
+	if((res = WSAStartup(MAKEWORD(2,0), &wsaData)) != 0) {
+		printf("WSAStartup() failed error code: %8X\n",
+			WSAGetLastError());
+	}
+	return res;
+#else
+	return 0;
+#endif
+}
+/* Shutdown socket in windows/linux.
+ */
+int socket_shutdown()
+{
+#ifdef _WIN32
+	return WSACleanup();
+#else
+	return 0;
+#endif
+}
 
 /* ------------------------ Start Functions --------------------- */
 
@@ -61,7 +96,7 @@ void *get_in_addr(struct sockaddr *sa)
 void init_socket(sock_t *sock, int (*func)(sock_t *sock))
 {
 	memset(sock->addr, 0, sizeof(sock->addr));
-	sock->fd = -1;
+	sock->fd = SOCKET_INVALID;
 	sock->errno = SOCKERR_OKAY;
 	sock->loop = !func ? default_loop : func;
 }
@@ -76,6 +111,7 @@ int server_socket(sock_t *sock, const char *port)
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE; /* use my IP */
 
 	if((rv=getaddrinfo(NULL, port, &hints, &servinfo)) != 0) {
@@ -139,6 +175,7 @@ int client_socket(sock_t *sock, const char *addr, const char *port)
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
 
 	if((rv=getaddrinfo(addr, port, &hints, &servinfo)) != 0) {
 		return 1;
@@ -236,6 +273,15 @@ const char *get_error_socket(sock_t *sock)
 		"Socket is closed."
 	};
 	return errmsg[sock->errno];
+}
+/* Gets current error number.
+ * Returns: int
+ */
+int get_errori_socket(sock_t *sock)
+{
+	if(sock->errno < 0 || sock->errno >= SOCKERR_COUNT)
+		return SOCKERR_UNKNOWN;
+	return sock->errno;
 }
 /* Close socket and cleanup structure.
  * Returns: 1=failure,0=success

@@ -8,8 +8,16 @@
 
 #define PRS_SOCKHELP_H
 
+#ifdef _WIN32
+#define PRS_EXPORT __declspec(dllexport)
+#else
+#define PRS_EXPORT extern
+#endif
+
 #ifdef __linux
-typedef int SOCKET;
+#define SOCKET int
+#define SOCKET_ERROR -1
+#define SOCKET_INVALID SOCKET_ERROR
 #endif
 
 typedef struct socket sock_t;
@@ -36,17 +44,20 @@ enum socket_error {
 
 #define SOCKRUN_LOOP ((int)0x00f0)
 
+/* startup and shutdown functions */
+PRS_EXPORT int socket_startup();
+PRS_EXPORT int socket_shutdown();
 /* Some functions for creating and closing/cleanup of sockets */
-void init_socket(sock_t *sock, int (*)(sock_t *sock));
-int server_socket(sock_t *sock, const char *port);
-int client_socket(sock_t *sock, const char *addr, const char *port);
-sock_t accept_socket(sock_t *server);
-int loop_socket(sock_t *sock, int loop_type);
-const char *get_error_socket(sock_t *sock);
-int close_socket(sock_t *sock);
+PRS_EXPORT void init_socket(sock_t *sock, int (*)(sock_t *sock));
+PRS_EXPORT int server_socket(sock_t *sock, const char *port);
+PRS_EXPORT int client_socket(sock_t *sock, const char *addr, const char *port);
+PRS_EXPORT sock_t accept_socket(sock_t *server);
+PRS_EXPORT int loop_socket(sock_t *sock, int loop_type);
+PRS_EXPORT const char *get_error_socket(sock_t *sock);
+PRS_EXPORT int get_errori_socket(sock_t *sock);
+PRS_EXPORT int close_socket(sock_t *sock);
 
 /* Helper Functions */
-int bmode_socket(sock_t *sock, int);
-long send_data(sock_t *sock, const void *data, long size, int flags);
-long recv_data(sock_t *sock, void *data, long size, int flags);
-
+PRS_EXPORT int bmode_socket(sock_t *sock, int);
+PRS_EXPORT long send_data(sock_t *sock, const void *data, long size, int flags);
+PRS_EXPORT long recv_data(sock_t *sock, void *data, long size, int flags);
