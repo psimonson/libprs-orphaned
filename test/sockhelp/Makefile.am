@@ -1,4 +1,4 @@
-AM_CFLAGS=-std=c89 -Wall -Werror -I../include
+AM_CFLAGS=-std=c89 -Wall -Werror -I../../include
 TESTS = test1 test2 test3 test4 test5 test6
 check_PROGRAMS = test1 test2 test3 test4 test5 test6
 test1_SOURCES = test1.c

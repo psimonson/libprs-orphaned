@@ -97,6 +97,6 @@ int main()
 		socket_shutdown();
 		return 0;
 	}
-	return loop_socket(&server, SOCKRUN_LOOP);
+	return !loop_socket(&server, SOCKRUN_LOOP);
 }
 

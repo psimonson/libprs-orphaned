@@ -57,5 +57,5 @@ int main()
 		socket_shutdown();
 		return 1;
 	}
-	return loop_socket(&client, SOCKRUN_LOOP);
+	return !loop_socket(&client, SOCKRUN_LOOP);
 }
