@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #include <errno.h>
 
 #include "file.h"

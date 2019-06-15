@@ -7,10 +7,12 @@
 
 #define PRS_CFILE_H
 
-#include <stdarg.h>
-
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifndef va_list
+#include <stdarg.h>
 #endif
 
 #ifndef MAX_PATH
@@ -59,9 +61,9 @@ write_file (file_t* file, const void* buf, size_t nmem, size_t size);
 extern int
 writef_file (file_t* file, const char* buf, ...);
 extern int
-vwritef_file (file_t* file, const char* buf, va_list ap);
-extern int
 readf_file (file_t* file, const char* buf, ...);
+extern int
+vwritef_file (file_t* file, const char* buf, va_list ap);
 extern int
 getc_file (file_t* file);
 extern void
