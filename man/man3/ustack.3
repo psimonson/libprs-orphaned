@@ -1,0 +1,40 @@
+.TH USTACK 3
+.SH NAME
+ustack.h - library functions and definitions contained inside of libprs
+.SH SYNOPSIS
+ustack_t *init_stack(void)
+  
+void push_stack(ustack_t *stack, void *data)
+  
+void *pop_stack(ustack_t *stack)
+  
+void *peek_stack(ustack_t *stack)
+  
+void reset_top(ustack_t *stack)
+  
+void free_stack(ustack_t *stack, void (*)(void))
+  
+.SH DESCRIPTION
+.B ustack.h
+- Universal stack implementation, can use any data type or structure.
+.TP
+.B ustack_t *init_stack(void)
+- initialize a stack variable
+.TP
+.B void push_stack(ustack_t *stack, void *data)
+- push data to stack and increment top
+.TP
+.B void *pop_stack(ustack_t *stack)
+- pop off data from top of stack and return it
+.TP
+.B void *peek_stack(ustack_t *stack)
+- peek at top of stack and return whats there
+.TP
+.B void reset_top(ustack_t *stack)
+- reset the count variable to top of stack
+.TP
+.B void free_stack(ustack_t *stack, void (*)(void*))
+- free universal stack with custom function
+.SH BUGS
+.B None
+known as of yet

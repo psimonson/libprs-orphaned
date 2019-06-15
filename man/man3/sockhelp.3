@@ -1,32 +1,32 @@
-.TH SOCKHELP 1
+.TH SOCKHELP 3
 .SH NAME
 sockhelp.h - library functions and definitions contained inside of libprs
 .SH SYNOPSIS
-.B int socket_startup(void)
+int socket_startup(void)
   
-.B int socket_shutdown(void)
+int socket_shutdown(void)
   
-.B void init_socket(sock_t *sock, int (*func)(sock_t *sock))
+void init_socket(sock_t *sock, int (*func)(sock_t *sock))
   
-.B int server_socket(sock_t *sock, const char *port)
+int server_socket(sock_t *sock, const char *port)
   
-.B int client_socket(sock_t *sock, const char *addr, const char *port)
+int client_socket(sock_t *sock, const char *addr, const char *port)
   
-.B sock_t accept_socket(sock_t *server)
+sock_t accept_socket(sock_t *server)
   
-.B int loop_socket(sock_t *sock, int loop_type)
+int loop_socket(sock_t *sock, int loop_type)
   
-.B const char *get_error_socket(sock_t *sock)
+const char *get_error_socket(sock_t *sock)
   
-.B int get_errori_socket(sock_t *sock)
+int get_errori_socket(sock_t *sock)
   
-.B int close_socket(sock_t *sock)
+int close_socket(sock_t *sock)
   
-.B int bmode_socket(sock_t *sock, int block)
+int bmode_socket(sock_t *sock, int block)
   
-.B long send_data(sock_t *sock, const void *data, long size, int flags)
+long send_data(sock_t *sock, const void *data, long size, int flags)
   
-.B long recv_data(sock_t *sock, void *data, long size, int flags)
+long recv_data(sock_t *sock, void *data, long size, int flags)
   
 .SH DESCRIPTION
 .B sockhelp.h
@@ -34,54 +34,54 @@ sockhelp.h - library functions and definitions contained inside of libprs
 from the OS (Operating System) to create network sockets.
 .TP
 .B int socket_startup(void)
-start up function for socket programming (used for portability)
+- start up function for socket programming (used for portability)
 .TP
 .B int socket_shutdown(void)
-shutdown function for socket programming (used for portability)\fR
+- shutdown function for socket programming (used for portability)\fR
 .TP
 .B void init_socket(sock_t *sock, int (*func)(sock_t *sock))
-initialize a socket structure and associate a main loop function with
+- initialize a socket structure and associate a main loop function with
 it.
 .TP
 .B int server_socket(sock_t *sock, const char *port)
-create a listening socket for a server.
+- create a listening socket for a server
 .TP
 .B int client_socket(sock_t *sock, const char *addr, const char *port)
-create a client socket to connect to
+- create a client socket to connect to
 .B addr
 and
 .B port
 .TP
 .B sock_t accept_socket(sock_t *server)
-accepts a client socket from
+- accepts a client socket from
 .B server
 socket
 .TP
 .B int loop_socket(sock_t *sock, int loop_type)
-runs main loop function that was given to
+- runs main loop function that was given to
 .B init_socket
 as the second argument
 .TP
 .B const char *get_error_socket(sock_t *sock)
-gets the error string associated with the error code
+- gets the error string associated with the error code
 .TP
 .B int get_errori_socket(sock_t *sock)
-gets the error number from given
+- gets the error number from given
 .B sock
 structure and returns it as an integer
 .TP
 .B int close_socket(sock_t *sock)
-closes down a socket structure and returns 0 for success, 1 for failure
+- closes down a socket structure and returns 0 for success, 1 for failure
 .TP
 .B int bmode_socket(sock_t *sock, int block)
-set blocking mode for socket 1 for blocking, 0 for non-blocking
+- set blocking mode for socket 1 for blocking, 0 for non-blocking
 .TP
 .B long send_data(sock_t *sock, const void *data, long size, int flags)
-sends data across the network that cannot be modified in the function
+- sends data across the network that cannot be modified in the function
 for security reasons
 .TP
 .B long recv_data(sock_t *sock, void *data, long size, int flags)
-receive data from a computer on the network into a buffer or a data structure
+- receive data from a computer on the network into a buffer or a data structure
 .SH BUGS
 .B None
 known as of yet
