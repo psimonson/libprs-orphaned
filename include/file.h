@@ -9,6 +9,10 @@
 
 #include <stdarg.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef MAX_PATH
 #define MAX_PATH 260                /* needed for unix/linux */
 #endif
@@ -80,3 +84,7 @@ extern int
 get_lines_file (file_t* file);
 extern FILE*
 get_handle_file (file_t* file);
+
+#ifdef __cplusplus
+}
+#endif

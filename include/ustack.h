@@ -9,6 +9,10 @@
 
 #define PRS_USTACK_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define STACKSIZE 255
 
 typedef struct ustack {
@@ -17,10 +21,6 @@ typedef struct ustack {
     int top;
     int cur;
 } ustack_t;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 ustack_t* init_stack();
 void push_stack(ustack_t* stack, void* data);

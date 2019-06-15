@@ -8,6 +8,10 @@
 
 #define PRS_BITMAP_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Bitmap library errors enumeration */
 typedef enum {
 	BMP_NO_ERROR,
@@ -62,10 +66,6 @@ typedef struct Color {
 	unsigned char b;
 } Color;
 #pragma pack(pop)
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* pixel functions */
 void get_pixel_bitmap(Bitmap *bitmap, int y, int x, Color *pixel);

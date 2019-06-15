@@ -8,6 +8,10 @@
 
 #define PRS_CLOGGER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef MAX_PATH
 #define MAX_PATH 260
 #endif
@@ -22,26 +26,15 @@ enum CLOG_ENUM {
 	CLOG4
 };
 
-extern void
-init_logger ();
+extern void init_logger ();
+extern void open_log (int logNum, const char *name);
+extern int read_log (int logNum, char *buf, int size);
+extern void write_log (int logNum, const char *data, ...);
+extern void close_log (int logNum);
+extern void print_status (int logNum);
+extern int get_status (int logNum);
+extern const char* get_log_name (int logNum);
 
-extern void
-open_log (int logNum, const char *name);
-
-extern int
-read_log (int logNum, char *buf, int size);
-
-extern void
-write_log (int logNum, const char *data, ...);
-
-extern void
-close_log (int logNum);
-
-extern void
-print_status (int logNum);
-
-extern int
-get_status (int logNum);
-
-extern const char*
-get_log_name (int logNum);
+#ifdef __cplusplus
+}
+#endif
