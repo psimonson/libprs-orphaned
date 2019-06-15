@@ -1,0 +1,70 @@
+.TH BITMAP 3
+.SH NAME
+bitmap.h - simple bitmap implementation library from libprs.
+.SH SYNOPSIS
+.TP
+.B main functions
+Bitmap *create_bitmap(int width, int height)
+  
+Bitmap *load_bitmap(const char *filename)
+  
+int write_bitmap(Bitmap *bitmap, const char *filename)
+  
+void flip_vertical_bitmap(Bitmap **bitmap)
+  
+void randomise_bitmap(Bitmap *bitmap)
+  
+void bitmap_to_greyscale(Bitmap *bitmap)
+  
+void encode_steganograph(Bitmap *bitmap, const char *msg)
+  
+char* decode_steganograph(Bitmap *bitmap)
+  
+void destroy_bitmap(Bitmap *bitmap)
+  
+int get_last_error_bitmap(void)
+.SH DESCRIPTION
+.B *** main bitmap functions are here ***
+.TP
+.B Bitmap *create_bitmap(int w, int h)
+- create a zeroed bitmap from
+.BI w
+and
+.BI h
+.
+.TP
+.B Bitmap *load_bitmap(const char *filename)
+- make a bitmap structure from
+.BI filename
+and load image data into it.
+.TP
+.B int write_bitmap(Bitmap *bitmap, const char *filename)
+- write out bitmap structure to a file with
+.BI filename
+.
+.TP
+.B void flip_vertical_bitmap(Bitmap **bitmap)
+- flips image vertically returns bitmap back to passed in argument.
+.TP
+.B void randomise_bitmap(Bitmap *bitmap)
+- randomly generate fuzz or "noise" replacing bitmap data with it.
+.TP
+.B void bitmap_to_greyscale(Bitmap *bitmap)
+- convert a bitmap object to greyscale.
+.TP
+.B void encode_steganograph(Bitmap *bitmap, const char *msg)
+- hides a message inside of a bitmap object.
+.TP
+.B char *decode_steganograph(Bitmap *bitmap)
+- reveals hidden message from given
+.BI bitmap
+object if it contains a hidden message.
+.TP
+.B void destroy_bitmap(Bitmap *bitmap)
+- destroys given bitmap object.
+.TP
+.B int get_last_error_bitmap(void)
+- gets last known error code from bitmap library.
+.SH BUGS
+.B None
+known as of yet.
