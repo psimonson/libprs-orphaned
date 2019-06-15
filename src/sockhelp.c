@@ -96,7 +96,7 @@ void *get_in_addr(struct sockaddr *sa)
 void init_socket(sock_t *sock, int (*func)(sock_t *sock))
 {
 	memset(sock->addr, 0, sizeof(sock->addr));
-	sock->fd = SOCKET_INVALID;
+	sock->fd = INVALID_SOCKET;
 	sock->errno = SOCKERR_OKAY;
 	sock->loop = !func ? default_loop : func;
 }
@@ -122,21 +122,21 @@ int server_socket(sock_t *sock, const char *port)
 	/* loop through all results */
 	for(p=servinfo; p!=NULL; p=p->ai_next) {
 		if((sock->fd = socket(p->ai_family, p->ai_socktype,
-				p->ai_protocol)) == -1) {
+				p->ai_protocol)) == INVALID_SOCKET) {
 			sock->errno = SOCKERR_CREATE;
 			continue;
 		}
 
 		if(setsockopt(sock->fd, SOL_SOCKET, SO_REUSEADDR, &yes,
-				sizeof(int)) == -1) {
+				sizeof(int)) == SOCKET_ERROR) {
 			sock->errno = SOCKERR_OPTION;
-			close(sock->fd);
+			close_socket(sock);
 			return 1;
 		}
 
-		if(bind(sock->fd, p->ai_addr, p->ai_addrlen) == -1) {
+		if(bind(sock->fd, p->ai_addr, p->ai_addrlen) == SOCKET_ERROR) {
 			sock->errno = SOCKERR_BIND;
-			close(sock->fd);
+			close_socket(sock);
 			continue;
 		}
 		break;
@@ -144,7 +144,7 @@ int server_socket(sock_t *sock, const char *port)
 
 	if(p==NULL) {
 		sock->errno = SOCKERR_BIND;
-		close(sock->fd);
+		close_socket(sock);
 		return 1;
 	}
 	inet_ntop(p->ai_addr->sa_family,
@@ -152,9 +152,9 @@ int server_socket(sock_t *sock, const char *port)
 		sizeof(sock->addr));
 	freeaddrinfo(servinfo);		/* all done with this */
 
-	if(listen(sock->fd, BACKLOG) == -1) {
+	if(listen(sock->fd, BACKLOG) == SOCKET_ERROR) {
 		sock->fd = SOCKERR_LISTEN;
-		close(sock->fd);
+		close_socket(sock);
 		return 1;
 	}
 	printf("server: %s listening on port %s.\n"
@@ -184,13 +184,14 @@ int client_socket(sock_t *sock, const char *addr, const char *port)
 	/* loop through all results */
 	for(p=servinfo; p!=NULL; p=p->ai_next) {
 		if((sock->fd=socket(p->ai_family, p->ai_socktype,
-				p->ai_protocol)) == -1) {
+				p->ai_protocol)) == INVALID_SOCKET) {
 			sock->errno = SOCKERR_CREATE;
 			continue;
 		}
-		if(connect(sock->fd, p->ai_addr, p->ai_addrlen) == -1) {
+		if(connect(sock->fd, p->ai_addr, p->ai_addrlen)
+				== SOCKET_ERROR) {
 			sock->errno = SOCKERR_CONNECT;
-			close(sock->fd);
+			close_socket(sock);
 			continue;
 		}
 		break;
@@ -198,7 +199,7 @@ int client_socket(sock_t *sock, const char *addr, const char *port)
 
 	if(p==NULL) {
 		sock->errno = SOCKERR_CONNECT;
-		close(sock->fd);
+		close_socket(sock);
 		return 1;
 	}
 	freeaddrinfo(servinfo);
@@ -227,9 +228,7 @@ sock_t accept_socket(sock_t *server)
 	memset(&sock, 0, sizeof(sock_t));
 	sock.fd = accept(server->fd, (struct sockaddr*)&addr,
 			&sin_size);
-	if(sock.fd < 0) {
-		close_socket(server);
-		sock.fd = -1;
+	if(sock.fd == INVALID_SOCKET) {
 		sock.errno = SOCKERR_CREATE;
 		return sock;
 	}
@@ -288,13 +287,23 @@ int get_errori_socket(sock_t *sock)
  */
 int close_socket(sock_t *sock)
 {
-	if(close(sock->fd)) {
+	int res = 0;
+#ifdef _WIN32
+	if((res = closesocket(sock->fd))) {
 		printf("Error: Could not close socket.\n");
-		return 1;
+		sock->errno = SOCKERR_CLOSE;
+		return res;
 	}
-	sock->fd = -1;
-	sock->errno = 0;
-	return 0;
+#else
+	if((res = close(sock->fd))) {
+		printf("Error: Could not close socket.\n");
+		sock->errno = SOCKERR_CLOSE;
+		return res;
+	}
+#endif
+	sock->fd = INVALID_SOCKET;
+	sock->errno = SOCKERR_OKAY;
+	return res;
 }
 
 /* ------------------------ Helper Functions --------------------- */
@@ -333,4 +342,3 @@ long recv_data(sock_t *sock, void *data, long size, int flags)
 	nbytes = recv(sock->fd, p, size, flags);
 	return nbytes;
 }
-

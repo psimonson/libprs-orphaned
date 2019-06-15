@@ -17,7 +17,7 @@
 #ifdef __linux
 #define SOCKET int
 #define SOCKET_ERROR -1
-#define SOCKET_INVALID SOCKET_ERROR
+#define INVALID_SOCKET SOCKET_ERROR
 #endif
 
 typedef struct socket sock_t;
