@@ -51,31 +51,6 @@ else(UNIX)
 	install(TARGETS prs_static ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} CONFIGURATIONS Release)
 	install(TARGETS prs LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} CONFIGURATIONS Release)
 	install(FILES ${CMAKE_BINARY_DIR}/prs.pc DESTINATION "${CMAKE_INSTALL_PREFIX}/share/pkgconfig")
-	set(MAN_NAMES sockhelp.3 bitmap.3 ustack.3) # file.3 clogger.3
-	set(MAN_FILES)
-	foreach(m IN LISTS MAN_NAMES)
-		if(NOT EXISTS "${CMAKE_BINARY_DIR}/share/man/man3/${m}.bz2")
-		add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/share/man/man3/${m}
-			COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/man/man3/${m} ${CMAKE_BINARY_DIR}/share/man/man3/${m}
-			DEPENDS ${CMAKE_SOURCE_DIR}/man/man3/${m}
-			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-			COMMENT "Copying ${m} to ${CMAKE_BINARY_DIR}..."
-			VERBATIM)
-		endif()
-		set(mf ${CMAKE_BINARY_DIR}/share/man/man3/${m}.bz2)
-		set(ms ${CMAKE_BINARY_DIR}/share/man/man3/${m})
-		if(NOT EXISTS ${mf})
-		add_custom_command(OUTPUT ${mf}
-			COMMAND bzip2 ${ms}
-			DEPENDS ${ms}
-			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-			COMMENT "Compressing manpage ${mf}"
-			VERBATIM)
-		endif()
-		list(APPEND MAN_FILES ${mf})
-	endforeach()
-	add_custom_target(man ALL DEPENDS ${MAN_FILES})
-	install(FILES ${MAN_FILES} DESTINATION "${CMAKE_INSTALL_PREFIX}/share/man/man3")
 endif()
 
 file(GLOB PRS_HEADERS ${PROJECT_SOURCE_DIR}/include/*.h)
@@ -90,3 +65,25 @@ enable_testing()
 add_subdirectory(test)
 endif(BUILD_TESTS)
 
+if(UNIX)
+	set(MAN_NAMES sockhelp.3 bitmap.3 ustack.3) # file.3 clogger.3
+	set(MAN_FILES)
+	foreach(m IN LISTS MAN_NAMES)
+		set(mf ${CMAKE_INSTALL_PREFIX}/share/man/man3/${m})
+		set(ms ${CMAKE_SOURCE_DIR}/man/man3/${m})
+		add_custom_command(OUTPUT ${mf}
+			COMMAND ${CMAKE_COMMAND} -E copy ${ms} ${mf}
+			DEPENDS ${ms}
+			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+			COMMENT "Copying manpage ${ms} to ${mf}"
+			VERBATIM)
+		add_custom_command(OUTPUT ${mf}.bz2
+			COMMAND bzip2 ${mf}
+			DEPENDS ${mf}
+			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+			COMMENT "Compressing manpage ${mf} to ${mf}.bz2"
+			VERBATIM)
+		list(APPEND MAN_FILES ${mf}.bz2)
+	endforeach()
+	add_custom_target(man DEPENDS ${MAN_FILES})
+endif(UNIX)
