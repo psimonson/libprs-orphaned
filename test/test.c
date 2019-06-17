@@ -12,8 +12,10 @@ main ()
     init_file(&file);
     open_log(CLOG0, "test.log");
     open_file(&file, "test.c", "rt");
-    if(get_errori_file(&file) != FILE_ERROR_OKAY)
-        goto error;
+    if(get_errori_file(&file) != FILE_ERROR_OKAY) {
+        close_log(CLOG0);
+        return 1;
+    }
     write_log(CLOG0, "Opened CLOG0\n");
     while((c = getc_file(&file)) != EOF)
         putchar(c);
