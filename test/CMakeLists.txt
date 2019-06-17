@@ -12,16 +12,16 @@ target_link_libraries(test_test5 prs)
 add_executable(test_test6 test6.c)
 target_link_libraries(test_test6 prs)
 # testing
-add_test(NAME test1
+add_test(NAME test_test
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
 	COMMAND test_test)
-add_test(NAME test2
+add_test(NAME test_test2
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
 	COMMAND test_test2)
-add_test(test3 test_test3)
-add_test(test4 test_test4)
-add_test(test5 test_test5)
-add_test(NAME test6
+add_test(test_test3 test_test3)
+add_test(test_test4 test_test4)
+add_test(test_test5 test_test5)
+add_test(NAME test_test6
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
 	COMMAND test_test6)
 # add sockhelp tests
