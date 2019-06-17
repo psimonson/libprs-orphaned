@@ -31,15 +31,9 @@ configure_file(
 	@ONLY
 )
 
-if(WIN32)
-set(PRS_LIBDIR "\Program Files\libprs")
-else()
-set(PRS_LIBDIR "${CMAKE_INSTALL_PREFIX}/lib")
-endif()
-
 # generate prs.pc
 if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
-	set(CMAKE_INSTALL_LIBDIR ${PRS_LIBDIR})
+	set(CMAKE_INSTALL_LIBDIR ${CMAKE_INSTALL_PREFIX}/lib)
 endif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
 configure_file(
 	${PROJECT_SOURCE_DIR}/prs.pc.in
@@ -49,19 +43,44 @@ configure_file(
 if(WIN32)
 	add_library(prs_static STATIC src/file.c src/clogger.c src/bitmap.c src/sockhelp.c src/ustack.c)
 	add_library(prs SHARED src/file.c src/clogger.c src/bitmap.c src/sockhelp.c src/ustack.c)
-	install(TARGETS prs_static ARCHIVE DESTINATION ${PRS_LIBDIR} CONFIGURATIONS Release)
-	install(TARGETS prs LIBRARY DESTINATION ${PRS_LIBDIR} CONFIGURATIONS Release)
+	install(TARGETS prs_static ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} CONFIGURATIONS Release)
+	install(TARGETS prs LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} CONFIGURATIONS Release)
 else(UNIX)
 	add_library(prs_static STATIC src/file.c src/clogger.c src/bitmap.c src/sockhelp.c src/ustack.c)
 	add_library(prs SHARED src/file.c src/clogger.c src/bitmap.c src/sockhelp.c src/ustack.c)
-	install(TARGETS prs_static ARCHIVE DESTINATION ${PRS_LIBDIR} CONFIGURATIONS Release)
-	install(TARGETS prs LIBRARY DESTINATION ${PRS_LIBDIR} CONFIGURATIONS Release)
+	install(TARGETS prs_static ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} CONFIGURATIONS Release)
+	install(TARGETS prs LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} CONFIGURATIONS Release)
+	install(FILES ${CMAKE_BINARY_DIR}/prs.pc DESTINATION "${CMAKE_INSTALL_PREFIX}/share/pkgconfig")
+	set(MAN_NAMES sockhelp.3 bitmap.3 ustack.3) # file.3 clogger.3
+	set(MAN_FILES)
+	foreach(m IN LISTS MAN_NAMES)
+		if(NOT EXISTS "${CMAKE_BINARY_DIR}/share/man/man3/${m}.bz2")
+		add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/share/man/man3/${m}
+			COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/man/man3/${m} ${CMAKE_BINARY_DIR}/share/man/man3/${m}
+			DEPENDS ${CMAKE_SOURCE_DIR}/man/man3/${m}
+			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+			COMMENT "Copying ${m} to ${CMAKE_BINARY_DIR}..."
+			VERBATIM)
+		endif()
+		set(mf ${CMAKE_BINARY_DIR}/share/man/man3/${m}.bz2)
+		set(ms ${CMAKE_BINARY_DIR}/share/man/man3/${m})
+		if(NOT EXISTS ${mf})
+		add_custom_command(OUTPUT ${mf}
+			COMMAND bzip2 ${ms}
+			DEPENDS ${ms}
+			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+			COMMENT "Compressing manpage ${mf}"
+			VERBATIM)
+		endif()
+		list(APPEND MAN_FILES ${mf})
+	endforeach()
+	add_custom_target(man ALL DEPENDS ${MAN_FILES})
+	install(FILES ${MAN_FILES} DESTINATION "${CMAKE_INSTALL_PREFIX}/share/man/man3")
 endif()
 
-file(GLOB files ${PROJECT_SOURCE_DIR}/include/*.h)
-foreach(file ${files})
-install(TARGETS ${i}
-	DESTINATION ${CMAKE_INSTALL_PREFIX}/include/prs)
+file(GLOB PRS_HEADERS ${PROJECT_SOURCE_DIR}/include/*.h)
+foreach(include ${PRS_HEADERS})
+install(FILES ${include} DESTINATION "${CMAKE_INSTALL_PREFIX}/include/prs")
 endforeach()
 
 #enable testing
