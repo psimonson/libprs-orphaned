@@ -10,5 +10,6 @@ if [ "$1" = "test" ]; then
 	cmake --build build --target all \
 	&& cmake --build build --target test || die Error!
 else
-	cmake -H. -Bbuild && cmake --build build --target all
+	cmake -H. -Bbuild -DCMAKE_INSTALL_PREFIX=testing && \
+	cmake --build build --target all
 fi
