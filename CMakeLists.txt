@@ -90,6 +90,11 @@ if(DOXYGEN_FOUND)
 			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src
 			COMMENT "Generating API Documentation with Doxygen"
 			VERBATIM)
+		if(WIN32)
+			install(DIRECTORY doc DESTINATION "${CMAKE_INSTALL_PREFIX}")
+		else(UNIX)
+			install(DIRECTORY doc DESTINATION "${CMAKE_INSTALL_PREFIX}/share/doc/${CMAKE_PROJECT_NAME}-${PRS_VERSION}")
+		endif(WIN32)
 	endif(BUILD_DOCS)
 else(DOXYGEN_FOUND)
 	message("Doxygen not found")
