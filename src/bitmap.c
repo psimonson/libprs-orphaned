@@ -14,7 +14,7 @@
 #include "file.h"
 #include "bitmap.h"
 
-int _bitmap_errno;
+int _bitmap_errno; /**< Current error code from bitmap library. */
 
 /**
  * @brief Create a new bitmap
@@ -232,7 +232,9 @@ fill_bitmap (Bitmap *bmp, Color pixel)
 			set_pixel_bitmap(bmp, y, x, pixel);
 }
 
-/* draw_line_bitmap:  draws a line horizontal or vertical. */
+/**
+ * @brief Draws a line horizontal or vertical.
+ */
 void
 draw_line_bitmap (Bitmap *bmp, int start, char flipped,
 		char vertical, int len, Color col)
@@ -258,7 +260,9 @@ draw_line_bitmap (Bitmap *bmp, int start, char flipped,
 
 
 
-/* draw_circle_bitmap:  draws a circle from start to given radius. */
+/**
+ * @brief Draws a circle from start to given radius.
+ */
 void
 draw_circle_bitmap (Bitmap *bmp, int x_centre, int y_centre, int r, Color pixel)
 {
@@ -318,7 +322,9 @@ draw_circle_bitmap (Bitmap *bmp, int x_centre, int y_centre, int r, Color pixel)
 	}
 }
 
-/* draw_suares_bitmap:  draws a set amount of squares diagonally. */
+/**
+ * @brief Draws a set amount of squares diagonally.
+ */
 void
 draw_squares_bitmap (Bitmap *bmp, int start, int count,
 		Color pixel)
@@ -333,7 +339,9 @@ draw_squares_bitmap (Bitmap *bmp, int start, int count,
 	}
 }
 
-/* flip_vertical_bitmap:  flip image upside down. */
+/**
+ * @brief Flip image upside down.
+ */
 void
 flip_vertical_bitmap (Bitmap **bitmap)
 {
@@ -368,7 +376,9 @@ flip_vertical_bitmap (Bitmap **bitmap)
 	*bitmap = bmp;
 }
 
-/* randomise_bitmap:  sets all pixels random in bitmap image. */
+/**
+ * @brief Sets all pixels random in bitmap image.
+ */
 void
 randomise_bitmap (Bitmap *bmp)
 {
@@ -386,7 +396,9 @@ randomise_bitmap (Bitmap *bmp)
 		}
 }
 
-/* color_to_greyscale:  convert a bitmap to greyscale. */
+/**
+ * @brief Convert a bitmap to greyscale.
+ */
 void
 bitmap_to_greyscale (Bitmap *bmp)
 {
@@ -406,7 +418,9 @@ bitmap_to_greyscale (Bitmap *bmp)
 		}
 }
 
-/* encode_steganograph:  embeds text into a bitmap. */
+/**
+ * @brief Embeds text into a bitmap.
+ */
 void
 encode_steganograph (Bitmap *bmp, const char *msg)
 {
@@ -437,7 +451,9 @@ encode_steganograph (Bitmap *bmp, const char *msg)
 	}
 }
 
-/* decode_steganograph:  gets the embedded text from a bitmap. */
+/**
+ * @brief Gets the embedded text from a bitmap.
+ */
 char*
 decode_steganograph(Bitmap *bmp)
 {
@@ -476,7 +492,9 @@ decode_steganograph(Bitmap *bmp)
 	return buf;
 }
 
-/* destroy_bitmap:  free up all memory for bitmap. */
+/**
+ * @brief Free up all memory for bitmap.
+ */
 void
 destroy_bitmap (Bitmap *bitmap)
 {
@@ -484,7 +502,9 @@ destroy_bitmap (Bitmap *bitmap)
 	free(bitmap);
 }
 
-/* bitmap_get_last_error:  gets last error code from my library. */
+/**
+ * @brief Gets last error code from my library.
+ */
 int
 get_last_error_bitmap ()
 {

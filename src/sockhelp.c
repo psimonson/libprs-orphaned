@@ -36,7 +36,7 @@
 
 #include "sockhelp.h"
 
-#define BACKLOG 100
+#define BACKLOG 100       /**< Backlog define for server socket. */
 
 /* ------------------------- Init Functions --------------------- */
 

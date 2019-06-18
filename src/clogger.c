@@ -16,20 +16,23 @@
 #include "file.h"
 #include "clogger.h"
 
+/**
+ * @brief Structure used for handling log files.
+ */
 struct CLOG {
-	file_t file;
-	int status;
-	long read_pos;
-	long write_pos;
+	file_t file;    /**< File structure for log file storage. */
+	int status;     /**< Current status of log file number. */
+	long read_pos;  /**< Current read position */
+	long write_pos; /**< Current write position */
 };
 
-struct CLOG _logs[MAX_LOGS];
-char init_var;
+struct CLOG _logs[MAX_LOGS]; /**< Global variable for storing log info */
+char init_var;               /**< Global variable for logger initialization */
 
 void close_log(int);
 int get_status(int);
 
-void
+static void
 _logger_exit_func ()
 {
 	int i;
@@ -39,6 +42,11 @@ _logger_exit_func ()
 			close_log(i);
 }
 
+/**
+ * @brief Initialize logger system.
+ *
+ * Returns: void
+ */
 void
 init_logger ()
 {
@@ -56,6 +64,11 @@ init_logger ()
 	}
 }
 
+/**
+ * @brief Opens a log file of name.
+ *
+ * Returns: void
+ */
 void
 open_log (int logNum, const char *name)
 {
@@ -73,6 +86,11 @@ open_log (int logNum, const char *name)
 	printf("Please use init_logger() first.\n");
 }
 
+/**
+ * @brief Reads a log file into buf of size.
+ *
+ * Returns: int
+ */
 int
 read_log (int logNum, char *buf, int size)
 {
@@ -107,6 +125,11 @@ read_log (int logNum, char *buf, int size)
 	return -1;
 }
 
+/**
+ * @brief Formatted output (writing to log file).
+ *
+ * Returns: void
+ */
 void
 write_log (int logNum, const char *data, ...)
 {
@@ -130,6 +153,11 @@ write_log (int logNum, const char *data, ...)
 	printf("Please use init_logger() first.\n");
 }
 
+/**
+ * @brief Close a log file.
+ *
+ * Returns: void
+ */
 void
 close_log (int logNum)
 {
@@ -146,6 +174,11 @@ close_log (int logNum)
 	printf("Please use init_logger() first.\n");
 }
 
+/**
+ * @brief Print status of log file.
+ *
+ * Returns: void
+ */
 void
 print_status (int logNum)
 {
@@ -157,6 +190,11 @@ print_status (int logNum)
 	printf("Please use init_logger() first.\n");
 }
 
+/**
+ * @brief Gets the status number from log file.
+ *
+ * Returns: int (status)
+ */
 int
 get_status (int logNum)
 {
@@ -166,6 +204,11 @@ get_status (int logNum)
 	return 0;
 }
 
+/**
+ * @brief Gets the file name from given log file.
+ *
+ * Returns: const char*
+ */
 const char*
 get_log_name (int logNum)
 {
