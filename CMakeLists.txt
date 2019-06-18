@@ -65,25 +65,34 @@ enable_testing()
 add_subdirectory(test)
 endif(BUILD_TESTS)
 
-if(UNIX)
-	set(MAN_NAMES sockhelp.3 bitmap.3 ustack.3) # file.3 clogger.3
-	set(MAN_FILES)
-	foreach(m IN LISTS MAN_NAMES)
-		set(mf ${CMAKE_INSTALL_PREFIX}/share/man/man3/${m})
-		set(ms ${CMAKE_SOURCE_DIR}/man/man3/${m})
-		add_custom_command(OUTPUT ${mf}
-			COMMAND ${CMAKE_COMMAND} -E copy ${ms} ${mf}
-			DEPENDS ${ms}
-			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
-			COMMENT "Copying manpage ${ms} to ${mf}"
+### Building documentation ###
+option(BUILD_DOCS "Build documentation" OFF)
+
+if(CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
+	set(BUILD_DOCS ON)
+endif()
+
+# check if Doxygen is installed
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+	if(BUILD_DOCS)
+		# set input and output files
+		set(DOXYGEN_IN ${CMAKE_SOURCE_DIR}/Doxyfile.in)
+		set(DOXYGEN_OUT ${CMAKE_BINARY_DIR}/Doxyfile)
+
+		# request to configure the file
+		configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+		message("Doxygen build started")
+
+		# note the option ALL which allows building docs with project
+		add_custom_target(doc_doxygen ALL
+			COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src
+			COMMENT "Generating API Documentation with Doxygen"
 			VERBATIM)
-		add_custom_command(OUTPUT ${mf}.bz2
-			COMMAND bzip2 ${mf}
-			DEPENDS ${mf}
-			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
-			COMMENT "Compressing manpage ${mf} to ${mf}.bz2"
-			VERBATIM)
-		list(APPEND MAN_FILES ${mf}.bz2)
-	endforeach()
-	add_custom_target(man DEPENDS ${MAN_FILES})
-endif(UNIX)
+	endif(BUILD_DOCS)
+else(DOXYGEN_FOUND)
+	message("Doxygen not found")
+endif(DOXYGEN_FOUND)
+
+

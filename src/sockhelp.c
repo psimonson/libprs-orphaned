@@ -1,8 +1,13 @@
-/* sockhelp.c - simple socket helper library written in C.
- ***********************************************************
- * Author: Philip R. Simonson
- * Date  : 2019/06/06
- ***********************************************************
+/**
+ * @file sockhelp.c
+ * @author Philip R. Simonson
+ * @date 06 Jun 2019
+ * @brief Simple socket helper library (WIP).
+ *
+ * This is going to be a cross platform socket (networking)
+ * library. Although its a work-in-progress right now. But
+ * everthing that is implemented right now all works in Linux.
+ * When this library is complete it will work in Windows also.
  */
 
 #ifdef __linux	/* if linux make as _GNU_SOURCE */
@@ -35,7 +40,8 @@
 
 /* ------------------------- Init Functions --------------------- */
 
-/* Initialize sockets in windows linux.
+/**
+ * @brief Initialize sockets in Windows/Linux.
  */
 int socket_startup()
 {
@@ -52,7 +58,8 @@ int socket_startup()
 	return 0;
 #endif
 }
-/* Shutdown socket in windows/linux.
+/**
+ * @brief Shutdown sockets in windows/linux.
  */
 int socket_shutdown()
 {
@@ -65,8 +72,10 @@ int socket_shutdown()
 
 /* ------------------------ Start Functions --------------------- */
 
-/* Default main loop function for my sockhelp library.
- * Returns: void
+/**
+ * @brief Default main loop function for my sockhelp library.
+ *
+ * Returns: int
  */
 static int default_loop(sock_t *sock)
 {
@@ -81,7 +90,9 @@ static int default_loop(sock_t *sock)
 		" it.\n" );
 	return 0;
 }
-/* Gets address structure.
+/**
+ * @brief Gets address structure.
+ *
  * Returns: void*
  */
 void *get_in_addr(struct sockaddr *sa)
@@ -90,8 +101,10 @@ void *get_in_addr(struct sockaddr *sa)
 		return &(((struct sockaddr_in*)sa)->sin_addr);
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
-/* Init socket structure and open connection.
- * Returns: 1=failure,0=success
+/**
+ * @brief Init socket structure and open connection.
+ *
+ * Returns: void
  */
 void init_socket(sock_t *sock, int (*func)(sock_t *sock))
 {
@@ -100,8 +113,10 @@ void init_socket(sock_t *sock, int (*func)(sock_t *sock))
 	sock->errno = SOCKERR_OKAY;
 	sock->loop = !func ? default_loop : func;
 }
-/* Create server socket.
- * Returns: 1=failure,0=success
+/**
+ * @brief Create server socket.
+ *
+ * Returns: 1=failure, 0=success
  */
 int server_socket(sock_t *sock, const char *port)
 {
@@ -163,8 +178,10 @@ int server_socket(sock_t *sock, const char *port)
 	sock->errno = SOCKERR_OKAY;
 	return 0;
 }
-/* Create a client connection.
- * Returns: 1=failure,0=success
+/**
+ * @brief Create a client connection.
+ *
+ * Returns: 1=failure, 0=success
  */
 int client_socket(sock_t *sock, const char *addr, const char *port)
 {
@@ -216,7 +233,9 @@ int client_socket(sock_t *sock, const char *addr, const char *port)
 	sock->errno = SOCKERR_CONNECT;
 	return 1;
 }
-/* Accepts client socket from server socket.
+/**
+ * @brief Accepts client socket from server socket.
+ *
  * Returns: sock_t
  */
 sock_t accept_socket(sock_t *server)

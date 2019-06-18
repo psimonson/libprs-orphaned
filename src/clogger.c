@@ -1,9 +1,11 @@
-/*
- * c_logger.h - My C logger header library.
+/**
+ * @file clogger.c
+ * @author Philip R. Simonson
+ * @date 13 Mar 2019
+ * @brief Simple logging system that I made.
  *
- * Author : Philip R. Simonson
- * Date   : 03/13/2019
- ******************************************************************************
+ * Just a logging system, very simple and straight
+ * forward to use.
  */
 
 #include <stdio.h>

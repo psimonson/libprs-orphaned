@@ -1,9 +1,14 @@
-/*
- * file.c - main source file for file operations.
+/**
+ * @file file.c
+ * @author Philip R. Simonson
+ * @date 11 May 2019
+ * @brief Simple file operation library.
  *
- * Author: Philip R. Simonson
- * Date  : 2019/05/11
- ********************************************************************
+ * This file library does make a bunch of calls into
+ * not so many. With just a few functions you can open
+ * a file and close. Or open two file, copy one to the
+ * other and close both with about 10-15 lines of code.
+ * Easier file handling and error checking.
  */
 
 #include <stdio.h>

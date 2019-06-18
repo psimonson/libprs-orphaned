@@ -1,3 +1,12 @@
+/**
+ * @file bitmap.c
+ * @author Philip R. Simonson
+ * @date 16 June 2019
+ * @brief Bitmap file loader/creator.
+ *
+ * This loader also has some special functionality.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,7 +16,12 @@
 
 int _bitmap_errno;
 
-/* create_bitmap:  create a new bitmap */
+/**
+ * @brief Create a new bitmap
+ *
+ * Prototype:
+ *   Bitmap *create_bitmap(int width, int height)
+ */
 Bitmap*
 create_bitmap (int width, int height)
 {
@@ -47,7 +61,12 @@ create_bitmap (int width, int height)
 	return bitmap;
 }
 
-/* get_data_bitmap:  gets the data from a bitmap object. */
+/**
+ * @brief Gets the data from a bitmap object.
+ *
+ * Prototype:
+ *   Bitmap *load_bitmap(const char *filename)
+ */
 Bitmap*
 load_bitmap (const char *filename)
 {
@@ -107,7 +126,12 @@ load_bitmap (const char *filename)
 	return bmp;
 }
 
-/* write_bitmap:  writes blank Bitmap image if not data has been given. */
+/**
+ * @brief Writes blank Bitmap image if not data has been given.
+ *
+ * Prototype:
+ *   int write_bitmap(Bitmap *bmp, const char *filename)
+ */
 int
 write_bitmap (Bitmap *bmp, const char *filename)
 {
@@ -141,8 +165,12 @@ write_bitmap (Bitmap *bmp, const char *filename)
 	return 0;
 }
 
-/* check_pixel_bitmap:  checks for valid pixels before plotting. */
-int
+/**
+ * @brief Checks for valid pixels before plotting.
+ *
+ * Function used internally doesn't export.
+ */
+static int
 _check_pixel_bitmap (Bitmap *bmp, int y, int x)
 {
 	if (x < 0 || x > bmp->info.width)
@@ -152,7 +180,12 @@ _check_pixel_bitmap (Bitmap *bmp, int y, int x)
 	return 0;
 }
 
-/* get_pixel_bitmap:  get a pixel at (x,y) coordinates r, g, b values. */
+/**
+ * @brief Get a pixel at (x,y) coordinates r, g, b values.
+ *
+ * Prototype:
+ *   void get_pixel_bitmap(Bitmap *bmp, int y, int x, Color *pixel)
+ */
 void
 get_pixel_bitmap (Bitmap *bmp, int y, int x, Color *pixel)
 {
@@ -165,7 +198,12 @@ get_pixel_bitmap (Bitmap *bmp, int y, int x, Color *pixel)
 	pixel->r = bmp->data[(bmp->info.width*y+x)*3+2];
 }
 
-/* set_pixel_bitmap:  put a pixel at (x,y) coordinates r, g, b values. */
+/**
+ * @brief Put a pixel at (x,y) coordinates r, g, b values.
+ *
+ * Prototype:
+ *   void set_pixel_bitmap(Bitmap *bmp, int y, int x, Color pixel)
+ */
 void
 set_pixel_bitmap (Bitmap *bmp, int y, int x, Color pixel)
 {
@@ -178,7 +216,12 @@ set_pixel_bitmap (Bitmap *bmp, int y, int x, Color pixel)
 	bmp->data[(bmp->info.width*y+x)*3+2] = pixel.r;
 }
 
-/* fill_bitmap:  fill an entire bitmap with a color. */
+/**
+ * @brief Fill an entire bitmap with a color.
+ *
+ * Prototype:
+ *   void fill_bitmap(Bitmap *bmp, Color pixel)
+ */
 void
 fill_bitmap (Bitmap *bmp, Color pixel)
 {
