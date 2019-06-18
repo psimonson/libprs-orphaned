@@ -257,7 +257,9 @@ sock_t accept_socket(sock_t *server)
 	sock.errno = SOCKERR_OKAY;
 	return sock;
 }
-/* Runs a main loop for given socket structure.
+/**
+ * @brief Runs a main loop for given socket structure.
+ *
  * Returns: int
  */
 int loop_socket(sock_t *sock, int loop_type)
@@ -275,7 +277,9 @@ int loop_socket(sock_t *sock, int loop_type)
 	}
 	return running = (running == 0 ? 1 : 0);
 }
-/* Gets current error message.
+/**
+ * @brief Gets current error message.
+ *
  * Returns: char*
  */
 const char *get_error_socket(sock_t *sock)
@@ -292,7 +296,9 @@ const char *get_error_socket(sock_t *sock)
 	};
 	return errmsg[sock->errno];
 }
-/* Gets current error number.
+/**
+ * @brief Gets current error number.
+ *
  * Returns: int
  */
 int get_errori_socket(sock_t *sock)
@@ -301,7 +307,9 @@ int get_errori_socket(sock_t *sock)
 		return SOCKERR_UNKNOWN;
 	return sock->errno;
 }
-/* Close socket and cleanup structure.
+/**
+ * @brief Close socket and cleanup structure.
+ *
  * Returns: 1=failure,0=success
  */
 int close_socket(sock_t *sock)
@@ -327,14 +335,18 @@ int close_socket(sock_t *sock)
 
 /* ------------------------ Helper Functions --------------------- */
 
-/* Sets whether or not it's blocking.
- * Returns: 1=failure,0=success
+/**
+ * @brief Sets whether or not it's blocking.
+ *
+ * Returns: 1=failure, 0=success
  */
 int bmode_socket(sock_t *sock, int bmode)
 {
 	return 0;
 }
-/* Sends data across the network to another computer.
+/**
+ * @brief Sends data across the network to another computer.
+ *
  * Returns: bytes sent (long int)
  */
 long send_data(sock_t *sock, const void *data, long size, int flags)
@@ -350,7 +362,9 @@ long send_data(sock_t *sock, const void *data, long size, int flags)
 	}
 	return total_bytes;
 }
-/* Receives data from a computer on the network.
+/**
+ * @brief Receives data from a computer on the network.
+ *
  * Returns: bytes received (long int)
  */
 long recv_data(sock_t *sock, void *data, long size, int flags)
