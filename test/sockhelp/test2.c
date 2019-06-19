@@ -5,13 +5,13 @@
  **********************************************************************
  */
 
-#define _XOPEN_SOURCE 600
-#include <stdio.h>
 #ifdef __linux
+#define _XOPEN_SOURCE 600
 #include <unistd.h>
 #include <sys/socket.h>
 #endif
 
+#include <stdio.h>
 #include "sockhelp.h"
 
 #define PORT "8000"

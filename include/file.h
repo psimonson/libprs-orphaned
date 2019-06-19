@@ -7,6 +7,8 @@
 
 #define PRS_CFILE_H
 
+#include "export.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,51 +42,51 @@ typedef struct file {
 } file_t;
 
 /* standard file funtions */
-extern void
+PRS_EXPORT void
 init_file (file_t* file);
-extern void
+PRS_EXPORT void
 open_file (file_t* file, const char* filename, const char* mode);
-extern void
+PRS_EXPORT void
 reopen_file (file_t* file, const char* filename, const char* mode);
-extern const char*
+PRS_EXPORT const char*
 get_error_file (file_t* file);
-extern int
+PRS_EXPORT int
 get_errori_file (file_t* file);
-extern void
+PRS_EXPORT void
 close_file (file_t* file);
 
 /* standard handling functions */
-extern int
+PRS_EXPORT int
 read_file (file_t* file, void* buf, size_t nmem, size_t size);
-extern int
+PRS_EXPORT int
 write_file (file_t* file, const void* buf, size_t nmem, size_t size);
-extern int
+PRS_EXPORT int
 writef_file (file_t* file, const char* buf, ...);
-extern int
+PRS_EXPORT int
 readf_file (file_t* file, const char* buf, ...);
-extern int
+PRS_EXPORT int
 vwritef_file (file_t* file, const char* buf, va_list ap);
-extern int
+PRS_EXPORT int
 getc_file (file_t* file);
-extern void
+PRS_EXPORT void
 putc_file (file_t* file, int c);
-extern void
+PRS_EXPORT void
 ungetc_file (file_t* file, int c);
-extern int
+PRS_EXPORT int
 seek_file (file_t* file, long bytes, int seek);
-extern long
+PRS_EXPORT long
 tell_file (file_t* file);
-extern int
+PRS_EXPORT int
 flush_file (file_t* file);
 
 /* get functions */
-extern const char*
+PRS_EXPORT const char*
 get_name_file (file_t* file);
-extern long
+PRS_EXPORT long
 get_size_file (file_t* file);
-extern int
+PRS_EXPORT int
 get_lines_file (file_t* file);
-extern FILE*
+PRS_EXPORT FILE*
 get_handle_file (file_t* file);
 
 #ifdef __cplusplus

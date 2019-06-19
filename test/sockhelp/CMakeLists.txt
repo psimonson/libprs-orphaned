@@ -1,17 +1,31 @@
 cmake_minimum_required(VERSION 2.6)
+
+# all executables for sockhelp testing
 add_executable(sockhelp_test1 test1.c)
-target_link_libraries(sockhelp_test1 prs)
 add_executable(sockhelp_test2 test2.c)
-target_link_libraries(sockhelp_test2 prs)
 add_executable(sockhelp_test3 test3.c)
-target_link_libraries(sockhelp_test3 prs)
 add_executable(sockhelp_test4 test4.c)
-target_link_libraries(sockhelp_test4 prs)
 add_executable(sockhelp_test5 test5.c)
-target_link_libraries(sockhelp_test5 prs)
 add_executable(sockhelp_test6 test6.c)
-target_link_libraries(sockhelp_test6 prs)
-#testing for sockhelp
+
+# link executables to libraries
+if(WIN32)
+	target_link_libraries(sockhelp_test1 prs ws2_32)
+	target_link_libraries(sockhelp_test2 prs ws2_32)
+	target_link_libraries(sockhelp_test3 prs ws2_32)
+	target_link_libraries(sockhelp_test4 prs ws2_32)
+	target_link_libraries(sockhelp_test5 prs ws2_32)
+	target_link_libraries(sockhelp_test6 prs ws2_32)
+else(UNIX)
+	target_link_libraries(sockhelp_test1 prs)
+	target_link_libraries(sockhelp_test2 prs)
+	target_link_libraries(sockhelp_test3 prs)
+	target_link_libraries(sockhelp_test4 prs)
+	target_link_libraries(sockhelp_test5 prs)
+	target_link_libraries(sockhelp_test6 prs)
+endif(WIN32)
+
+# add all executables for testing
 add_test(sockhelp_test1 sockhelp_test1)
 add_test(sockhelp_test2 sockhelp_test2)
 add_test(sockhelp_test3 sockhelp_test3)

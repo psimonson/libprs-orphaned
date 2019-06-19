@@ -8,14 +8,10 @@
 
 #define PRS_SOCKHELP_H
 
+#include "export.h"
+
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifdef _WIN32
-#define PRS_EXPORT __declspec(dllexport)
-#else
-#define PRS_EXPORT extern
 #endif
 
 #ifdef __linux

@@ -8,6 +8,8 @@
 
 #define PRS_CLOGGER_H
 
+#include "export.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,14 +28,14 @@ enum CLOG_ENUM {
 	CLOG4
 };
 
-extern void init_logger ();
-extern void open_log (int logNum, const char *name);
-extern int read_log (int logNum, char *buf, int size);
-extern void write_log (int logNum, const char *data, ...);
-extern void close_log (int logNum);
-extern void print_status (int logNum);
-extern int get_status (int logNum);
-extern const char* get_log_name (int logNum);
+PRS_EXPORT void init_logger ();
+PRS_EXPORT void open_log (int logNum, const char *name);
+PRS_EXPORT int read_log (int logNum, char *buf, int size);
+PRS_EXPORT void write_log (int logNum, const char *data, ...);
+PRS_EXPORT void close_log (int logNum);
+PRS_EXPORT void print_status (int logNum);
+PRS_EXPORT int get_status (int logNum);
+PRS_EXPORT const char* get_log_name (int logNum);
 
 #ifdef __cplusplus
 }

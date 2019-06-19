@@ -9,6 +9,8 @@
 
 #define PRS_USTACK_H
 
+#include "export.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -22,12 +24,12 @@ typedef struct ustack {
     int cur;
 } ustack_t;
 
-ustack_t* init_stack();
-void push_stack(ustack_t* stack, void* data);
-void* pop_stack(ustack_t* stack);
-void* peek_stack(ustack_t* stack);
-void reset_top(ustack_t* stack);
-void free_stack(ustack_t* stack, void (*)(void*));
+PRS_EXPORT ustack_t* init_stack();
+PRS_EXPORT void push_stack(ustack_t* stack, void* data);
+PRS_EXPORT void* pop_stack(ustack_t* stack);
+PRS_EXPORT void* peek_stack(ustack_t* stack);
+PRS_EXPORT void reset_top(ustack_t* stack);
+PRS_EXPORT void free_stack(ustack_t* stack, void (*)(void*));
 
 #ifdef __cplusplus
 }

@@ -8,6 +8,8 @@
 
 #define PRS_BITMAP_H
 
+#include "export.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -68,27 +70,28 @@ typedef struct Color {
 #pragma pack(pop)
 
 /* pixel functions */
-void get_pixel_bitmap(Bitmap *bitmap, int y, int x, Color *pixel);
-void set_pixel_bitmap(Bitmap *bitmap, int y, int x, Color pixel);
-void fill_bitmap(Bitmap *bitmap, Color pixel);
+PRS_EXPORT void get_pixel_bitmap(Bitmap *bitmap, int y, int x, Color *pixel);
+PRS_EXPORT void set_pixel_bitmap(Bitmap *bitmap, int y, int x, Color pixel);
+PRS_EXPORT void fill_bitmap(Bitmap *bitmap, Color pixel);
 
 /* drawing functions */
-void draw_line_bitmap(Bitmap *bitmap, int start, char flipped,
+PRS_EXPORT void draw_line_bitmap(Bitmap *bitmap, int start, char flipped,
 		char vertical, int len, Color pixel);
-void draw_circle_bitmap(Bitmap *bitmap, int w, int h, int r, Color pixel);
-void draw_squares_bitmap(Bitmap *bitmap, int start, int count, Color pixel);
+PRS_EXPORT void draw_circle_bitmap(Bitmap *bitmap, int w, int h, int r, Color pixel);
+PRS_EXPORT void draw_squares_bitmap(Bitmap *bitmap, int start, int count, Color pixel);
 
 /* main bitmap functions */
-Bitmap *create_bitmap(int width, int height);
-Bitmap *load_bitmap(const char *filename);
-int write_bitmap(Bitmap *bitmap, const char *filename);
-void flip_vertical_bitmap(Bitmap **bitmap);
-void randomise_bitmap(Bitmap *bitmap);
-void bitmap_to_greyscale(Bitmap *bitmap);
-void encode_steganograph(Bitmap *bitmap, const char *msg);
-char* decode_steganograph(Bitmap *bitmap);
-void destroy_bitmap(Bitmap *bitmap);
-int get_last_error_bitmap();
+PRS_EXPORT Bitmap *create_bitmap(int width, int height);
+PRS_EXPORT Bitmap *load_bitmap(const char *filename);
+PRS_EXPORT int write_bitmap(Bitmap *bitmap, const char *filename);
+PRS_EXPORT void flip_vertical_bitmap(Bitmap **bitmap);
+PRS_EXPORT void randomise_bitmap(Bitmap *bitmap);
+PRS_EXPORT void bitmap_to_greyscale(Bitmap *bitmap);
+PRS_EXPORT void encode_steganograph(Bitmap *bitmap, const char *msg);
+PRS_EXPORT char* decode_steganograph(Bitmap *bitmap);
+PRS_EXPORT void destroy_bitmap(Bitmap *bitmap);
+PRS_EXPORT int get_last_error_bitmap();
+
 #ifdef __cplusplus
 }
 #endif
