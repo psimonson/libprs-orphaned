@@ -29,7 +29,7 @@ typedef struct socket sock_t;
 struct socket {
 	char addr[255];
 	SOCKET fd;
-	int errno;
+	int error;
 	int (*loop)(sock_t *sock);
 };
 

@@ -21,10 +21,12 @@
 
 /* Headers for socket programming */
 #ifdef _WIN32
-#define _WINVER 0x600
+#undef _WIN32_WINNT
+#define WINVER 0x0700
+#define _WIN32_WINNT 0x0700
+#include <winsock2.h>
 #include <windows.h>
 #include <ws2tcpip.h>
-#include <winsock2.h>
 #else
 #include <unistd.h>
 #include <sys/socket.h>
@@ -46,7 +48,7 @@
 int socket_startup()
 {
 #ifdef _WIN32
-	WSAData wsaData;
+	WSADATA wsaData;
 	int res;
 	
 	if((res = WSAStartup(MAKEWORD(2,0), &wsaData)) != 0) {
@@ -110,7 +112,7 @@ void init_socket(sock_t *sock, int (*func)(sock_t *sock))
 {
 	memset(sock->addr, 0, sizeof(sock->addr));
 	sock->fd = INVALID_SOCKET;
-	sock->errno = SOCKERR_OKAY;
+	sock->error = SOCKERR_OKAY;
 	sock->loop = !func ? default_loop : func;
 }
 /**
@@ -121,7 +123,12 @@ void init_socket(sock_t *sock, int (*func)(sock_t *sock))
 int server_socket(sock_t *sock, const char *port)
 {
 	struct addrinfo hints,*servinfo,*p;
-	int yes=1,rv;
+#ifdef _WIN32
+	char yes='1';
+#else
+	int yes=1;
+#endif
+	int rv;
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
@@ -138,19 +145,19 @@ int server_socket(sock_t *sock, const char *port)
 	for(p=servinfo; p!=NULL; p=p->ai_next) {
 		if((sock->fd = socket(p->ai_family, p->ai_socktype,
 				p->ai_protocol)) == INVALID_SOCKET) {
-			sock->errno = SOCKERR_CREATE;
+			sock->error = SOCKERR_CREATE;
 			continue;
 		}
 
 		if(setsockopt(sock->fd, SOL_SOCKET, SO_REUSEADDR, &yes,
 				sizeof(int)) == SOCKET_ERROR) {
-			sock->errno = SOCKERR_OPTION;
+			sock->error = SOCKERR_OPTION;
 			close_socket(sock);
 			return 1;
 		}
 
 		if(bind(sock->fd, p->ai_addr, p->ai_addrlen) == SOCKET_ERROR) {
-			sock->errno = SOCKERR_BIND;
+			sock->error = SOCKERR_BIND;
 			close_socket(sock);
 			continue;
 		}
@@ -158,13 +165,19 @@ int server_socket(sock_t *sock, const char *port)
 	}
 
 	if(p==NULL) {
-		sock->errno = SOCKERR_BIND;
+		sock->error = SOCKERR_BIND;
 		close_socket(sock);
 		return 1;
 	}
+#ifdef _WIN32
+	InetNtop(p->ai_addr->sa_family,
+		get_in_addr((struct sockaddr*)&p->ai_addr), sock->addr,
+		sizeof(sock->addr));
+#else
 	inet_ntop(p->ai_addr->sa_family,
 		get_in_addr((struct sockaddr*)&p->ai_addr), sock->addr,
 		sizeof(sock->addr));
+#endif
 	freeaddrinfo(servinfo);		/* all done with this */
 
 	if(listen(sock->fd, BACKLOG) == SOCKET_ERROR) {
@@ -175,7 +188,7 @@ int server_socket(sock_t *sock, const char *port)
 	printf("server: %s listening on port %s.\n"
 		"server: waiting for connections...\n",
 		sock->addr, port);
-	sock->errno = SOCKERR_OKAY;
+	sock->error = SOCKERR_OKAY;
 	return 0;
 }
 /**
@@ -202,12 +215,12 @@ int client_socket(sock_t *sock, const char *addr, const char *port)
 	for(p=servinfo; p!=NULL; p=p->ai_next) {
 		if((sock->fd=socket(p->ai_family, p->ai_socktype,
 				p->ai_protocol)) == INVALID_SOCKET) {
-			sock->errno = SOCKERR_CREATE;
+			sock->error = SOCKERR_CREATE;
 			continue;
 		}
 		if(connect(sock->fd, p->ai_addr, p->ai_addrlen)
 				== SOCKET_ERROR) {
-			sock->errno = SOCKERR_CONNECT;
+			sock->error = SOCKERR_CONNECT;
 			close_socket(sock);
 			continue;
 		}
@@ -215,7 +228,7 @@ int client_socket(sock_t *sock, const char *addr, const char *port)
 	}
 
 	if(p==NULL) {
-		sock->errno = SOCKERR_CONNECT;
+		sock->error = SOCKERR_CONNECT;
 		close_socket(sock);
 		return 1;
 	}
@@ -226,11 +239,11 @@ int client_socket(sock_t *sock, const char *addr, const char *port)
 		strncpy(sock->addr, host->h_name,
 			strlen(host->h_name));
 		printf("client: connecting to %s\n", sock->addr);
-		sock->errno = SOCKERR_OKAY;
+		sock->error = SOCKERR_OKAY;
 		return 0;
 	}
 	printf("client: %s failed to connect.\n", addr);
-	sock->errno = SOCKERR_CONNECT;
+	sock->error = SOCKERR_CONNECT;
 	return 1;
 }
 /**
@@ -248,13 +261,19 @@ sock_t accept_socket(sock_t *server)
 	sock.fd = accept(server->fd, (struct sockaddr*)&addr,
 			&sin_size);
 	if(sock.fd == INVALID_SOCKET) {
-		sock.errno = SOCKERR_CREATE;
+		sock.error = SOCKERR_CREATE;
 		return sock;
 	}
+#ifdef _WIN32
+	InetNtop(addr.ss_family,
+		get_in_addr((struct sockaddr*)&addr),
+		sock.addr, sizeof(sock.addr));
+#else
 	inet_ntop(addr.ss_family,
 		get_in_addr((struct sockaddr*)&addr),
 		sock.addr, sizeof(sock.addr));
-	sock.errno = SOCKERR_OKAY;
+#endif
+	sock.error = SOCKERR_OKAY;
 	return sock;
 }
 /**
@@ -294,7 +313,7 @@ const char *get_error_socket(sock_t *sock)
 		"Failed to connect to socket.",
 		"Socket is closed."
 	};
-	return errmsg[sock->errno];
+	return errmsg[sock->error];
 }
 /**
  * @brief Gets current error number.
@@ -303,9 +322,9 @@ const char *get_error_socket(sock_t *sock)
  */
 int get_errori_socket(sock_t *sock)
 {
-	if(sock->errno < 0 || sock->errno >= SOCKERR_COUNT)
+	if(sock->error < 0 || sock->error >= SOCKERR_COUNT)
 		return SOCKERR_UNKNOWN;
-	return sock->errno;
+	return sock->error;
 }
 /**
  * @brief Close socket and cleanup structure.
@@ -318,18 +337,18 @@ int close_socket(sock_t *sock)
 #ifdef _WIN32
 	if((res = closesocket(sock->fd))) {
 		printf("Error: Could not close socket.\n");
-		sock->errno = SOCKERR_CLOSE;
+		sock->error = SOCKERR_CLOSE;
 		return res;
 	}
 #else
 	if((res = close(sock->fd))) {
 		printf("Error: Could not close socket.\n");
-		sock->errno = SOCKERR_CLOSE;
+		sock->error = SOCKERR_CLOSE;
 		return res;
 	}
 #endif
 	sock->fd = INVALID_SOCKET;
-	sock->errno = SOCKERR_OKAY;
+	sock->error = SOCKERR_OKAY;
 	return res;
 }
 
