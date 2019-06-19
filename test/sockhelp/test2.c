@@ -15,6 +15,7 @@
 
 #include <stdio.h>
 #include "sockhelp.h"
+#include "unused.h"
 
 #define PORT "8000"
 #define MESSAGE "Hello world test!!!\r\n"
@@ -26,6 +27,7 @@ DWORD thread(LPVOID p)
 	sock_t client2;
 	int retry,bytes;
 
+	UNUSED(p);
 	retry = 3;
 	socket_startup();
 	init_socket(&client2, NULL);

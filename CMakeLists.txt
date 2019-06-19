@@ -14,6 +14,9 @@ include_directories(
 	"${PROJECT_SOURCE_DIR}/include"
 )
 
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -std=c89 -Wall -Wextra -Werror -g")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -std=c89 -Wall -Wextra -Werror -O2")
+
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
 	if(WIN32)
 		set(CMAKE_INSTALL_PREFIX "C:\Program Files\PRS-Library")

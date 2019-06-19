@@ -37,6 +37,7 @@
 #endif
 
 #include "sockhelp.h"
+#include "unused.h"
 
 #define BACKLOG 100       /**< Backlog define for server socket. */
 
@@ -81,6 +82,7 @@ int socket_shutdown()
  */
 static int default_loop(sock_t *sock)
 {
+	UNUSED(sock);
 	printf(	"default_loop: Please implement this function.\n"
 		"=======================================================\n"
 		"static void any_name_loop_func(sock_t *sock)\n"
@@ -361,6 +363,8 @@ int close_socket(sock_t *sock)
  */
 int bmode_socket(sock_t *sock, int bmode)
 {
+	UNUSED(sock);  /* pointer to socket structure */
+	UNUSED(bmode); /* 0 is blocking, 1 is non-blocking */
 	return 0;
 }
 /**

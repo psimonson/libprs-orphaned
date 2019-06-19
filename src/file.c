@@ -11,6 +11,10 @@
  * Easier file handling and error checking.
  */
 
+#if defined(__linux) || defined(__UNIX__)
+#define _GNU_SOURCE 1
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>

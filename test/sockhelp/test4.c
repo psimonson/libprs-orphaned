@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include "sockhelp.h"
+#include "unused.h"
 
 #define ADDR "127.0.0.1"
 #define PORT "8000"
@@ -54,6 +55,7 @@ DWORD thread(LPVOID p)
 	char s[32];
 	int retry,bytes;
 
+	UNUSED(p);
 	retry = 3;
 	socket_startup();
 	init_socket(&client, NULL);
