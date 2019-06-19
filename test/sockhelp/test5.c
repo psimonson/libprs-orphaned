@@ -5,8 +5,11 @@
  **********************************************************************
  */
 
-#include <stdio.h>
+#ifdef __linux
 #include <sys/socket.h>
+#endif
+
+#include <stdio.h>
 #include "sockhelp.h"
 
 #define ADDR "www.slackware.com"

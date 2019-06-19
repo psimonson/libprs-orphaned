@@ -14,7 +14,9 @@
 extern "C" {
 #endif
 
-#ifdef __linux
+#ifdef _WIN32
+#define SOCKET unsigned int
+#else
 #define SOCKET int
 #define SOCKET_ERROR -1
 #define INVALID_SOCKET SOCKET_ERROR

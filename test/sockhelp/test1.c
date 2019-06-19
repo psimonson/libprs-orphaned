@@ -7,9 +7,7 @@
 
 #include <stdio.h>
 
-#ifdef _WIN32
-#include <winsock2.h>
-#else
+#if defined(__linux) || (__UNIX)
 #include <sys/socket.h>
 #endif
 
@@ -40,8 +38,7 @@ int main()
 		return 1;
 	}
 	printf("Receiving...\n");
-	while((bytes = recv_data(&client, buffer, sizeof(buffer),
-			MSG_NOSIGNAL)) > 0) {
+	while((bytes = recv_data(&client, buffer, sizeof(buffer), 0)) > 0) {
 		buffer[bytes] = 0;
 		printf("%s", buffer);
 		fflush(stdout);

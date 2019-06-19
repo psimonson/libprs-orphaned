@@ -1,12 +1,18 @@
-/* test3.c - program to test loop default function.
- **********************************************************************
- * Author: Philip R. Simonson
- * Date  : 2019/06/08
- **********************************************************************
+/**
+ * @file test3.c
+ * @author Philip R. Simonson
+ * @date 8 June 2019
+ * @brief Program to test loop default function.
+ *
+ * Default loop function just tells you to implement a real
+ * loop function.
  */
 
-#include <stdio.h>
+#ifdef __linux
 #include <sys/socket.h>
+#endif
+
+#include <stdio.h>
 #include "sockhelp.h"
 
 #define PORT "8000"

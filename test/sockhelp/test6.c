@@ -6,9 +6,12 @@
  **********************************************************************
  */
 
+#ifdef __linux
+#include <sys/socket.h>
+#endif
+
 #include <stdio.h>
 #include <string.h>
-#include <sys/socket.h>
 #include "sockhelp.h"
 
 #define ADDR "www.slackware.com"
@@ -23,7 +26,7 @@ static int client_loop(sock_t *sock)
 	char s[32];
 	int bytes;
 	
-	if((bytes=recv_data(sock, s, sizeof(s), MSG_NOSIGNAL)) > 0) {
+	if((bytes=recv_data(sock, s, sizeof(s), 0)) > 0) {
 		s[bytes] = 0;
 		printf("%s", s);
 		fflush(stdout);
@@ -51,7 +54,7 @@ int main()
 		fprintf(stderr, "Error: %s\n", get_error_socket(&client));
 		return 1;
 	}
-	if(send_data(&client, GMSG, strlen(GMSG), MSG_NOSIGNAL) < 0) {
+	if(send_data(&client, GMSG, strlen(GMSG), 0) < 0) {
 		fprintf(stderr, "Error: %s\n", get_error_socket(&client));
 		close_socket(&client);
 		socket_shutdown();
