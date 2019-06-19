@@ -47,6 +47,7 @@ static int main_loop(sock_t *sock)
 		close_socket(sock);
 	return res;
 }
+#ifdef _WIN32
 DWORD thread(LPVOID p)
 {
 	sock_t client;
@@ -58,11 +59,7 @@ DWORD thread(LPVOID p)
 	init_socket(&client, NULL);
 	while(retry && !client_socket(&client, ADDR, PORT)) {
 		if(client.error == SOCKERR_OKAY) break;
-#ifdef _WIN32
 		Sleep(2);
-#else
-		usleep(1000000);
-#endif
 		retry--;
 	}
 	if(!retry && client.error != SOCKERR_OKAY) {
@@ -87,6 +84,7 @@ DWORD thread(LPVOID p)
 	socket_shutdown();
 	return 0;
 }
+#endif
 /* Entry point for test.
  */
 int main()

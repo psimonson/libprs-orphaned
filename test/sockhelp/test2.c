@@ -19,6 +19,7 @@
 #define PORT "8000"
 #define MESSAGE "Hello world test!!!\r\n"
 
+#ifdef _WIN32
 DWORD thread(LPVOID p)
 {
 	char buf[32];
@@ -30,11 +31,7 @@ DWORD thread(LPVOID p)
 	init_socket(&client2, NULL);
 	while(retry && !client_socket(&client2, "127.0.0.1", "8000")) {
 		if(client2.error == SOCKERR_OKAY) break;
-#ifdef _WIN32
 		Sleep(2);
-#else
-		usleep(1000000);
-#endif
 		retry--;
 	}
 	if(retry == 0 && client2.error != SOCKERR_OKAY) {
@@ -52,6 +49,7 @@ DWORD thread(LPVOID p)
 	close_socket(&client2);
 	return 0;
 }
+#endif
 int main()
 {
 	sock_t server,client;
@@ -117,7 +115,9 @@ int main()
 		socket_shutdown();
 		return 0;
 	}
+#ifdef _WIN32
 	WaitForSingleObject(mthread, 0);
+#endif
 	printf("done.\n");
 	close_socket(&client);
 	close_socket(&server);
