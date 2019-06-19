@@ -36,7 +36,7 @@ configure_file(
 
 # generate prs.pc
 if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
-	set(CMAKE_INSTALL_LIBDIR ${CMAKE_INSTALL_PREFIX}/lib)
+	set(CMAKE_INSTALL_LIBDIR lib)
 endif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
 configure_file(
 	${PROJECT_SOURCE_DIR}/prs.pc.in
@@ -47,11 +47,11 @@ if(WIN32)
 	add_library(prs SHARED src/file.c src/clogger.c src/bitmap.c src/sockhelp.c src/ustack.c)
 	target_link_libraries(prs ws2_32)
 	set_target_properties(prs PROPERTIES PREFIX "")
-	install(TARGETS prs ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library)
+	install(TARGETS prs ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} COMPONENT library)
 else(UNIX)
 	add_library(prs_static STATIC src/file.c src/clogger.c src/bitmap.c src/sockhelp.c src/ustack.c)
 	add_library(prs SHARED src/file.c src/clogger.c src/bitmap.c src/sockhelp.c src/ustack.c)
-	install(TARGETS prs prs_static ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library)
+	install(TARGETS prs prs_static ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} COMPONENT library)
 	install(FILES ${CMAKE_BINARY_DIR}/prs.pc DESTINATION "${CMAKE_INSTALL_PREFIX}/share/pkgconfig")
 endif(WIN32)
 
