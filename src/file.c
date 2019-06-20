@@ -175,7 +175,6 @@ read_file (file_t* file, void* buf, size_t nmem, size_t size)
         file->error = FILE_ERROR_READ;
     return bytes;
 }
-
 /**
  * @brief Write into file from buf; of size
  *
@@ -189,7 +188,6 @@ write_file (file_t* file, const void* buf, size_t nmem, size_t size)
         file->error = FILE_ERROR_WRITE;
     return bytes;
 }
-
 /**
  * @brief Write formatted into file
  *
@@ -207,7 +205,6 @@ writef_file (file_t* file, const char* buf, ...)
         file->error = FILE_ERROR_WRITE;
     return res;
 }
-
 /**
  * @brief Write formatted into file; using va_list
  *
@@ -218,7 +215,16 @@ vwritef_file (file_t* file, const char* buf, va_list ap)
 {
     return vfprintf(file->fp, buf, ap);
 }
-
+/**
+ * @brief Read a line of text from file
+ *
+ * Returns: char*
+ */
+char*
+gets_file (file_t* file, char* buf, long size)
+{
+	return fgets(buf, size, file->fp);
+}
 /**
  * @brief Read formatted from file
  *
@@ -236,7 +242,6 @@ readf_file (file_t* file, const char* buf, ...)
         file->error = FILE_ERROR_READ;
     return res;
 }
-
 /**
  * @brief Gets one byte from the file
  *
@@ -253,7 +258,6 @@ getc_file (file_t* file)
         file->error = FILE_ERROR_READ;
     return c;
 }
-
 /**
  * @brief Puts one byte into the file
  *
@@ -267,7 +271,6 @@ putc_file (file_t* file, int c)
     if(errno != 0)
         file->error = FILE_ERROR_WRITE;
 }
-
 /**
  * @brief Puts one byte back onto file stream.
  *
@@ -281,7 +284,6 @@ ungetc_file (file_t* file, int c)
     if(errno != 0)
         file->error = FILE_ERROR_WRITE;
 }
-
 /**
  * @brief Seek through file by bytes.
  *
@@ -297,7 +299,6 @@ seek_file (file_t* file, long bytes, int seek)
         file->error = FILE_ERROR_SEEK;
     return res;
 }
-
 /**
  * @brief Tell size of file; returns size in bytes.
  *
@@ -313,7 +314,6 @@ tell_file (file_t* file)
         file->error = FILE_ERROR_TELL;
     return size;
 }
-
 /**
  * @brief Flushs a file.
  *
@@ -337,7 +337,6 @@ get_handle_file (file_t* file)
 {
     return (file->fp == NULL) ? NULL : file->fp;
 }
-
 /**
  * @brief Gets the name of the file passed in.
  *
@@ -348,7 +347,6 @@ get_name_file (file_t* file)
 {
     return file->name;
 }
-
 /**
  * @brief Gets the size of the current file.
  *
@@ -366,7 +364,6 @@ get_size_file (file_t* file)
         file->error = FILE_ERROR_SIZE;
     return size;
 }
-
 /**
  * @brief Gets the line count of the current file.
  *

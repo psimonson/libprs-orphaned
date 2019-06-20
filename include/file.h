@@ -66,6 +66,8 @@ PRS_EXPORT int
 readf_file (file_t* file, const char* buf, ...);
 PRS_EXPORT int
 vwritef_file (file_t* file, const char* buf, va_list ap);
+PRS_EXPORT char*
+gets_file (file_t* file, char* buf, long size);
 PRS_EXPORT int
 getc_file (file_t* file);
 PRS_EXPORT void
