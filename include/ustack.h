@@ -7,6 +7,7 @@
  **********************************************************************
  */
 
+#ifndef PRS_USTACK_H
 #define PRS_USTACK_H
 
 #include "export.h"
@@ -33,4 +34,6 @@ PRS_EXPORT void free_stack(ustack_t* stack, void (*)(void*));
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

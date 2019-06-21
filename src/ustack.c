@@ -3,6 +3,7 @@
  * @author Philip R. Simonson
  * @date 24 May 2019
  * @brief Simple universal stack implementation.
+ * @details
  *
  * Main source file for universal stack. Fully working stack that
  * all you need to do is create your own functions for data

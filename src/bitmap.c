@@ -3,6 +3,7 @@
  * @author Philip R. Simonson
  * @date 16 June 2019
  * @brief Bitmap file loader/creator.
+ * @details
  *
  * This loader also has some special functionality.
  */

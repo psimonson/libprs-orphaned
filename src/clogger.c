@@ -3,6 +3,7 @@
  * @author Philip R. Simonson
  * @date 13 Mar 2019
  * @brief Simple logging system that I made.
+ * @details
  *
  * Just a logging system, very simple and straight
  * forward to use.

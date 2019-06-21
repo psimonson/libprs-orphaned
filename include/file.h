@@ -5,16 +5,17 @@
  ********************************************************************
  */
 
+#ifndef PRS_CFILE_H
 #define PRS_CFILE_H
 
 #include "export.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef va_list
 #include <stdarg.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 #ifndef MAX_PATH
@@ -93,4 +94,6 @@ get_handle_file (file_t* file);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

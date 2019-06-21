@@ -3,6 +3,7 @@
  * @author Philip R. Simonson
  * @date 06 Jun 2019
  * @brief Simple socket helper library (WIP).
+ * @details
  *
  * This is going to be a cross platform socket (networking)
  * library. Although its a work-in-progress right now. But

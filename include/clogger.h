@@ -6,6 +6,7 @@
  ******************************************************************************
  */
 
+#ifndef PRS_CLOGGER_H
 #define PRS_CLOGGER_H
 
 #include "export.h"
@@ -39,4 +40,6 @@ PRS_EXPORT const char* get_log_name (int logNum);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

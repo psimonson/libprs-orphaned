@@ -6,6 +6,7 @@
  ********************************************************************
  */
 
+#ifndef PRS_SOCKHELP_H
 #define PRS_SOCKHELP_H
 
 #include "export.h"
@@ -66,4 +67,6 @@ PRS_EXPORT long recv_data(sock_t *sock, void *data, long size, int flags);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

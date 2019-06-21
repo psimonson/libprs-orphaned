@@ -6,6 +6,7 @@
  ********************************************************************
  */
 
+#ifndef PRS_BITMAP_H
 #define PRS_BITMAP_H
 
 #include "export.h"
@@ -94,4 +95,6 @@ PRS_EXPORT int get_last_error_bitmap();
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

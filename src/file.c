@@ -3,6 +3,7 @@
  * @author Philip R. Simonson
  * @date 11 May 2019
  * @brief Simple file operation library.
+ * @details
  *
  * This file library does make a bunch of calls into
  * not so many. With just a few functions you can open
