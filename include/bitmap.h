@@ -55,20 +55,16 @@ typedef struct BITMAPINFO {
 } BitmapInfo;
 #pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct BITMAP {
 	BitmapInfo info;
 	unsigned char *data;
 } Bitmap;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct Color {
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
 } Color;
-#pragma pack(pop)
 
 /* pixel functions */
 PRS_EXPORT void get_pixel_bitmap(Bitmap *bitmap, int y, int x, Color *pixel);
