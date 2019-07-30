@@ -227,6 +227,16 @@ gets_file (file_t* file, char* buf, long size)
 	return fgets(buf, size, file->fp);
 }
 /**
+ * @brief Put a line of text to file
+ *
+ * Returns: int
+ */
+int
+puts_file (file_t* file, const char* buf)
+{
+	return fputs(buf, file->fp);
+}
+/**
  * @brief Read formatted from file
  *
  * Returns: int
@@ -299,6 +309,16 @@ seek_file (file_t* file, long bytes, int seek)
     if(errno != 0)
         file->error = FILE_ERROR_SEEK;
     return res;
+}
+/**
+ * @brief Rewind file back to start.
+ *
+ * Returns: void
+ */
+void
+rewind_file (file_t* file)
+{
+	rewind(file->fp);
 }
 /**
  * @brief Tell size of file; returns size in bytes.

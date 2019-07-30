@@ -70,6 +70,8 @@ vwritef_file (file_t* file, const char* buf, va_list ap);
 PRS_EXPORT char*
 gets_file (file_t* file, char* buf, long size);
 PRS_EXPORT int
+puts_file (file_t* file, const char* buf);
+PRS_EXPORT int
 getc_file (file_t* file);
 PRS_EXPORT void
 putc_file (file_t* file, int c);
@@ -77,6 +79,8 @@ PRS_EXPORT void
 ungetc_file (file_t* file, int c);
 PRS_EXPORT int
 seek_file (file_t* file, long bytes, int seek);
+PRS_EXPORT void
+rewind_file (file_t* file);
 PRS_EXPORT long
 tell_file (file_t* file);
 PRS_EXPORT int
