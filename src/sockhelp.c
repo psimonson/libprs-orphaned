@@ -239,8 +239,7 @@ int client_socket(sock_t *sock, const char *addr, const char *port)
 	
 	host = gethostbyname(addr);
 	if(host) {
-		strncpy(sock->addr, host->h_name,
-			strlen(host->h_name));
+		strcpy(sock->addr, host->h_name);
 		printf("client: connecting to %s\n", sock->addr);
 		sock->error = SOCKERR_OKAY;
 		return 0;

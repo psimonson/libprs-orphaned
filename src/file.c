@@ -64,7 +64,7 @@ open_file (file_t* file, const char* filename, const char* mode)
         file->error = FILE_ERROR_OPEN;
         return;
     }
-    strncpy(file->name, filename, strlen(filename));
+    strcpy(file->name, filename);
     if(strchr(mode, 'w') == NULL) {
         file->size = get_size_file(file);
         if(file->size < 0) {
@@ -100,7 +100,7 @@ reopen_file (file_t* file, const char* filename, const char* mode)
         file->error = FILE_ERROR_OPEN;
         return;
     }
-    strncpy(file->name, filename, strlen(filename));
+    strcpy(file->name, filename);
     if(strchr(mode, 'w') == NULL) {
         file->size = get_size_file(file);
         if(file->size < 0) {

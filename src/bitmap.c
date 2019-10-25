@@ -438,16 +438,16 @@ encode_steganograph (Bitmap *bmp, const char *msg)
 	}
 	for(j=7; j>=0; --j,++offset) {
 		char add = (byte >> j) & 1;
-		bmp->data[offset] = (bmp->data[offset] & 0xFE) | add;
+		bmp->data[offset] = (bmp->data[offset] & 1) | add;
 	}
 	for(j=31; j>=0; --j,++offset) {
 		char add = (strlen(msg) >> j) & 1;
-		bmp->data[offset] = (bmp->data[offset] & 0xFE) | add;
+		bmp->data[offset] = (bmp->data[offset] & 1) | add;
 	}
 	for(i=0; i<=(int)strlen(msg); ++i) {
 		for(j=7; j>=0; --j,++offset) {
 			int b = (msg[i] >> j) & 1;
-			bmp->data[offset] = ((bmp->data[offset] & 0xFE) | b);
+			bmp->data[offset] = ((bmp->data[offset] & 1) | b);
 		}
 	}
 }

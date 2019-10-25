@@ -22,5 +22,5 @@ elif [ "$2" = "win32" ]; then
 	cmake --build build --target all || exit
 else
 	cmake -H. -Bbuild $install_dir && \
-	cmake --build build --target all
+	cmake --build build --target all || exit
 fi
