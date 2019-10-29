@@ -1,8 +1,12 @@
-/*
- * c_logger.h - My C logger header library.
+/**
+ * @file clogger.h
+ * @author Philip R. Simonson
+ * @date   03/13/2019
+ ******************************************************************************
+ * @details
  *
- * Author : Philip R. Simonson
- * Date   : 03/13/2019
+ * My simple log file library, used for making logging easier. Like to report
+ * stuff happening in your program.
  ******************************************************************************
  */
 
@@ -29,13 +33,21 @@ enum CLOG_ENUM {
 	CLOG4
 };
 
+/** @brief This function must be run first. */
 PRS_EXPORT void init_logger ();
+/** @brief Open a log file for reading writing. */
 PRS_EXPORT void open_log (int logNum, const char *name);
+/** @brief Read a log file. */
 PRS_EXPORT int read_log (int logNum, char *buf, int size);
+/** @brief Write to a log file. */
 PRS_EXPORT void write_log (int logNum, const char *data, ...);
+/** @brief Close an opened log file. */
 PRS_EXPORT void close_log (int logNum);
+/** @brief Print status of log file. */
 PRS_EXPORT void print_status (int logNum);
+/** @brief Get status from log file. */
 PRS_EXPORT int get_status (int logNum);
+/** @brief Get log file name. */
 PRS_EXPORT const char* get_log_name (int logNum);
 
 #ifdef __cplusplus

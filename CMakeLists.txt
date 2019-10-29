@@ -89,7 +89,7 @@ if(DOXYGEN_FOUND)
 		# note the option ALL which allows building docs with project
 		add_custom_target(doc_doxygen ALL
 			COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src
+			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/include
 			COMMENT "Generating API Documentation with Doxygen"
 			VERBATIM)
 		if(WIN32)

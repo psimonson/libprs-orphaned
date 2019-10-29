@@ -1,9 +1,12 @@
-/*
- * ustack.h - Simple stack data structure. Please see comment header
- *            inside of the main source file "ustack.c".
+/**
+ * @file ustack.h
+ * @author Philip R. Simonson
+ * @date   2019/05/24
  **********************************************************************
- * Author: Philip R. Simonson
- * Date  : 2019/05/24
+ * @details
+ *
+ * Make a simple dynamic stack, handling everything from this library
+ * with anything to do with the stack.
  **********************************************************************
  */
 
@@ -18,6 +21,7 @@ extern "C" {
 
 #define STACKSIZE 255
 
+/** @brief Universal stack structure. */
 typedef struct ustack {
     void* data;
     int size;
