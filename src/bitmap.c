@@ -14,6 +14,7 @@
 
 #include "file.h"
 #include "bitmap.h"
+#include "bitfiddle.h"
 
 int _bitmap_errno; /**< Current error code from bitmap library. */
 
@@ -425,29 +426,28 @@ bitmap_to_greyscale (Bitmap *bmp)
 void
 encode_steganograph (Bitmap *bmp, const char *msg)
 {
-	static long offset = 0;
-	unsigned char byte = 0xf0;
-	int i,j;
+	long offset = 0;
+	unsigned char byte = 0xfb;
+	int i, j, len = strlen(msg);
 
 	if (!bmp || !msg)
 		return;
 
-	if ((int)(strlen(msg)+40) > bmp->info.isize) {
+	if ((int)(strlen(msg)) > bmp->info.isize) {
 		printf("Error: image size not big enough.\n");
 		return;
 	}
-	for(j=7; j>=0; --j,++offset) {
-		char add = (byte >> j) & 1;
-		bmp->data[offset] = (bmp->data[offset] & 1) | add;
+	for(i=0; i<=7; ++i,++offset) {
+		bmp->data[offset] = (GET_BIT(byte, i) ? SET_BIT(bmp->data[offset], 0) : CLR_BIT(bmp->data[offset], 0));
+		printf("Byte bits: %d\t\tData bit: %d\n",
+			GET_BIT(byte, i) ? 1 : 0, GET_BIT(bmp->data[offset], 0) ? 1 : 0);
 	}
-	for(j=31; j>=0; --j,++offset) {
-		char add = (strlen(msg) >> j) & 1;
-		bmp->data[offset] = (bmp->data[offset] & 1) | add;
+	for(j=0; j<=(int)(sizeof(int)); ++j,++offset) {
+		bmp->data[offset] = (GET_BIT(len, j) ? SET_BIT(bmp->data[offset], 0) : CLR_BIT(bmp->data[offset], 0));
 	}
 	for(i=0; i<=(int)strlen(msg); ++i) {
-		for(j=7; j>=0; --j,++offset) {
-			int b = (msg[i] >> j) & 1;
-			bmp->data[offset] = ((bmp->data[offset] & 1) | b);
+		for(j=0; j<=7; ++j,++offset) {
+			bmp->data[offset] = (GET_BIT(msg[i], j) ? SET_BIT(bmp->data[offset], 0) : CLR_BIT(bmp->data[offset], 0));
 		}
 	}
 }
@@ -458,39 +458,41 @@ encode_steganograph (Bitmap *bmp, const char *msg)
 char*
 decode_steganograph(Bitmap *bmp)
 {
-	char *buf;
-	int i, j, length = 0;
-	static long offset = 40;
+	char *data;
+	int i, j, len = 0;
+	long offset = 0;
 	unsigned char byte;
 
 	if (!bmp)
 		return NULL;
 
 	byte = 0;
-	for(i=0; i<8; ++i)
-		byte = (byte << 1) | (bmp->data[i] & 1);
-
-	if (byte != 0xf0) {
+	for(i=0; i<=7; ++i,++offset) {
+		byte = (GET_BIT(bmp->data[offset], 0) ? SET_BIT(byte, i) : CLR_BIT(byte, i));
+		printf("Byte bit: %d\t\tData bit: %d\n",
+		GET_BIT(byte, i) ? 1 : 0, GET_BIT(bmp->data[offset], 0));
+	}
+	if(byte != 0xfb) {
 		_bitmap_errno = BMP_DECODE_ERROR;
 		destroy_bitmap(bmp);
 		return NULL;
 	}
-
-	for(i=8; i<40; ++i)
-		length = (length << 1) | (bmp->data[i] & 1);
-
-	buf = malloc(length+1);
-	if (!buf) {
+	for(j=0; j<=(int)(sizeof(int)); ++j,++offset) {
+		len = (GET_BIT(bmp->data[offset], 0) ? SET_BIT(len, j) : CLR_BIT(len, j));
+	}
+	printf("Length: %d\n", len);
+	data = (char*)malloc(len+1);
+	if(data == NULL) {
 		_bitmap_errno = BMP_MALLOC_ERROR;
+		destroy_bitmap(bmp);
 		return NULL;
 	}
-	memset(buf, 0, length+1);
-	for(i=0; i<length; i++) {
-		for(j=0; j<8; ++j,++offset)
-			buf[i] = (buf[i] << 1) | (bmp->data[offset] & 1);
-	}
-	buf[length+1] = '\0';
-	return buf;
+	memset(data, 0, len+1);
+	for(i=0; i<=len; ++i)
+		for(j=0; j<=7; ++j,++offset)
+			data[i] = (GET_BIT(bmp->data[offset], 0) ? SET_BIT(data[i], j) : CLR_BIT(data[i], j));
+	data[i] = '\0';
+	return data;
 }
 
 /**
