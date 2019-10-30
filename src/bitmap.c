@@ -439,8 +439,6 @@ encode_steganograph (Bitmap *bmp, const char *msg)
 	}
 	for(i=0; i<=7; ++i,++offset) {
 		bmp->data[offset] = (GET_BIT(byte, i) ? SET_BIT(bmp->data[offset], 0) : CLR_BIT(bmp->data[offset], 0));
-		printf("Byte bits: %d\t\tData bit: %d\n",
-			GET_BIT(byte, i) ? 1 : 0, GET_BIT(bmp->data[offset], 0) ? 1 : 0);
 	}
 	for(j=0; j<=(int)(sizeof(int)); ++j,++offset) {
 		bmp->data[offset] = (GET_BIT(len, j) ? SET_BIT(bmp->data[offset], 0) : CLR_BIT(bmp->data[offset], 0));
