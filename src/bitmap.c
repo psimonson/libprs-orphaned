@@ -433,7 +433,7 @@ encode_steganograph (Bitmap *bmp, const char *msg)
 	if (!bmp || !msg)
 		return;
 
-	if ((int)(strlen(msg)) > bmp->info.isize) {
+	if ((int)(strlen(msg)+sizeof(int)+sizeof(char)) > bmp->info.isize) {
 		printf("Error: image size not big enough.\n");
 		return;
 	}
@@ -469,8 +469,6 @@ decode_steganograph(Bitmap *bmp)
 	byte = 0;
 	for(i=0; i<=7; ++i,++offset) {
 		byte = (GET_BIT(bmp->data[offset], 0) ? SET_BIT(byte, i) : CLR_BIT(byte, i));
-		printf("Byte bit: %d\t\tData bit: %d\n",
-		GET_BIT(byte, i) ? 1 : 0, GET_BIT(bmp->data[offset], 0));
 	}
 	if(byte != 0xfb) {
 		_bitmap_errno = BMP_DECODE_ERROR;
@@ -480,7 +478,6 @@ decode_steganograph(Bitmap *bmp)
 	for(j=0; j<=(int)(sizeof(int)); ++j,++offset) {
 		len = (GET_BIT(bmp->data[offset], 0) ? SET_BIT(len, j) : CLR_BIT(len, j));
 	}
-	printf("Length: %d\n", len);
 	data = (char*)malloc(len+1);
 	if(data == NULL) {
 		_bitmap_errno = BMP_MALLOC_ERROR;
