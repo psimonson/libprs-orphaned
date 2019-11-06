@@ -63,24 +63,21 @@ open_file(const char* filename, const char* mode)
     file->error = FILE_ERROR_OKAY;
     if((file->fp = fopen(filename, mode)) == NULL) {
         file->error = FILE_ERROR_OPEN;
-        return NULL;
+        return file;
     }
     strcpy(file->name, filename);
     if(strchr(mode, 'w') == NULL) {
         file->size = get_size_file(file);
         if(file->size < 0) {
-            close_file(file);
             file->error = FILE_ERROR_SIZE;
-            return NULL;
         }
         if(strchr(mode, 'b') == NULL) {
             file->lines = get_lines_file(file);
             if(file->lines < 0) {
-                close_file(file);
                 file->error = FILE_ERROR_LINE;
-                return NULL;
             }
-        }
+	}
+	return file;
     } else {
         file->size = 0;
         file->lines = 0;
@@ -107,24 +104,21 @@ reopen_file(const char* filename, const char* mode)
     file->error = FILE_ERROR_OKAY;
     if((file->fp = freopen(filename, mode, file->fp)) == NULL) {
         file->error = FILE_ERROR_OPEN;
-        return NULL;
+	return file;
     }
     strcpy(file->name, filename);
     if(strchr(mode, 'w') == NULL) {
         file->size = get_size_file(file);
         if(file->size < 0) {
-            close_file(file);
             file->error = FILE_ERROR_SIZE;
-            return NULL;
         }
         if(strchr(mode, 'b') == NULL) {
             file->lines = get_lines_file(file);
             if(file->lines < 0) {
-                close_file(file);
                 file->error = FILE_ERROR_LINE;
-                return NULL;
             }
         }
+	return file;
     } else {
         file->size = 0;
         file->lines = 0;
