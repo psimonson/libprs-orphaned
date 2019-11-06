@@ -41,32 +41,23 @@ enum {
 };
 
 /** @brief File structure, for handling files in this library. */
-typedef struct file {
-    FILE *fp;
-    char name[MAX_PATH];
-    long size;
-    long lines;
-    int error;
-} file_t;
+typedef struct file file_t;
 
-/** @brief Initialise the file structure. */
-PRS_EXPORT void
-init_file (file_t* file);
 /** @brief Open a file with open mode. */
-PRS_EXPORT void
-open_file (file_t* file, const char* filename, const char* mode);
+PRS_EXPORT file_t*
+open_file(const char* filename, const char* mode);
 /** @brief Reopen a file with open mode. */
-PRS_EXPORT void
-reopen_file (file_t* file, const char* filename, const char* mode);
+PRS_EXPORT file_t*
+reopen_file(const char* filename, const char* mode);
 /** @brief Get error for file structure (const char *). */
 PRS_EXPORT const char*
-get_error_file (file_t* file);
+get_error_file(file_t* file);
 /** @brief Get error for file structure (int). */
 PRS_EXPORT int
-get_errori_file (file_t* file);
+get_errori_file(file_t* file);
 /** @brief Close a file structure. */
 PRS_EXPORT void
-close_file (file_t* file);
+close_file(file_t* file);
 
 /** @brief Read from a file, this is like fread(). */
 PRS_EXPORT int

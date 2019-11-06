@@ -73,58 +73,55 @@ Bitmap*
 load_bitmap (const char *filename)
 {
 	Bitmap *bmp;
-	file_t file;
+	file_t *file;
 
-	init_file(&file);
-	open_file(&file, filename, "rb");
-	if (get_errori_file(&file) != FILE_ERROR_OKAY) {
-		_bitmap_errno = BMP_FILE_ERROR;
+	file = open_file(filename, "rb");
+	if (file == NULL)
 		return NULL;
-	}
 
 	bmp = malloc(sizeof(Bitmap));
-	if (!bmp) {
+	if (bmp == NULL) {
 		_bitmap_errno = BMP_MALLOC_ERROR;
-		close_file(&file);
+		close_file(file);
 		return NULL;
 	}
 
 	/* get bitmap info */
-	read_file(&file, &bmp->info.type, 2, 1);
-	read_file(&file, &bmp->info.fsize, 4, 1);
-	read_file(&file, &bmp->info.res1, 2, 1);
-	read_file(&file, &bmp->info.res2, 2, 1);
-	read_file(&file, &bmp->info.offset, 4, 1);
-	read_file(&file, &bmp->info.size, 4, 1);
-	read_file(&file, &bmp->info.width, 4, 1);
-	read_file(&file, &bmp->info.height, 4, 1);
-	read_file(&file, &bmp->info.planes, 2, 1);
-	read_file(&file, &bmp->info.bpp, 2, 1);
-	read_file(&file, &bmp->info.compression, 4, 1);
-	read_file(&file, &bmp->info.isize, 4, 1);
-	read_file(&file, &bmp->info.hres, 4, 1);
-	read_file(&file, &bmp->info.vres, 4, 1);
-	read_file(&file, &bmp->info.palette, 4, 1);
-	read_file(&file, &bmp->info.impcolors, 4, 1);
+	read_file(file, &bmp->info.type, 2, 1);
+	read_file(file, &bmp->info.fsize, 4, 1);
+	read_file(file, &bmp->info.res1, 2, 1);
+	read_file(file, &bmp->info.res2, 2, 1);
+	read_file(file, &bmp->info.offset, 4, 1);
+	read_file(file, &bmp->info.size, 4, 1);
+	read_file(file, &bmp->info.width, 4, 1);
+	read_file(file, &bmp->info.height, 4, 1);
+	read_file(file, &bmp->info.planes, 2, 1);
+	read_file(file, &bmp->info.bpp, 2, 1);
+	read_file(file, &bmp->info.compression, 4, 1);
+	read_file(file, &bmp->info.isize, 4, 1);
+	read_file(file, &bmp->info.hres, 4, 1);
+	read_file(file, &bmp->info.vres, 4, 1);
+	read_file(file, &bmp->info.palette, 4, 1);
+	read_file(file, &bmp->info.impcolors, 4, 1);
 
 	if (bmp->info.type != 0x4D42 && bmp->info.fsize != bmp->info.isize) {
 		_bitmap_errno = BMP_TYPE_ERROR;
-		close_file(&file);
+		close_file(file);
 		return NULL;
 	}
 
 	/* load bitmap data */
 	bmp->data = malloc(bmp->info.isize);
-	if (!bmp->data) {
+	if (bmp->data == NULL) {
 		_bitmap_errno = BMP_MALLOC_ERROR;
 		free(bmp);
-		close_file(&file);
+		close_file(file);
 		return NULL;
 	}
 	memset(bmp->data, 0, bmp->info.isize);
-	seek_file(&file, bmp->info.offset, SEEK_SET);
-	read_file(&file, bmp->data, 1, bmp->info.isize);
-	close_file(&file);
+	seek_file(file, bmp->info.offset, SEEK_SET);
+	read_file(file, bmp->data, 1, bmp->info.isize);
+	close_file(file);
 	return bmp;
 }
 
@@ -137,30 +134,27 @@ load_bitmap (const char *filename)
 int
 write_bitmap (Bitmap *bmp, const char *filename)
 {
-	file_t file;
+	file_t *file;
 	int res;
 
-	init_file(&file);
-	open_file(&file, filename, "wb");
-	if (get_errori_file(&file) != FILE_ERROR_OKAY) {
-		_bitmap_errno = BMP_FILE_ERROR;
+	file = open_file(filename, "wb");
+	if (file == NULL)
 		return 1;
-	}
 
-	res = write_file(&file, &bmp->info, 1, sizeof(BitmapInfo));
+	res = write_file(file, &bmp->info, 1, sizeof(BitmapInfo));
 	if (res < (int)sizeof(BitmapInfo)) {
 		_bitmap_errno = BMP_FILE_ERROR;
-		close_file(&file);
+		close_file(file);
 		return 1;
 	}
-	res = write_file(&file, bmp->data, 1, bmp->info.isize);
+	res = write_file(file, bmp->data, 1, bmp->info.isize);
 	if (res < bmp->info.isize) {
 		_bitmap_errno = BMP_FILE_ERROR;
-		close_file(&file);
+		close_file(file);
 		return 1;
 	}
-	close_file(&file);
-	if (get_errori_file(&file) != FILE_ERROR_CLOSED) {
+	close_file(file);
+	if (get_errori_file(file) != FILE_ERROR_CLOSED) {
 		_bitmap_errno = BMP_FILE_ERROR;
 		return 1;
 	}

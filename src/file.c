@@ -17,11 +17,20 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>
 
 #include "file.h"
+
+struct file {
+    FILE *fp;
+    char name[MAX_PATH];
+    long size;
+    long lines;
+    int error;
+};
 
 static const char *_prs_file_errors[] = {
     "File is okay (no error).",
@@ -38,31 +47,23 @@ static const char *_prs_file_errors[] = {
 /* ------------------------- standard functions ------------------------ */
 
 /**
- * @brief Initialise the file structure
- *
- * Returns: void
+ * @brief Open a file by (path, mode).
  */
-void
-init_file (file_t* file)
+file_t*
+open_file(const char* filename, const char* mode)
 {
+    file_t *file;
+    file = (file_t*)malloc(sizeof(file_t));
+    if(file == NULL)
+	return NULL;
     file->fp = NULL;
     memset(file->name, 0, MAX_PATH);
     file->size = -1;
     file->lines = -1;
     file->error = FILE_ERROR_OKAY;
-}
-
-/**
- * @brief Open a file by (path, mode).
- *
- * Returns: void
- */
-void
-open_file (file_t* file, const char* filename, const char* mode)
-{
     if((file->fp = fopen(filename, mode)) == NULL) {
         file->error = FILE_ERROR_OPEN;
-        return;
+        return NULL;
     }
     strcpy(file->name, filename);
     if(strchr(mode, 'w') == NULL) {
@@ -70,14 +71,14 @@ open_file (file_t* file, const char* filename, const char* mode)
         if(file->size < 0) {
             close_file(file);
             file->error = FILE_ERROR_SIZE;
-            return;
+            return NULL;
         }
         if(strchr(mode, 'b') == NULL) {
             file->lines = get_lines_file(file);
             if(file->lines < 0) {
                 close_file(file);
                 file->error = FILE_ERROR_LINE;
-                return;
+                return NULL;
             }
         }
     } else {
@@ -86,19 +87,27 @@ open_file (file_t* file, const char* filename, const char* mode)
     }
     file->error = FILE_ERROR_OKAY;
     fseek(file->fp, 0, SEEK_SET);
+    return file;
 }
 
 /**
  * @brief Reopen file with different mode.
- *
- * Returns: void
  */
-void
-reopen_file (file_t* file, const char* filename, const char* mode)
+file_t*
+reopen_file(const char* filename, const char* mode)
 {
+    file_t *file;
+    file = (file_t*)malloc(sizeof(file_t));
+    if(file == NULL)
+	    return NULL;
+    file->fp = NULL;
+    memset(file->name, 0, MAX_PATH);
+    file->size = -1;
+    file->lines = -1;
+    file->error = FILE_ERROR_OKAY;
     if((file->fp = freopen(filename, mode, file->fp)) == NULL) {
         file->error = FILE_ERROR_OPEN;
-        return;
+        return NULL;
     }
     strcpy(file->name, filename);
     if(strchr(mode, 'w') == NULL) {
@@ -106,14 +115,14 @@ reopen_file (file_t* file, const char* filename, const char* mode)
         if(file->size < 0) {
             close_file(file);
             file->error = FILE_ERROR_SIZE;
-            return;
+            return NULL;
         }
         if(strchr(mode, 'b') == NULL) {
             file->lines = get_lines_file(file);
             if(file->lines < 0) {
                 close_file(file);
                 file->error = FILE_ERROR_LINE;
-                return;
+                return NULL;
             }
         }
     } else {
@@ -122,12 +131,11 @@ reopen_file (file_t* file, const char* filename, const char* mode)
     }
     file->error = FILE_ERROR_OKAY;
     fseek(file->fp, 0, SEEK_SET);
+    return file;
 }
 
 /**
  * @brief Gets the error string associated with error code.
- *
- * Returns: const char*
  */
 const char*
 get_error_file (file_t* file)
@@ -137,8 +145,6 @@ get_error_file (file_t* file)
 
 /**
  * @brief Gets the error code from file.
- *
- * Returns: int
  */
 int
 get_errori_file (file_t* file)
@@ -148,25 +154,22 @@ get_errori_file (file_t* file)
 
 /**
  * @brief Uninitialize the file structure; closing file.
- *
- * Returns: void
  */
 void
-close_file (file_t* file)
+close_file(file_t* file)
 {
     fclose(file->fp);
     memset(file->name, 0, MAX_PATH);
     file->size = -1;
     file->lines = -1;
     file->error = FILE_ERROR_CLOSED;
+    free(file);
 }
 
 /* ------------------------- handling functions ------------------------ */
 
 /**
  * @brief Read file into buf; of size
- *
- * Returns: int
  */
 int
 read_file (file_t* file, void* buf, size_t nmem, size_t size)
@@ -178,8 +181,6 @@ read_file (file_t* file, void* buf, size_t nmem, size_t size)
 }
 /**
  * @brief Write into file from buf; of size
- *
- * Returns: int
  */
 int
 write_file (file_t* file, const void* buf, size_t nmem, size_t size)
@@ -191,8 +192,6 @@ write_file (file_t* file, const void* buf, size_t nmem, size_t size)
 }
 /**
  * @brief Write formatted into file
- *
- * Returns: int
  */
 int
 writef_file (file_t* file, const char* buf, ...)
@@ -208,8 +207,6 @@ writef_file (file_t* file, const char* buf, ...)
 }
 /**
  * @brief Write formatted into file; using va_list
- *
- * Returns: int
  */
 int
 vwritef_file (file_t* file, const char* buf, va_list ap)
@@ -218,8 +215,6 @@ vwritef_file (file_t* file, const char* buf, va_list ap)
 }
 /**
  * @brief Read a line of text from file
- *
- * Returns: char*
  */
 char*
 gets_file (file_t* file, char* buf, long size)
@@ -228,8 +223,6 @@ gets_file (file_t* file, char* buf, long size)
 }
 /**
  * @brief Put a line of text to file
- *
- * Returns: int
  */
 int
 puts_file (file_t* file, const char* buf)
@@ -238,8 +231,6 @@ puts_file (file_t* file, const char* buf)
 }
 /**
  * @brief Read formatted from file
- *
- * Returns: int
  */
 int
 readf_file (file_t* file, const char* buf, ...)
@@ -255,8 +246,6 @@ readf_file (file_t* file, const char* buf, ...)
 }
 /**
  * @brief Gets one byte from the file
- *
- * Returns: int
  */
 int
 getc_file (file_t* file)
@@ -271,8 +260,6 @@ getc_file (file_t* file)
 }
 /**
  * @brief Puts one byte into the file
- *
- * Returns: void
  */
 void
 putc_file (file_t* file, int c)
@@ -284,8 +271,6 @@ putc_file (file_t* file, int c)
 }
 /**
  * @brief Puts one byte back onto file stream.
- *
- * Returns: void
  */
 void
 ungetc_file (file_t* file, int c)
@@ -297,8 +282,6 @@ ungetc_file (file_t* file, int c)
 }
 /**
  * @brief Seek through file by bytes.
- *
- * Returns: int
  */
 int
 seek_file (file_t* file, long bytes, int seek)
@@ -312,8 +295,6 @@ seek_file (file_t* file, long bytes, int seek)
 }
 /**
  * @brief Rewind file back to start.
- *
- * Returns: void
  */
 void
 rewind_file (file_t* file)
@@ -322,8 +303,6 @@ rewind_file (file_t* file)
 }
 /**
  * @brief Tell size of file; returns size in bytes.
- *
- * Returns: long
  */
 long
 tell_file (file_t* file)
@@ -337,8 +316,6 @@ tell_file (file_t* file)
 }
 /**
  * @brief Flushs a file.
- *
- * Returns: int
  */
 int
 flush_file (file_t* file)
@@ -350,8 +327,6 @@ flush_file (file_t* file)
 
 /**
  * @brief Gets the handle for a given file; returns FILE pointer.
- *
- * Returns: FILE*
  */
 FILE*
 get_handle_file (file_t* file)
@@ -360,8 +335,6 @@ get_handle_file (file_t* file)
 }
 /**
  * @brief Gets the name of the file passed in.
- *
- * Returns: const char*
  */
 const char*
 get_name_file (file_t* file)
@@ -370,8 +343,6 @@ get_name_file (file_t* file)
 }
 /**
  * @brief Gets the size of the current file.
- *
- * Returns: long
  */
 long
 get_size_file (file_t* file)
@@ -387,8 +358,6 @@ get_size_file (file_t* file)
 }
 /**
  * @brief Gets the line count of the current file.
- *
- * Returns: int
  */
 int
 get_lines_file (file_t* file)
