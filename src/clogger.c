@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <errno.h>
 
 #include "file.h"
 #include "clogger.h"
@@ -27,8 +28,8 @@ struct CLOG {
 	long write_pos;  /**< Current write position */
 };
 
-struct CLOG _logs[MAX_LOGS]; /**< Global variable for storing log info */
-char init_var;               /**< Global variable for logger initialization */
+struct CLOG _logs[MAX_LOGS];  /**< Global variable for storing log info */
+char init_var;                /**< Global variable for logger initialization */
 
 void close_log(int);
 int get_status(int);
@@ -56,7 +57,10 @@ init_logger ()
 
 		init_var = 1;
 		for(i=0; i<MAX_LOGS; i++) {
-			memset(&_logs[i], 0, sizeof(struct CLOG));
+			_logs[i].file = NULL;
+			_logs[i].status = CLOGERR_CLOSE;
+			_logs[i].write_pos = 0;
+			_logs[i].read_pos = 0;
 		}
 		atexit(_logger_exit_func);
 	} else {
@@ -73,12 +77,14 @@ void
 open_log (int logNum, const char *name)
 {
 	if(init_var) {
-		if(!get_status(logNum)) {
+		if(get_status(logNum) == CLOGERR_CLOSE) {
 			_logs[logNum].file = open_file(name, "a+t");
 			if(get_errori_file(_logs[logNum].file)
-				!= FILE_ERROR_OKAY)
+				!= FILE_ERROR_OKAY) {
+				_logs[logNum].status = CLOGERR_OPEN;
 				return;
-			_logs[logNum].status = 1;
+			}
+			_logs[logNum].status = CLOGERR_OKAY;
 			return;
 		}
 		return;
@@ -92,10 +98,10 @@ open_log (int logNum, const char *name)
  * Returns: int
  */
 int
-read_log (int logNum, char *buf, int size)
+read_log(int logNum, char *buf, int size)
 {
 	if(init_var) {
-		if(get_status(logNum)) {
+		if(get_status(logNum) == CLOGERR_OKAY) {
 			int c, pos;
 
 			seek_file(_logs[logNum].file,
@@ -109,12 +115,16 @@ read_log (int logNum, char *buf, int size)
 			c = pos = 0;
 			memset(buf, 0, size);
 			while(pos < size &&
-				((c = getc_file(_logs[logNum].file))
-				!= '\n'))
+				(c = getc_file(_logs[logNum].file)
+				!= EOF && c != '\n'))
 				buf[pos++] = c;
 			_logs[logNum].read_pos =
 				tell_file(_logs[logNum].file);
 			buf[pos] = '\0';
+			if(c != EOF && errno != 0) {
+				_logs[logNum].status = CLOGERR_READ;
+				errno = 0;
+			}
 			return c;
 		}
 		printf("Warning: Could not read, log CLOG%d not open.\n",
@@ -131,20 +141,25 @@ read_log (int logNum, char *buf, int size)
  * Returns: void
  */
 void
-write_log (int logNum, const char *data, ...)
+write_log(int logNum, const char *data, ...)
 {
 	if(init_var) {
-		if(get_status(logNum)) {
+		if(get_status(logNum) == CLOGERR_OKAY) {
 			va_list ap;
+			int res;
 			seek_file(_logs[logNum].file,
 				_logs[logNum].write_pos,
 				SEEK_SET);
 			va_start(ap, data);
-			vwritef_file(_logs[logNum].file, data, ap);
+			res = vwritef_file(_logs[logNum].file, data, ap);
 			va_end(ap);
 			_logs[logNum].write_pos =
 				tell_file(_logs[logNum].file);
 			flush_file(_logs[logNum].file);
+			if(res < 0 && errno != 0) {
+				_logs[logNum].status = CLOGERR_WRITE;
+				errno = 0;
+			}
 			return;
 		}
 		printf("Warning: Not writing, log CLOG%d not open.\n", logNum);
@@ -159,12 +174,12 @@ write_log (int logNum, const char *data, ...)
  * Returns: void
  */
 void
-close_log (int logNum)
+close_log(int logNum)
 {
 	if(init_var) {
-		if(get_status(logNum)) {
+		if(get_status(logNum) == CLOGERR_OKAY) {
 			close_file(_logs[logNum].file);
-			_logs[logNum].status = 0;
+			_logs[logNum].status = CLOGERR_CLOSE;
 			_logs[logNum].read_pos = 0;
 			_logs[logNum].write_pos = 0;
 			return;
@@ -180,11 +195,16 @@ close_log (int logNum)
  * Returns: void
  */
 void
-print_status (int logNum)
+print_status_log(int logNum)
 {
 	if(init_var) {
-		printf("CLOG%d: Log %s\n", logNum,
-			(get_status(logNum) == 1) ? "open" : "closed");
+		const char *_err_codes[] = {
+			"OKAY", "OPEN ERROR",
+			"CLOSED", "WRITE ERROR",
+			"READ ERROR"
+		};
+		printf("CLOG%d: Log status\t\t- [%s]\n", logNum,
+			_err_codes[get_status_log(logNum)]);
 		return;
 	}
 	printf("Please use init_logger() first.\n");
@@ -196,7 +216,7 @@ print_status (int logNum)
  * Returns: int (status)
  */
 int
-get_status (int logNum)
+get_status_log(int logNum)
 {
 	if(init_var)
 		return _logs[logNum].status;
@@ -210,7 +230,7 @@ get_status (int logNum)
  * Returns: const char*
  */
 const char*
-get_log_name (int logNum)
+get_name_log(int logNum)
 {
 	if(init_var)
 		return get_name_file(_logs[logNum].file);
