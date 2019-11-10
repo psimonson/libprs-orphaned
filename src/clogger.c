@@ -32,7 +32,6 @@ struct CLOG _logs[MAX_LOGS];  /**< Global variable for storing log info */
 char init_var;                /**< Global variable for logger initialization */
 
 void close_log(int);
-int get_status(int);
 
 static void
 _logger_exit_func ()
@@ -40,7 +39,7 @@ _logger_exit_func ()
 	int i;
 
 	for(i=0; i<MAX_LOGS; i++)
-		if (get_status(i))
+		if (get_status_log(i))
 			close_log(i);
 }
 
@@ -77,7 +76,7 @@ void
 open_log (int logNum, const char *name)
 {
 	if(init_var) {
-		if(get_status(logNum) == CLOGERR_CLOSE) {
+		if(get_status_log(logNum) == CLOGERR_CLOSE) {
 			_logs[logNum].file = open_file(name, "a+t");
 			if(get_errori_file(_logs[logNum].file)
 				!= FILE_ERROR_OKAY) {
@@ -101,7 +100,7 @@ int
 read_log(int logNum, char *buf, int size)
 {
 	if(init_var) {
-		if(get_status(logNum) == CLOGERR_OKAY) {
+		if(get_status_log(logNum) == CLOGERR_OKAY) {
 			int c, pos;
 
 			seek_file(_logs[logNum].file,
@@ -144,7 +143,7 @@ void
 write_log(int logNum, const char *data, ...)
 {
 	if(init_var) {
-		if(get_status(logNum) == CLOGERR_OKAY) {
+		if(get_status_log(logNum) == CLOGERR_OKAY) {
 			va_list ap;
 			int res;
 			seek_file(_logs[logNum].file,
@@ -177,7 +176,7 @@ void
 close_log(int logNum)
 {
 	if(init_var) {
-		if(get_status(logNum) == CLOGERR_OKAY) {
+		if(get_status_log(logNum) == CLOGERR_OKAY) {
 			close_file(_logs[logNum].file);
 			_logs[logNum].status = CLOGERR_CLOSE;
 			_logs[logNum].read_pos = 0;
