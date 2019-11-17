@@ -21,7 +21,7 @@ main ()
     if(get_errori_file(file) != FILE_ERROR_OKAY)
         goto error;
     write_log(CLOG0, "File: %s\nLines: %ld\nSize: %ld\n",
-        get_log_name(CLOG0), get_lines_file(file), get_size_file(file));
+        get_name_log(CLOG0), get_lines_file(file), get_size_file(file));
     close_file(file);
     close_log(CLOG0);
     return 0;

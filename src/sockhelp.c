@@ -19,6 +19,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
+#include <ctype.h>
+#include <limits.h>
 
 /* Headers for socket programming */
 #ifdef _WIN32
@@ -398,3 +401,121 @@ long recv_data(sock_t *sock, void *data, long size, int flags)
 	nbytes = recv(sock->fd, p, size, flags);
 	return nbytes;
 }
+/**
+ * @brief Reverse string in place.
+ */
+void reverse(char *s)
+{
+	int i, j, c;
+	for(i=0, j=strlen(s)-1; i < j; ++i,--j) {
+		c = s[i];
+		s[i] = s[j];
+		s[j] = c;
+	}
+}
+/**
+ * @brief Convert decimal number into string.
+ */
+void itoa(int x, char *buf)
+{
+	int i, sign;
+	if((sign = x) < 0)
+		x = -x;
+	i = 0;
+	do {
+		buf[i++] = x % 10 + '0';
+	} while((x /= 10) > 0);
+	if(sign < 0)
+		buf[i++] = '-';
+	buf[i] = '\0';
+	reverse(buf);
+}
+/**
+ * @brief Write formatted messages to socket.
+ *
+ * Returns: bytes written (int)
+ */
+int writef_socket(sock_t *sock, const char *format, ...)
+{
+	va_list ap;
+	int written;
+	va_start(ap, format);
+	written = 0;
+	while(*format != '\0') {
+		int maxrem = INT_MAX - written;
+		const char *format_begun_at;
+
+		if(format[0] != '%' || format[1] == '%') {
+			int amount;
+			if(format[0] == '%')
+				format++;
+			amount = 1;
+			while(format[amount] && format[amount] != '%')
+				amount++;
+			if(maxrem < amount) {
+				return -1;
+			}
+			if(send_data(sock, format, amount, 0) < 0)
+				return -1;
+			format += amount;
+			written += amount;
+		}
+
+		format_begun_at = format++;
+
+		if(*format == 'c') {
+			char c;
+			format++;
+			c = (char)va_arg(ap, int);
+			if(!maxrem) {
+				/* TODO: Set overflow error. */
+				return -1;
+			}
+			if(send_data(sock, &c, sizeof(c), 0) < 0)
+				return -1;
+			written++;
+		} else if(*format == 'd') {
+			char buf[32];
+			int len, x;
+			format++;
+			x = (int)va_arg(ap, int);
+			itoa(x, buf);
+			len = strlen(buf);
+			if(maxrem < len) {
+				/* TODO: Set overflow error. */
+				return -1;
+			}
+			if(send_data(sock, buf, len, 0) < 0)
+				return -1;
+			written += len;
+		} else if(*format == 's') {
+			const char *s;
+			int len;
+			format++;
+			s = (const char*)va_arg(ap, const char*);
+			len = strlen(s);
+			if(maxrem < len) {
+				/* TODO: Set overflow error. */
+				return -1;
+			}
+			if(send_data(sock, s, len, 0) < 0)
+				return -1;
+			written += len;
+		} else {
+			int len;
+			format = format_begun_at;
+			len = strlen(format);
+			if(maxrem < len) {
+				/* TODO: Set overflow error. */
+				return -1;
+			}
+			if(send_data(sock, format, len, 0) < 0)
+				return -1;
+			written += len;
+			format += len;
+		}
+	}
+	va_end(ap);
+	return written;
+}
+

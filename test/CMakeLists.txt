@@ -29,3 +29,4 @@ add_test(NAME test_test6
 	COMMAND test_test6)
 # add sockhelp tests
 add_subdirectory(sockhelp)
+add_subdirectory(ulist)

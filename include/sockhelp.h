@@ -19,9 +19,7 @@
 extern "C" {
 #endif
 
-#ifdef _WIN32
-#define SOCKET unsigned int
-#else
+#if !defined(_WIN32) || !defined(_WIN64)
 #define SOCKET int
 #define SOCKET_ERROR -1
 #define INVALID_SOCKET SOCKET_ERROR
@@ -79,6 +77,9 @@ PRS_EXPORT int bmode_socket(sock_t *sock, int);
 PRS_EXPORT long send_data(sock_t *sock, const void *data, long size, int flags);
 /** @brief Receives data from a socket. */
 PRS_EXPORT long recv_data(sock_t *sock, void *data, long size, int flags);
+
+/** @brief Write formatted data to socket. */
+PRS_EXPORT int writef_socket(sock_t *sock, const char *msg, ...);
 
 #ifdef __cplusplus
 }
