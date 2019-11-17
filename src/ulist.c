@@ -209,9 +209,9 @@ PRS_EXPORT const char *strerror_ulist(int errno)
 
 PRS_EXPORT int get_error_ulist(void)
 {
-	int errno = _errno_ulist;
+	int error = _errno_ulist;
 	_errno_ulist = 0;
-	return errno;
+	return error;
 }
 
 #ifdef __cplusplus

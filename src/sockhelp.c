@@ -413,6 +413,7 @@ void reverse(char *s)
 		s[j] = c;
 	}
 }
+#ifndef _WIN32
 /**
  * @brief Convert decimal number into string.
  */
@@ -430,6 +431,7 @@ void itoa(int x, char *buf)
 	buf[i] = '\0';
 	reverse(buf);
 }
+#endif
 /**
  * @brief Write formatted messages to socket.
  *
@@ -479,7 +481,11 @@ int writef_socket(sock_t *sock, const char *format, ...)
 			int len, x;
 			format++;
 			x = (int)va_arg(ap, int);
+#ifdef _WIN32
+			itoa(x, buf, sizeof(buf));
+#else
 			itoa(x, buf);
+#endif
 			len = strlen(buf);
 			if(maxrem < len) {
 				/* TODO: Set overflow error. */

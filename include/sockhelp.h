@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-#if !defined(_WIN32) || !defined(_WIN64)
+#ifndef _WIN32
 #define SOCKET int
 #define SOCKET_ERROR -1
 #define INVALID_SOCKET SOCKET_ERROR
