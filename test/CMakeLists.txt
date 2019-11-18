@@ -13,6 +13,8 @@ add_executable(test_test5 test5.c)
 target_link_libraries(test_test5 prs)
 add_executable(test_test6 test6.c)
 target_link_libraries(test_test6 prs)
+add_executable(test_test7 test7.c)
+target_link_libraries(test_test7 prs)
 
 # testing
 add_test(NAME test_test
@@ -21,12 +23,21 @@ add_test(NAME test_test
 add_test(NAME test_test2
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
 	COMMAND test_test2)
-add_test(test_test3 test_test3)
-add_test(test_test4 test_test4)
-add_test(test_test5 test_test5)
+add_test(NAME test_test3
+	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
+	COMMAND test_test3)
+add_test(NAME test_test4
+	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
+	COMMAND test_test4)
+add_test(NAME test_test5
+	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
+	COMMAND test_test5)
 add_test(NAME test_test6
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
 	COMMAND test_test6)
+add_test(NAME test_test7
+	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test
+	COMMAND test_test7)
 # add sockhelp tests
 add_subdirectory(sockhelp)
 add_subdirectory(ulist)

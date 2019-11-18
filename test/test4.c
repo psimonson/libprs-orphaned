@@ -3,7 +3,7 @@
 #include <string.h>
 #include "ustack.h"
 
-static void
+void
 free_data (void* data)
 {
     free(data);
@@ -36,6 +36,7 @@ main ()
     push_stack(stack, str3);
     while(stack->top > 0)
         printf("String: %s\n", (char*)pop_stack(stack));
+    reset_top(stack);
     free_stack(stack, free_data);
     return 0;
 }

@@ -48,7 +48,7 @@ PRS_EXPORT file_t*
 open_file(const char* filename, const char* mode);
 /** @brief Reopen a file with open mode. */
 PRS_EXPORT file_t*
-reopen_file(const char* filename, const char* mode);
+reopen_file(file_t *file, const char* mode);
 /** @brief Get error for file structure (const char *). */
 PRS_EXPORT const char*
 get_error_file(file_t* file);

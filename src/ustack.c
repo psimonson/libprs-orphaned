@@ -129,15 +129,14 @@ reset_top (ustack_t* stack)
 void
 free_stack (ustack_t* stack, void (*func)(void*))
 {
-    if(func != NULL) {
-        stack->top = stack->cur;
+    if(stack != NULL) {
+        reset_top(stack);
         while(stack->top > 0) {
             void* data = pop_stack(stack);
             if(data == NULL) break;
             (*func)(data);
         }
-        free(stack[stack->top].data);
         stack->cur = 0;
+	free(stack);
     }
-    free(stack);
 }

@@ -91,22 +91,16 @@ open_file(const char* filename, const char* mode)
  * @brief Reopen file with different mode.
  */
 file_t*
-reopen_file(const char* filename, const char* mode)
+reopen_file(file_t *file, const char* mode)
 {
-    file_t *file;
-    file = (file_t*)malloc(sizeof(file_t));
-    if(file == NULL)
-	    return NULL;
-    file->fp = NULL;
-    memset(file->name, 0, MAX_PATH);
-    file->size = -1;
-    file->lines = -1;
-    file->error = FILE_ERROR_OKAY;
-    if((file->fp = freopen(filename, mode, file->fp)) == NULL) {
+    if(file != NULL &&
+             (file->fp = freopen(file->name, mode, file->fp)) == NULL) {
         file->error = FILE_ERROR_OPEN;
 	return file;
     }
-    strcpy(file->name, filename);
+    file->size = -1;
+    file->lines = -1;
+    file->error = FILE_ERROR_OKAY;
     if(strchr(mode, 'w') == NULL) {
         file->size = get_size_file(file);
         if(file->size < 0) {
