@@ -6,13 +6,13 @@ int
 main ()
 {
     file_t *file;
-    int c;
+    int c, err;
     
     file = open_file("test6.c", "rt");
     if(file == NULL) {
 	return 1;
-    } else if(get_errori_file(file) != FILE_ERROR_OKAY) {
-        fprintf(stderr, "Error: %s\n", get_error_file(file));
+    } else if((err = get_error_file()) != FILE_ERROR_OKAY) {
+        fprintf(stderr, "Error: %s\n", strerror_file(err));
         return 1;
     }
     printf("File Pointer: %p\n", get_handle_file(file));

@@ -8,7 +8,7 @@ main ()
     char buf[32];
     file_t *file1;
     file_t *file2;
-    int bytes;
+    int bytes, err;
     
     /* open files */
     file1 = open_file("test.c", "rt");
@@ -24,13 +24,13 @@ main ()
     while((bytes = read_file(file1, buf, 1, 32)) > 0) {
         write_file(file2, buf, 1, bytes);
     }
-    if(get_errori_file(file1) != FILE_ERROR_OKAY) {
-        printf("Error: %s\n", get_error_file(file1));
+    if((err = get_error_file()) != FILE_ERROR_OKAY) {
+        printf("Error: %s\n", strerror_file(err));
         close_file(file1);
         return 1;
     }
-    if(get_errori_file(file2) != FILE_ERROR_OKAY) {
-        printf("Error: %s\n", get_error_file(file2));
+    if((err = get_error_file()) != FILE_ERROR_OKAY) {
+        printf("Error: %s\n", strerror_file(err));
         close_file(file2);
         return 1;
     }

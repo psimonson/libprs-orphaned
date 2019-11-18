@@ -37,8 +37,7 @@ enum {
     FILE_ERROR_READ,
     FILE_ERROR_WRITE,
     FILE_ERROR_SEEK,
-    FILE_ERROR_TELL,
-    FILE_ERROR_CLOSED
+    FILE_ERROR_TELL
 };
 
 /** @brief File structure, for handling files in this library. */
@@ -52,10 +51,10 @@ PRS_EXPORT file_t*
 reopen_file(file_t *file, const char* mode);
 /** @brief Get error for file structure (const char *). */
 PRS_EXPORT const char*
-get_error_file(file_t* file);
+strerror_file(int err);
 /** @brief Get error for file structure (int). */
 PRS_EXPORT int
-get_errori_file(file_t* file);
+get_error_file(void);
 /** @brief Close a file structure. */
 PRS_EXPORT void
 close_file(file_t* file);

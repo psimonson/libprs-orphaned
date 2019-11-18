@@ -154,10 +154,6 @@ write_bitmap (Bitmap *bmp, const char *filename)
 		return 1;
 	}
 	close_file(file);
-	if (get_errori_file(file) != FILE_ERROR_CLOSED) {
-		_bitmap_errno = BMP_FILE_ERROR;
-		return 1;
-	}
 	return 0;
 }
 

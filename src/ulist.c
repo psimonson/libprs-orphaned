@@ -23,7 +23,7 @@ struct ulist {
 	ulist_t *next;
 };
 
-int _errno_ulist;
+static int _errno_ulist;
 
 char *pstrdup(const char *s)
 {

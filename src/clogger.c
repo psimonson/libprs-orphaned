@@ -78,8 +78,7 @@ open_log (int logNum, const char *name)
 	if(init_var) {
 		if(get_status_log(logNum) == CLOGERR_CLOSE) {
 			_logs[logNum].file = open_file(name, "a+t");
-			if(get_errori_file(_logs[logNum].file)
-				!= FILE_ERROR_OKAY) {
+			if(get_error_file() != FILE_ERROR_OKAY) {
 				_logs[logNum].status = CLOGERR_OPEN;
 				return;
 			}
@@ -101,14 +100,11 @@ read_log(int logNum, char *buf, int size)
 {
 	if(init_var) {
 		if(get_status_log(logNum) == CLOGERR_OKAY) {
-			int c, pos;
-
+			int c, pos, err;
 			seek_file(_logs[logNum].file,
 				_logs[logNum].read_pos, SEEK_SET);
-			if(get_errori_file(_logs[logNum].file)
-				!= FILE_ERROR_OKAY) {
-				printf("Error: %s\n",
-					get_error_file(_logs[logNum].file));
+			if((err = get_error_file()) != FILE_ERROR_OKAY) {
+				printf("Error: %s\n", strerror_file(err));
 				return -1;
 			}
 			c = pos = 0;

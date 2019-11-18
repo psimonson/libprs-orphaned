@@ -24,12 +24,13 @@
 
 #include "file.h"
 
+static int _errno_file;
+
 struct file {
     FILE *fp;
     char name[MAX_PATH];
     long size;
     long lines;
-    int error;
 };
 
 static const char *_prs_file_errors[] = {
@@ -40,8 +41,7 @@ static const char *_prs_file_errors[] = {
     "File was unable to be read.",
     "File was unable to be written to.",
     "File was unable to seek.",
-    "Cannot tell size of file.",
-    "File was closed."
+    "Cannot tell size of file."
 };
 
 /* ------------------------- standard functions ------------------------ */
@@ -60,21 +60,21 @@ open_file(const char* filename, const char* mode)
     memset(file->name, 0, MAX_PATH);
     file->size = -1;
     file->lines = -1;
-    file->error = FILE_ERROR_OKAY;
+    _errno_file = FILE_ERROR_OKAY;
     if((file->fp = fopen(filename, mode)) == NULL) {
-        file->error = FILE_ERROR_OPEN;
+        _errno_file = FILE_ERROR_OPEN;
         return file;
     }
     strcpy(file->name, filename);
     if(strchr(mode, 'w') == NULL) {
         file->size = get_size_file(file);
         if(file->size < 0) {
-            file->error = FILE_ERROR_SIZE;
+            _errno_file = FILE_ERROR_SIZE;
         }
         if(strchr(mode, 'b') == NULL) {
             file->lines = get_lines_file(file);
             if(file->lines < 0) {
-                file->error = FILE_ERROR_LINE;
+                _errno_file = FILE_ERROR_LINE;
             }
 	}
 	return file;
@@ -82,7 +82,7 @@ open_file(const char* filename, const char* mode)
         file->size = 0;
         file->lines = 0;
     }
-    file->error = FILE_ERROR_OKAY;
+    _errno_file = FILE_ERROR_OKAY;
     fseek(file->fp, 0, SEEK_SET);
     return file;
 }
@@ -95,21 +95,22 @@ reopen_file(file_t *file, const char* mode)
 {
     if(file != NULL &&
              (file->fp = freopen(file->name, mode, file->fp)) == NULL) {
-        file->error = FILE_ERROR_OPEN;
-	return file;
+        _errno_file = FILE_ERROR_OPEN;
+	close_file(file);
+	return NULL;
     }
     file->size = -1;
     file->lines = -1;
-    file->error = FILE_ERROR_OKAY;
+    _errno_file = FILE_ERROR_OKAY;
     if(strchr(mode, 'w') == NULL) {
         file->size = get_size_file(file);
         if(file->size < 0) {
-            file->error = FILE_ERROR_SIZE;
+            _errno_file = FILE_ERROR_SIZE;
         }
         if(strchr(mode, 'b') == NULL) {
             file->lines = get_lines_file(file);
             if(file->lines < 0) {
-                file->error = FILE_ERROR_LINE;
+                _errno_file = FILE_ERROR_LINE;
             }
         }
 	return file;
@@ -117,7 +118,7 @@ reopen_file(file_t *file, const char* mode)
         file->size = 0;
         file->lines = 0;
     }
-    file->error = FILE_ERROR_OKAY;
+    _errno_file = FILE_ERROR_OKAY;
     fseek(file->fp, 0, SEEK_SET);
     return file;
 }
@@ -126,18 +127,20 @@ reopen_file(file_t *file, const char* mode)
  * @brief Gets the error string associated with error code.
  */
 const char*
-get_error_file (file_t* file)
+strerror_file (int err)
 {
-    return _prs_file_errors[file->error];
+    return _prs_file_errors[err];
 }
 
 /**
  * @brief Gets the error code from file.
  */
 int
-get_errori_file (file_t* file)
+get_error_file (void)
 {
-    return file->error;
+    int error = _errno_file;
+    _errno_file = FILE_ERROR_OKAY;
+    return error;
 }
 
 /**
@@ -150,7 +153,7 @@ close_file(file_t* file)
     memset(file->name, 0, MAX_PATH);
     file->size = -1;
     file->lines = -1;
-    file->error = FILE_ERROR_CLOSED;
+    _errno_file = FILE_ERROR_OKAY;
     free(file);
 }
 
@@ -164,7 +167,7 @@ read_file (file_t* file, void* buf, size_t nmem, size_t size)
 {
     int bytes;
     if((bytes = fread(buf, nmem, size, file->fp)) < 0)
-        file->error = FILE_ERROR_READ;
+        _errno_file = FILE_ERROR_READ;
     return bytes;
 }
 /**
@@ -175,7 +178,7 @@ write_file (file_t* file, const void* buf, size_t nmem, size_t size)
 {
     int bytes;
     if((bytes = fwrite(buf, nmem, size, file->fp)) < 0)
-        file->error = FILE_ERROR_WRITE;
+        _errno_file = FILE_ERROR_WRITE;
     return bytes;
 }
 /**
@@ -190,7 +193,7 @@ writef_file (file_t* file, const char* buf, ...)
     res = vfprintf(file->fp, buf, ap);
     va_end(ap);
     if(res < 0)
-        file->error = FILE_ERROR_WRITE;
+        _errno_file = FILE_ERROR_WRITE;
     return res;
 }
 /**
@@ -229,7 +232,7 @@ readf_file (file_t* file, const char* buf, ...)
     res = vfscanf(file->fp, buf, ap);
     va_end(ap);
     if(res < 0)
-        file->error = FILE_ERROR_READ;
+        _errno_file = FILE_ERROR_READ;
     return res;
 }
 /**
@@ -243,7 +246,7 @@ getc_file (file_t* file)
     errno = 0;
     c = fgetc(file->fp);
     if(errno != 0)
-        file->error = FILE_ERROR_READ;
+        _errno_file = FILE_ERROR_READ;
     return c;
 }
 /**
@@ -255,7 +258,7 @@ putc_file (file_t* file, int c)
     errno = 0;
     fputc(c, file->fp);
     if(errno != 0)
-        file->error = FILE_ERROR_WRITE;
+        _errno_file = FILE_ERROR_WRITE;
 }
 /**
  * @brief Puts one byte back onto file stream.
@@ -266,7 +269,7 @@ ungetc_file (file_t* file, int c)
     errno = 0;
     ungetc(c, file->fp);
     if(errno != 0)
-        file->error = FILE_ERROR_WRITE;
+        _errno_file = FILE_ERROR_WRITE;
 }
 /**
  * @brief Seek through file by bytes.
@@ -278,7 +281,7 @@ seek_file (file_t* file, long bytes, int seek)
     errno = 0;
     res = fseek(file->fp, bytes, seek);
     if(errno != 0)
-        file->error = FILE_ERROR_SEEK;
+        _errno_file = FILE_ERROR_SEEK;
     return res;
 }
 /**
@@ -299,7 +302,7 @@ tell_file (file_t* file)
     errno = 0;
     size = ftell(file->fp);
     if(errno != 0)
-        file->error = FILE_ERROR_TELL;
+        _errno_file = FILE_ERROR_TELL;
     return size;
 }
 /**
@@ -341,7 +344,7 @@ get_size_file (file_t* file)
     size = ftell(file->fp);
     fseek(file->fp, cur_pos, SEEK_SET);
     if(size < 0)
-        file->error = FILE_ERROR_SIZE;
+        _errno_file = FILE_ERROR_SIZE;
     return size;
 }
 /**
