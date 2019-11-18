@@ -2,6 +2,7 @@
  * @file sockhelp.h
  * @author Philip R. Simonson
  * @date   2019/06/06
+ * @brief Simple socket library for Linux/Unix and possibly Windows.
  ********************************************************************
  * @details
  *

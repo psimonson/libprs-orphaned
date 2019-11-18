@@ -2,6 +2,8 @@
  * @file ulist.h
  * @author Philip R. Simonson
  * @date 11/10/2019
+ * @brief Simple universal dynamic linked list.
+ ********************************************************************
  * @details
  *
  * Simple universal dynamic linked list.

@@ -2,6 +2,7 @@
  * @file bitmap.h
  * @author Philip R. Simonson
  * @date   2019/05/18
+ * @brief Simple bitmap file format handler.
  ********************************************************************
  * @details
  *

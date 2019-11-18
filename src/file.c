@@ -146,7 +146,7 @@ get_errori_file (file_t* file)
 void
 close_file(file_t* file)
 {
-    fclose(file->fp);
+    if(file->fp != NULL) fclose(file->fp);
     memset(file->name, 0, MAX_PATH);
     file->size = -1;
     file->lines = -1;

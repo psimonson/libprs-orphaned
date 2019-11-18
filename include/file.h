@@ -2,6 +2,7 @@
  * @file file.h
  * @author Philip R. Simonson
  * @date   2019/05/11
+ * @brief Trying to make file handling easier with this.
  ********************************************************************
  * @details
  *

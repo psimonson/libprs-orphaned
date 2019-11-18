@@ -2,6 +2,7 @@
  * @file clogger.h
  * @author Philip R. Simonson
  * @date   03/13/2019
+ * @brief My simple log file library implementation.
  ******************************************************************************
  * @details
  *

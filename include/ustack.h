@@ -2,6 +2,7 @@
  * @file ustack.h
  * @author Philip R. Simonson
  * @date   2019/05/24
+ * @brief Dynamic Universal Stack, make a stack that holds anything.
  **********************************************************************
  * @details
  *

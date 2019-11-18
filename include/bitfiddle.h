@@ -2,6 +2,7 @@
  * @file bitfiddle.h
  * @author Philip R. Simonson
  * @date 10/28/2019
+ * @brief Bit fiddling header file.
  *******************************************************
  * @details
  *
