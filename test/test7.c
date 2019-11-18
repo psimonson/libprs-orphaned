@@ -12,7 +12,7 @@ int main()
 	f = reopen_file(f, "rt");
 	if(get_errori_file(f) != FILE_ERROR_OKAY)
 		return 1;
-	read_file(f, buf, 0, 13);
+	read_file(f, buf, 1, 13);
 	buf[13] = 0;
 	printf("Data: %s", buf);
 	close_file(f);
