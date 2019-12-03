@@ -19,17 +19,15 @@
 
 int main()
 {
-	sock_t client;
+	sock_t *client;
 
 	socket_startup();
-	init_socket(&client, NULL);
 	if(client_socket(&client, ADDR, PORT)) {
-		fprintf(stderr, "Error: %s\n", get_error_socket(&client));
+		fprintf(stderr, "Error: %s\n", get_error_socket(client));
 		socket_shutdown();
 		return 1;
 	}
-	loop_socket(&client, SOCKRUN_LOOP);
-	close_socket(&client);
+	destroy_socket(client);
 	socket_shutdown();
 	return 0;
 }

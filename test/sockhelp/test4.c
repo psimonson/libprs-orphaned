@@ -11,7 +11,9 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #else
+#include <ws2tcpip.h>
 #include <windows.h>
+#include <winsock2.h>
 #endif
 
 #include <stdio.h>
@@ -27,23 +29,22 @@ int handle_client(sock_t *sock)
 {
 	if(send_data(sock, "Hello again!\r\n", 15, 0) < 0)
 		return 1;
-	close_socket(sock);
+	destroy_socket(sock);
 	return 0;
 }
 /* Server main loop function.
  */
 static int main_loop(sock_t *sock)
 {
-	sock_t client;
+	sock_t *client;
 	int res;
 
-	init_socket(&client, NULL);
 	client = accept_socket(sock); /* accept client connection */
-	if(client.error != SOCKERR_OKAY) { /* connection failed */
+	if(get_errori_socket(client) != SOCKERR_OKAY) { /* connection failed */
 		printf("Warning: Could not accept connection.\n");
 		return 1;
 	}
-	res = handle_client(&client);
+	res = handle_client(client);
 	if(!res)
 		close_socket(sock);
 	return res;
@@ -51,32 +52,31 @@ static int main_loop(sock_t *sock)
 #ifdef _WIN32
 DWORD thread(LPVOID p)
 {
-	sock_t client;
+	sock_t *client;
 	char s[32];
 	int retry,bytes;
 
 	UNUSED(p);
 	retry = 3;
 	socket_startup();
-	init_socket(&client, NULL);
 	while(retry && !client_socket(&client, ADDR, PORT)) {
-		if(client.error == SOCKERR_OKAY) break;
+		if(get_errori_socket(client) == SOCKERR_OKAY) break;
 		Sleep(2);
 		retry--;
 	}
-	if(!retry && client.error != SOCKERR_OKAY) {
+	if(!retry && get_errori_socket(client) != SOCKERR_OKAY) {
 		fprintf(stderr, "Error: %s\n",
-			get_error_socket(&client));
+			get_error_socket(client));
 		socket_shutdown();
 		return 1;
 	}
 	printf("Client received: ");
-	while((bytes = recv_data(&client, s, sizeof(s), 0)) > 0) {
+	while((bytes = recv_data(client, s, sizeof(s), 0)) > 0) {
 		s[bytes] = 0;
 		printf("%s", s);
 		fflush(stdout);
 	}
-	close_socket(&client);
+	destroy_socket(client);
 	if(bytes < 0) {
 		printf("\nError: Cannot receive data.\n");
 		socket_shutdown();
@@ -91,45 +91,43 @@ DWORD thread(LPVOID p)
  */
 int main()
 {
-	sock_t server;
+	sock_t *server;
 
 	socket_startup();
-	init_socket(&server, main_loop);
 	if(server_socket(&server, PORT)) {
-		fprintf(stderr, "Error: %s\n", get_error_socket(&server));
+		fprintf(stderr, "Error: %s\n", get_error_socket(server));
 		socket_shutdown();
 		return 1;
 	}
 #ifdef _WIN32
 	CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&thread,
-		(LPVOID)&server, 0, NULL);
+		(LPVOID)server, 0, NULL);
 #else
 	if(!fork()) {
-		sock_t client;
+		sock_t *client;
 		char s[32];
-		int retry,bytes;
+		int retry, bytes;
 		
 		retry = 3;
 		socket_startup();
-		init_socket(&client, NULL);
 		while(retry && !client_socket(&client, ADDR, PORT)) {
-			if(client.error == SOCKERR_OKAY) break;
+			if(get_errori_socket(client) == SOCKERR_OKAY) break;
 			usleep(1000000);
 			retry--;
 		}
-		if(!retry && client.error != SOCKERR_OKAY) {
+		if(!retry && get_errori_socket(client) != SOCKERR_OKAY) {
 			fprintf(stderr, "Error: %s\n",
-				get_error_socket(&client));
+				get_error_socket(client));
 			socket_shutdown();
 			return 1;
 		}
 		printf("Client received: ");
-		while((bytes = recv_data(&client, s, sizeof(s), 0)) > 0) {
+		while((bytes = recv_data(client, s, sizeof(s), 0)) > 0) {
 			s[bytes] = 0;
 			printf("%s", s);
 			fflush(stdout);
 		}
-		close_socket(&client);
+		destroy_socket(client);
 		if(bytes < 0) {
 			printf("\nError: Cannot receive data.\n");
 			socket_shutdown();
@@ -140,6 +138,6 @@ int main()
 		return 0;
 	}
 #endif
-	return !loop_socket(&server, SOCKRUN_LOOP);
+	return main_loop(NULL);
 }
 

@@ -6,8 +6,12 @@
  **********************************************************************
  */
 
-#ifdef __linux
+#if defined(__linux) || defined(__UNIX)
 #include <sys/socket.h>
+#else
+#include <ws2tcpip.h>
+#include <windows.h>
+#include <winsock2.h>
 #endif
 
 #include <stdio.h>
@@ -31,12 +35,12 @@ static int client_loop(sock_t *sock)
 		printf("%s", s);
 		fflush(stdout);
 	} else if(bytes == 0) {
-		close_socket(sock);
+		destroy_socket(sock);
 		socket_shutdown();
 		return 0;
 	} else {
 		fprintf(stderr, "Error: %s\n", get_error_socket(sock));
-		close_socket(sock);
+		destroy_socket(sock);
 		socket_shutdown();
 		return 0;
 	}
@@ -46,19 +50,18 @@ static int client_loop(sock_t *sock)
  */
 int main()
 {
-	sock_t client;
+	sock_t *client;
 
 	socket_startup();
-	init_socket(&client, client_loop);
 	if(client_socket(&client, ADDR, PORT)) {
-		fprintf(stderr, "Error: %s\n", get_error_socket(&client));
+		fprintf(stderr, "Error: %s\n", get_error_socket(client));
 		return 1;
 	}
-	if(send_data(&client, GMSG, strlen(GMSG), 0) < 0) {
-		fprintf(stderr, "Error: %s\n", get_error_socket(&client));
-		close_socket(&client);
+	if(send_data(client, GMSG, strlen(GMSG), 0) < 0) {
+		fprintf(stderr, "Error: %s\n", get_error_socket(client));
+		destroy_socket(client);
 		socket_shutdown();
 		return 1;
 	}
-	return !loop_socket(&client, SOCKRUN_LOOP);
+	return client_loop(client);
 }

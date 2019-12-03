@@ -8,10 +8,6 @@
  * loop function.
  */
 
-#ifdef __linux
-#include <sys/socket.h>
-#endif
-
 #include <stdio.h>
 #include "sockhelp.h"
 
@@ -19,17 +15,15 @@
 
 int main()
 {
-	sock_t server;
+	sock_t *server;
 
 	socket_startup();
-	init_socket(&server, NULL);
 	if(server_socket(&server, PORT)) {
-		fprintf(stderr, "Error: %s\n", get_error_socket(&server));
+		fprintf(stderr, "Error: %s\n", get_error_socket(server));
 		socket_shutdown();
 		return 1;
 	}
-	loop_socket(&server, SOCKRUN_LOOP);
-	close_socket(&server);
+	destroy_socket(server);
 	socket_shutdown();
 	return 0;
 }

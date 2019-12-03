@@ -6,11 +6,6 @@
  */
 
 #include <stdio.h>
-
-#if defined(__linux) || (__UNIX)
-#include <sys/socket.h>
-#endif
-
 #include "sockhelp.h"
 
 #define SITE "www.slackware.com"
@@ -21,29 +16,28 @@
 int main()
 {
 	char buffer[1024];
-	sock_t client;
+	sock_t *client;
 	long bytes;
 
 	socket_startup();
-	init_socket(&client, NULL);
 	if(client_socket(&client, SITE, PORT)) {
-		fprintf(stderr, "Error: %s\n", get_error_socket(&client));
+		fprintf(stderr, "Error: %s\n", get_error_socket(client));
 		socket_shutdown();
 		return 1;
 	}
-	if(send_data(&client, GETMETHOD, sizeof(GETMETHOD), 0) < 0) {
-		fprintf(stderr, "Error: %s\n", get_error_socket(&client));
-		close_socket(&client);
+	if(send_data(client, GETMETHOD, sizeof(GETMETHOD), 0) < 0) {
+		fprintf(stderr, "Error: %s\n", get_error_socket(client));
+		destroy_socket(client);
 		socket_shutdown();
 		return 1;
 	}
 	printf("Receiving...\n");
-	while((bytes = recv_data(&client, buffer, sizeof(buffer), 0)) > 0) {
+	while((bytes = recv_data(client, buffer, sizeof(buffer), 0)) > 0) {
 		buffer[bytes] = 0;
 		printf("%s", buffer);
 		fflush(stdout);
 	}
-	close_socket(&client);
+	destroy_socket(client);
 	socket_shutdown();
 	return 0;
 }
