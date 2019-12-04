@@ -360,7 +360,7 @@ int close_socket(sock_t *sock)
 int blocking_socket(sock_t *sock, int bmode)
 {
 #ifdef _WIN32
-	long unsigned int mode = (bmode ? 1 : 0);
+	long unsigned int mode = (bmode ? 0 : 1);
 	return ioctlsocket(sock->fd, FIONBIO, &mode);
 #else
 	if(bmode)
