@@ -13,19 +13,17 @@
 #ifndef PRS_SOCKHELP_H
 #define PRS_SOCKHELP_H
 
+#include "export.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
-#include <winsock2.h>
 #include <windows.h>
-#endif
-
-#include "export.h"
-
-#if defined(__linux) || defined(__UNIX)
+#include <winsock2.h>
+#else
 #define SOCKET int
 #define SOCKET_ERROR -1
 #define INVALID_SOCKET SOCKET_ERROR

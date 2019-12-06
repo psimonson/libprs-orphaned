@@ -6,16 +6,9 @@
  ********************************************************************
  */
 
-#ifdef _WIN32
-#include <ws2tcpip.h>
-#include <winsock2.h>
-#include <windows.h>
-#else
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/time.h>
-#endif
-
 #include <stdio.h>
 #include <assert.h>
 
