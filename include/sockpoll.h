@@ -40,7 +40,9 @@ extern "C" {
 #endif
 
 /** @brief Poll events for sockets. */
-PRS_EXPORT int poll(struct pollfd *p_arr, nfds_t n_fds, int timeout);
+PRS_EXPORT int poll_socket(struct pollfd *p_arr, nfds_t n_fds, int timeout);
+/** @brief Poll server socket for multiple connections. */
+PRS_EXPORT int poll_multiple_socket(sock_t *sock, int (*)(sock_t*, int*));
 
 #ifdef __cplusplus
 }

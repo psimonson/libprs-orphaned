@@ -6,10 +6,15 @@
  ********************************************************************
  */
 
+#if defined(__linux) || defined(__UNIX)
+#define _GNU_SOURCE 1
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/time.h>
+#endif
+
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 
 #include "sockhelp.h"
@@ -100,12 +105,37 @@ static void map_select_results(struct pollfd *p_arr, nfds_t n_fds,
 			p_cur->revents |= POLLOUT;
 	}
 }
+/* Handle client data incoming and outgoing.
+ */
+static int default_client_handler(sock_t *sock, int *done)
+{
+	char buf[BUFSIZ];
+	int bytes;
+
+	writef_socket(sock, "Enter message: ");
+	if((bytes = recv_data(sock, buf, sizeof(buf), 0)) <= 0) {
+		if(bytes == 0) {
+			printf("Server: Client [%s] disconnected!\n",
+				get_addr_socket(sock));
+		} else {
+			perror("recv failed");
+		}
+	} else {
+		buf[bytes] = 0;
+		if(strcmp(buf, "exit\r") == 0) {
+			*done = 1;
+			bytes = 0;
+		}
+		writef_socket(sock, "Client says: %s\r\n", buf);
+	}
+	return bytes;
+}
 
 /* ------------------------ Global Functions ---------------------- */
 
 /* Poll events using select.
  */
-PRS_EXPORT int poll(struct pollfd *p_arr, nfds_t n_fds, int timeout)
+int poll_socket(struct pollfd *p_arr, nfds_t n_fds, int timeout)
 {
 	fd_set read, write, except;
 	struct timeval stime, *ptime;
@@ -125,4 +155,90 @@ PRS_EXPORT int poll(struct pollfd *p_arr, nfds_t n_fds, int timeout)
 	if(ready >= 0)
 		map_select_results(p_arr, n_fds, &read, &write, &except);
 	return ready;
+}
+/* Handle multiple connections to socket.
+ */
+int poll_multiple_socket(sock_t *sock, int (*func)(sock_t*, int*))
+{
+#define POLL_MAXCONN 10
+	struct pollfd fds[POLL_MAXCONN], old_fds[POLL_MAXCONN];
+	int fd_count, bytes, i, done;
+	sock_t *client;
+
+	if(sock == NULL) return 1;
+
+	/* Clear base file descriptor sets */
+	for(i = 0; i < POLL_MAXCONN; i++) {
+		old_fds[i].sock = NULL;
+		old_fds[i].events = 0;
+		old_fds[i].revents = 0;
+	}
+
+	/* Set initial listening socket */
+	old_fds[0].sock = sock;
+	old_fds[0].events = POLLIN;
+	old_fds[0].revents = 0;
+	fd_count = 1;
+	done = 0;
+
+	while(!done) {
+		for(i = 0; i < POLL_MAXCONN; i++)
+			fds[i] = old_fds[i];
+
+		if(poll_socket(fds, fd_count, -1) < 0) {
+			perror("poll failed");
+			break;
+		}
+
+		for(i = 0; i < fd_count; i++) {
+			if(fds[i].revents & POLLIN) {
+				if(fds[i].sock == sock) {
+					/* server socket */
+					client = accept_socket(sock);
+					if(client == NULL)
+						continue;
+					if(fd_count < POLL_MAXCONN) {
+						printf("Server: Client [%s] connected!\n",
+							get_addr_socket(client));
+						old_fds[fd_count].sock = client;
+						old_fds[fd_count].events = POLLIN;
+						old_fds[fd_count].revents = 0;
+						fd_count++;
+					} else {
+						printf("Server: Too many clients already.\n");
+					}
+				} else {
+					/* client sockets */
+					if((*func) == NULL) {
+						bytes = default_client_handler(fds[i].sock, &done);
+					} else {
+						bytes = (*func)(fds[i].sock, &done);
+					}
+					if(bytes <= 0) {
+						int j;
+
+						/* remove socket from sock set */
+						destroy_socket(old_fds[i].sock);
+						for(j = i; j < fd_count; j++)
+							old_fds[j] = old_fds[j+1];
+						fd_count--;
+					} else {
+						printf("Server: received %d bytes.\n",
+							bytes);
+					}
+				}
+			}
+		}
+	}
+
+	/* Clear all sockets */
+	for(i = 0; i < POLL_MAXCONN; i++) {
+		if(old_fds[i].sock != NULL) {
+			destroy_socket(old_fds[i].sock);
+			old_fds[i].events = 0;
+			old_fds[i].revents = 0;
+		}
+	}
+	return 0;
+#undef POLL_MAXCONN
 }
