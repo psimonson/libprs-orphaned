@@ -105,6 +105,12 @@ static void map_select_results(struct pollfd *p_arr, nfds_t n_fds,
 			p_cur->revents |= POLLOUT;
 	}
 }
+/* Handle client connection.
+ */
+static void default_client_connection(sock_t *sock)
+{
+	writef_socket(sock, "Welcome to an echo server!\r\n");
+}
 /* Handle client data incoming and outgoing.
  */
 static int default_client_handler(sock_t *sock, int *done)
@@ -158,9 +164,9 @@ int poll_socket(struct pollfd *p_arr, nfds_t n_fds, int timeout)
 }
 /* Handle multiple connections to socket.
  */
-int poll_multiple_socket(sock_t *sock, int (*func)(sock_t*, int*))
+int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
+	int (*func2)(sock_t*, int*))
 {
-#define POLL_MAXCONN 10
 	struct pollfd fds[POLL_MAXCONN], old_fds[POLL_MAXCONN];
 	int fd_count, bytes, i, done;
 	sock_t *client;
@@ -200,6 +206,8 @@ int poll_multiple_socket(sock_t *sock, int (*func)(sock_t*, int*))
 					if(fd_count < POLL_MAXCONN) {
 						printf("Server: Client [%s] connected!\n",
 							get_addr_socket(client));
+						if((*func1) == NULL) default_client_connection(client);
+						else (*func1)(client);
 						old_fds[fd_count].sock = client;
 						old_fds[fd_count].events = POLLIN;
 						old_fds[fd_count].revents = 0;
@@ -209,10 +217,12 @@ int poll_multiple_socket(sock_t *sock, int (*func)(sock_t*, int*))
 					}
 				} else {
 					/* client sockets */
-					if((*func) == NULL) {
+					if((*func2) == NULL) {
 						bytes = default_client_handler(fds[i].sock, &done);
+						if(done) break;
 					} else {
-						bytes = (*func)(fds[i].sock, &done);
+						bytes = (*func2)(fds[i].sock, &done);
+						if(done) break;
 					}
 					if(bytes <= 0) {
 						int j;

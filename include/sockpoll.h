@@ -14,9 +14,10 @@
 #include "sockhelp.h"
 #include "export.h"
 
-/**
- * @brief Poll defines for reading, writing, and exceptions.
- */
+/* Max connections at once */
+#define POLL_MAXCONN 32
+
+/* Defines for polling connections */
 #define POLLIN		0x01
 #define POLLPRI		0x02
 #define POLLOUT		0x04
@@ -42,7 +43,8 @@ extern "C" {
 /** @brief Poll events for sockets. */
 PRS_EXPORT int poll_socket(struct pollfd *p_arr, nfds_t n_fds, int timeout);
 /** @brief Poll server socket for multiple connections. */
-PRS_EXPORT int poll_multiple_socket(sock_t *sock, int (*)(sock_t*, int*));
+PRS_EXPORT int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
+	int (*func2)(sock_t*, int*));
 
 #ifdef __cplusplus
 }
