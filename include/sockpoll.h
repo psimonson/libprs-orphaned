@@ -40,6 +40,10 @@ typedef unsigned long nfds_t;
 extern "C" {
 #endif
 
+/** @brief Get poll fd at idx. */
+PRS_EXPORT struct pollfd get_poll_fd(int idx);
+/** @brief Get poll count. */
+PRS_EXPORT int get_poll_count(void);
 /** @brief Poll events for sockets. */
 PRS_EXPORT int poll_socket(struct pollfd *p_arr, nfds_t n_fds, int timeout);
 /** @brief Poll server socket for multiple connections. */

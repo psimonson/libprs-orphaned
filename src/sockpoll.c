@@ -25,6 +25,9 @@
 #define MAX(a,b)	((a) > (b) ? (a) : (b))
 #endif
 
+static struct pollfd *_poll_fds;
+static int _poll_count;
+
 /* ----------------------- Private Functions ---------------------- */
 
 /* Map poll() structures to file descriptor
@@ -139,6 +142,18 @@ static int default_client_handler(sock_t *sock, int *done)
 
 /* ------------------------ Global Functions ---------------------- */
 
+/* Get poll file descriptors. Use only with poll_multiple_socket().
+ */
+struct pollfd get_poll_fd(int idx)
+{
+	return _poll_fds[(int)((idx >= 0 && idx <= POLL_MAXCONN) ? idx : 0)];
+}
+/* Get poll file descriptor count. Use only with poll_multiple_socket().
+ */
+int get_poll_count(void)
+{
+	return _poll_count;
+}
 /* Poll events using select.
  */
 int poll_socket(struct pollfd *p_arr, nfds_t n_fds, int timeout)
@@ -185,11 +200,17 @@ int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
 	old_fds[0].events = POLLIN;
 	old_fds[0].revents = 0;
 	fd_count = 1;
+
+	/* Set the initial values for get functions */
+	_poll_fds = old_fds;
 	done = 0;
 
 	while(!done) {
 		for(i = 0; i < POLL_MAXCONN; i++)
 			fds[i] = old_fds[i];
+
+		/* Update the value for poll_count */
+		_poll_count = fd_count;
 
 		if(poll_socket(fds, fd_count, -1) < 0) {
 			perror("poll failed");
