@@ -44,11 +44,15 @@ extern "C" {
 PRS_EXPORT struct pollfd get_poll_fd(int idx);
 /** @brief Get poll count. */
 PRS_EXPORT int get_poll_count(void);
+/** @brief Get server socket from polling functions. */
+PRS_EXPORT const sock_t *get_server_socket(void);
+/** @brief Set server socket for polling functions. */
+PRS_EXPORT void set_server_socket(sock_t *sock);
 /** @brief Poll events for sockets. */
 PRS_EXPORT int poll_socket(struct pollfd *p_arr, nfds_t n_fds, int timeout);
 /** @brief Poll server socket for multiple connections. */
 PRS_EXPORT int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
-	int (*func2)(sock_t*, int*));
+	int (*func2)(sock_t *sock, int *done));
 
 #ifdef __cplusplus
 }

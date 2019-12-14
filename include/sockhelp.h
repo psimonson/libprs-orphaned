@@ -45,8 +45,6 @@ enum socket_error {
 	SOCKERR_COUNT			/**< How many errors */
 };
 
-#define SOCKRUN_LOOP ((int)0x00f0)
-
 /** @brief Initialise the socket library. */
 PRS_EXPORT int socket_startup();
 /** @brief Shutdown and cleanup the socket library. */
