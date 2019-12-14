@@ -247,8 +247,7 @@ int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
 			printf("timeout\n");
 		} else {
 			for(i = 0; i < fd_count; i++) {
-				switch(fds[i].revents) {
-				case POLLIN:
+				if(fds[i].revents & POLLIN) {
 					/* read fds */
 					if(fds[i].sock == sock) {
 						/* server socket */
@@ -282,9 +281,8 @@ int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
 						switch(bytes) {
 						case -1:
 							if(errno == EAGAIN || errno == EWOULDBLOCK) {
-								printf("Server: No Data.\n");
-								psleep(250);
-								old_fds[i].events = POLLIN;
+								psleep(100);
+								break;
 							} else {
 								perror("send failed");
 							}
@@ -304,48 +302,10 @@ int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
 							fd_count--;
 						} break;
 						default:
-							printf("Server: received %d bytes.\n", bytes);
-							old_fds[i].events = POLLOUT;
+							printf("Client: received %d bytes.\n", bytes);
+						break;
 						}
 					}
-				break;
-				case POLLOUT:
-					if(fds[i].sock != sock) {
-						if((*func2) == NULL) {
-							bytes = default_handle_client(fds[i].sock, &done);
-							if(done) break;
-						} else {
-							bytes = (*func2)(fds[i].sock, &done);
-							if(done) break;
-						}
-						switch(bytes) {
-						case -1:
-							if(errno == EAGAIN || errno == EWOULDBLOCK) {
-								printf("Server: No Data.\n");
-								psleep(250);
-								old_fds[i].events = POLLOUT;
-							} else {
-								perror("send failed");
-							}
-						break;
-						case 0:
-							printf("Client: All data sent.\n");
-							old_fds[i].events = POLLIN;
-						break;
-						default:
-							printf("Client: Sent %d bytes.\n", bytes);
-							old_fds[i].events = POLLIN;
-						}
-					}
-				break;
-				case POLLPRI:
-					printf("Server: POLLPRI [Not yet implemented]\n");
-				break;
-				case POLLERR:
-					printf("Server: Error polling socket.\n");
-				break;
-				default:
-				break;
 				}
 			}
 		}
