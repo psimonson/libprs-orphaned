@@ -116,6 +116,7 @@ static void map_select_results(struct pollfd *p_arr, nfds_t n_fds,
  */
 static void default_on_connect(sock_t *sock)
 {
+	UNUSED(sock);
 	printf(
 		"Please implement the on_connect function.\n"
 		"======================================================\n"
@@ -130,6 +131,8 @@ static void default_on_connect(sock_t *sock)
  */
 static int default_handle_client(sock_t *sock, int *done)
 {
+	UNUSED(sock);
+	UNUSED(done);
 	printf(
 		"Please implement the handle_client function.\n"
 		"========================================================\n"
