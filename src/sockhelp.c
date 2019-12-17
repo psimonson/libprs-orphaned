@@ -49,7 +49,7 @@
 
 /** @brief socket structure */
 struct socket {
-	char addr[260];			/**< IP Address of connection */
+	struct sockaddr_storage addr;	/**< Socket address storage */
 	SOCKET fd;			/**< Socket descriptor */
 	int error;			/**< Error code storage */
 };
@@ -163,15 +163,6 @@ int server_socket(sock_t **sock, const char *port)
 		close_socket(*sock);
 		return 1;
 	}
-#ifdef _WIN32
-	InetNtop(p->ai_addr->sa_family,
-		get_in_addr((struct sockaddr*)&p->ai_addr), (*sock)->addr,
-		sizeof((*sock)->addr));
-#else
-	inet_ntop(p->ai_addr->sa_family,
-		get_in_addr((struct sockaddr*)&p->ai_addr), (*sock)->addr,
-		sizeof((*sock)->addr));
-#endif
 	freeaddrinfo(servinfo);		/* all done with this */
 
 	if(listen((*sock)->fd, BACKLOG) == SOCKET_ERROR) {
@@ -181,7 +172,7 @@ int server_socket(sock_t **sock, const char *port)
 	}
 	printf("server: %s listening on port %s.\n"
 		"server: waiting for connections...\n",
-		(*sock)->addr, port);
+		get_addr_socket((*sock)), port);
 	(*sock)->error = SOCKERR_OKAY;
 	return 0;
 }
@@ -193,8 +184,9 @@ int server_socket(sock_t **sock, const char *port)
 int client_socket(sock_t **sock, const char *addr, const char *port)
 {
 	struct addrinfo hints,*servinfo,*p;
-	struct hostent *host;
-	int rv;
+	int rv, copied;
+
+	copied = 0;
 
 	/* create socket */
 	*sock = (sock_t*)malloc(sizeof(sock_t));
@@ -231,17 +223,18 @@ int client_socket(sock_t **sock, const char *addr, const char *port)
 		(*sock)->error = SOCKERR_CONNECT;
 		close_socket(*sock);
 		return 1;
+	} else {
+		memcpy(&(*sock)->addr, &p->ai_addr, sizeof(struct sockaddr_storage));
+		copied = 1;
 	}
 	freeaddrinfo(servinfo);
 	
-	host = gethostbyname(addr);
-	if(host) {
-		strcpy((*sock)->addr, host->h_name);
-		printf("client: connecting to %s\n", (*sock)->addr);
+	if(copied) {
+		printf("Client: connecting to %s\n", get_addr_socket((*sock)));
 		(*sock)->error = SOCKERR_OKAY;
 		return 0;
 	}
-	printf("client: %s failed to connect.\n", addr);
+	printf("Client: %s failed to connect.\n", addr);
 	(*sock)->error = SOCKERR_CONNECT;
 	return 1;
 }
@@ -252,8 +245,7 @@ int client_socket(sock_t **sock, const char *addr, const char *port)
  */
 sock_t *accept_socket(sock_t *server)
 {
-	struct sockaddr_storage addr;
-	socklen_t sin_size = sizeof(addr);
+	socklen_t sin_size = sizeof(struct sockaddr_storage);
 	sock_t *sock;
 
 	/* create socket */
@@ -261,21 +253,12 @@ sock_t *accept_socket(sock_t *server)
 	if(sock == NULL)
 		return NULL;
 	clear_socket(sock);
-	sock->fd = accept(server->fd, (struct sockaddr*)&addr,
+	sock->fd = accept(server->fd, (struct sockaddr*)&sock->addr,
 			&sin_size);
 	if(sock->fd == INVALID_SOCKET) {
 		sock->error = SOCKERR_CREATE;
 		return sock;
 	}
-#ifdef _WIN32
-	InetNtop(addr.ss_family,
-		get_in_addr((struct sockaddr*)&addr),
-		sock->addr, sizeof(sock->addr));
-#else
-	inet_ntop(addr.ss_family,
-		get_in_addr((struct sockaddr*)&addr),
-		sock->addr, sizeof(sock->addr));
-#endif
 	sock->error = SOCKERR_OKAY;
 	return sock;
 }
@@ -375,15 +358,7 @@ int blocking_socket(sock_t *sock, int bmode)
  */
 long send_data(sock_t *sock, const void *data, long size, int flags)
 {
-	long total_bytes=0,nbytes;
-	char *p=(char*)data;
-
-	while(total_bytes < size) {
-		nbytes = send(sock->fd, p+total_bytes, size-total_bytes, flags);
-		total_bytes += nbytes;
-		size -= nbytes;
-	}
-	return total_bytes;
+	return send(sock->fd, data, size, flags);
 }
 /**
  * @brief Receives data from a computer on the network.
@@ -522,7 +497,22 @@ int writef_socket(sock_t *sock, const char *format, ...)
  */
 const char *get_addr_socket(sock_t *s)
 {
-	return (const char *)s->addr;
+	static char addr[32];
+	memset(addr, 0, sizeof(addr));
+	sprintf(addr, "%ld.%ld.%ld.%ld",
+#if _BIG_ENDIAN == _LITTLE_ENDIAN
+		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF),
+		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF00) >> 8,
+		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF0000) >> 16,
+		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF000000) >> 24
+#else
+		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF000000),
+		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF0000) >> 8,
+		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF00) >> 16,
+		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF) >> 24
+#endif
+	);
+	return (const char *)addr;
 }
 /**
  * @brief Clears socket structure, makes fd = INVALID_SOCKET
