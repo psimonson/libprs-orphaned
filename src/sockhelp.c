@@ -358,7 +358,13 @@ int blocking_socket(sock_t *sock, int bmode)
  */
 long send_data(sock_t *sock, const void *data, long size, int flags)
 {
-	return send(sock->fd, data, size, flags);
+#ifdef _WIN32
+	int addrlen = sizeof(struct sockaddr);
+#else
+	socklen_t addrlen = sizeof(struct sockaddr);
+#endif
+	return sendto(sock->fd, data, size, flags,
+		(struct sockaddr*)&sock->addr, addrlen);
 }
 /**
  * @brief Receives data from a computer on the network.
@@ -367,7 +373,13 @@ long send_data(sock_t *sock, const void *data, long size, int flags)
  */
 long recv_data(sock_t *sock, void *data, long size, int flags)
 {
-	return recv(sock->fd, data, size, flags);
+#ifdef _WIN32
+	int addrlen = sizeof(struct sockaddr);
+#else
+	socklen_t addrlen = sizeof(struct sockaddr);
+#endif
+	return recvfrom(sock->fd, data, size, flags,
+		(struct sockaddr*)&sock->addr, &addrlen);
 }
 /**
  * @brief Reverse string in place.
@@ -500,17 +512,10 @@ const char *get_addr_socket(sock_t *s)
 	static char addr[32];
 	memset(addr, 0, sizeof(addr));
 	sprintf(addr, "%ld.%ld.%ld.%ld",
-#if _BIG_ENDIAN == _LITTLE_ENDIAN
-		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF),
-		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF00) >> 8,
-		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF0000) >> 16,
-		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF000000) >> 24
-#else
-		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF000000),
-		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF0000) >> 8,
-		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF00) >> 16,
-		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF) >> 24
-#endif
+	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF),
+	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF00) >> 8,
+	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF0000) >> 16,
+	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF000000) >> 24
 	);
 	return (const char *)addr;
 }
