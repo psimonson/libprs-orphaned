@@ -40,6 +40,10 @@ typedef unsigned long nfds_t;
 extern "C" {
 #endif
 
+/** @brief Add poll fd to pfds. */
+PRS_EXPORT void add_poll_fd(sock_t *sock);
+/** @brief Del poll fd from pfds. */
+PRS_EXPORT void del_poll_fd(sock_t *sock);
 /** @brief Get poll fd at idx. */
 PRS_EXPORT struct pollfd get_poll_fd(int idx);
 /** @brief Get poll count. */

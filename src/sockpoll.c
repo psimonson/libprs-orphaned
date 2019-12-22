@@ -29,7 +29,7 @@
 #endif
 
 static sock_t *_poll_server;
-static struct pollfd *_poll_fds;
+static struct pollfd _poll_fds[POLL_MAXCONN];
 static int _poll_count;
 
 /* ----------------------- Private Functions ---------------------- */
@@ -156,6 +156,42 @@ void psleep(int ms)
 
 /* ------------------------ Global Functions ---------------------- */
 
+/* Add a socket to the multiple poll fds.
+ */
+void add_poll_fd(sock_t *sock)
+{
+	int count = (_poll_count >= 0 && _poll_count < POLL_MAXCONN)
+		? _poll_count : -1;
+	if(count < 0) return;
+	else {
+		_poll_fds[count].sock = sock;
+		_poll_fds[count].events = POLLIN;
+		++_poll_count;
+	}
+}
+/* Del a socket from poll fds.
+ */
+void del_poll_fd(sock_t *sock)
+{
+	int count = (_poll_count >= 0 && _poll_count < POLL_MAXCONN)
+		? _poll_count : -1;
+	if(count < 0) return;
+	else {
+		int i;
+
+		if(sock == NULL) return;
+		for(i = 0; i < _poll_count; i++)
+			if(_poll_fds[i].sock == sock)
+				break;
+		destroy_socket(_poll_fds[i].sock);
+		for(; i < _poll_count; i++)
+			_poll_fds[i] = _poll_fds[i+1];
+		_poll_fds[_poll_count].sock = NULL;
+		_poll_fds[_poll_count].events = 0;
+		_poll_fds[_poll_count].revents = 0;
+		--_poll_count;
+	}
+}
 /* Get poll file descriptors. Use only with poll_multiple_socket().
  */
 struct pollfd get_poll_fd(int idx)
@@ -212,44 +248,37 @@ int poll_socket(struct pollfd *p_arr, nfds_t n_fds, int timeout)
 int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
 	int (*func2)(sock_t*, int*))
 {
-	struct pollfd fds[POLL_MAXCONN], old_fds[POLL_MAXCONN];
-	int fd_count, bytes, i, done;
+	struct pollfd fds[POLL_MAXCONN];
+	int bytes, i, done;
 	sock_t *client;
 
 	if(sock == NULL) return 1;
 
 	/* Clear base file descriptor sets */
 	for(i = 0; i < POLL_MAXCONN; i++) {
-		old_fds[i].sock = NULL;
-		old_fds[i].events = 0;
-		old_fds[i].revents = 0;
+		fds[i].sock = NULL;
+		fds[i].events = 0;
+		fds[i].revents = 0;
 	}
 
 	/* Set initial listening socket */
-	old_fds[0].sock = sock;
-	old_fds[0].events = POLLIN;
-	fd_count = 1;
-
-	/* Set the initial values for get functions */
-	_poll_fds = old_fds;
+	add_poll_fd(sock);
 	done = 0;
 
 	while(!done) {
 		int num_ready;
 
 		for(i = 0; i < POLL_MAXCONN; i++)
-			fds[i] = old_fds[i];
+			fds[i] = _poll_fds[i];
 
-		/* Update the value for poll_count */
-		_poll_count = fd_count;
-
-		if((num_ready = poll_socket(fds, fd_count, -1)) < 0) {
+		/* check sockets for readiness */
+		if((num_ready = poll_socket(fds, _poll_count, -1)) < 0) {
 			perror("poll failed");
 			break;
 		} else if(num_ready == 0) {
 			printf("timeout\n");
 		} else {
-			for(i = 0; i < fd_count; i++) {
+			for(i = 0; i < _poll_count; i++) {
 				if(fds[i].revents & POLLIN) {
 					/* read fds */
 					if(fds[i].sock == sock) {
@@ -261,14 +290,12 @@ int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
 							destroy_socket(client);
 							continue;
 						}
-						if(fd_count < POLL_MAXCONN) {
+						if(_poll_count < POLL_MAXCONN) {
 							printf("Server: Client [%s] connected!\n",
 								get_addr_socket(client));
 							if((*func1) == NULL) default_on_connect(client);
 							else (*func1)(client);
-							old_fds[fd_count].sock = client;
-							old_fds[fd_count].events = POLLIN;
-							fd_count++;
+							add_poll_fd(client);
 						} else {
 							printf("Server: Too many clients already.\n");
 						}
@@ -291,18 +318,10 @@ int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
 							}
 						break;
 						case 0: {
-							int j;
-
 							/* remove socket from set */
 							printf("Server: Client [%s] disconnected!\n",
 								get_addr_socket(fds[i].sock));
-							destroy_socket(old_fds[i].sock);
-							for(j = i; j < fd_count-1; j++)
-								old_fds[j] = old_fds[j+1];
-							old_fds[fd_count].sock = NULL;
-							old_fds[fd_count].events = 0;
-							old_fds[fd_count].revents = 0;
-							fd_count--;
+							del_poll_fd(fds[i].sock);
 						} break;
 						default:
 							printf("Client: received %d bytes.\n", bytes);
@@ -315,11 +334,12 @@ int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
 	}
 
 	/* Clear all sockets */
-	for(i = 0; i < fd_count; i++) {
-		if(old_fds[i].sock != NULL) {
-			destroy_socket(old_fds[i].sock);
-			old_fds[i].events = 0;
-			old_fds[i].revents = 0;
+	for(i = 0; i < _poll_count; i++) {
+		if(_poll_fds[i].sock != NULL) {
+			destroy_socket(_poll_fds[i].sock);
+			_poll_fds[i].sock = NULL;
+			_poll_fds[i].events = 0;
+			_poll_fds[i].revents = 0;
 		}
 	}
 	return 0;

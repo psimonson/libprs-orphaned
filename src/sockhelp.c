@@ -343,12 +343,16 @@ int close_socket(sock_t *sock)
 int blocking_socket(sock_t *sock, int bmode)
 {
 #ifdef _WIN32
-	long unsigned int mode = (bmode ? 0 : 1);
+	long unsigned int mode = bmode ? 1 : 0;
 	return ioctlsocket(sock->fd, FIONBIO, &mode);
 #else
+	int flags;
+	flags = fcntl(sock->fd, F_GETFL);
 	if(bmode)
-		return fcntl(sock->fd, F_SETFL, O_NONBLOCK);
-	return 0;
+		flags |= O_NONBLOCK;
+	else
+		flags &= ~O_NONBLOCK;
+	return fcntl(sock->fd, F_SETFL, flags);
 #endif
 }
 /**
@@ -533,4 +537,24 @@ static void clear_socket(sock_t *sock)
 SOCKET get_socket(sock_t *sock)
 {
 	return (sock != NULL ? sock->fd : INVALID_SOCKET);
+}
+/**
+ * @brief Get address information from socket.
+ */
+void *get_addr_info(sock_t *sock)
+{
+	return (void*)&sock->addr;
+}
+/**
+ * @brief Set socket descriptor.
+ */
+sock_t *new_socket(void *addrinfo, SOCKET fd)
+{
+	sock_t *sock;
+	sock = (sock_t*)malloc(sizeof(sock_t));
+	if(sock == NULL) return NULL;
+	memcpy(&sock->addr, addrinfo, sizeof(sock->addr));
+	sock->fd = fd;
+	sock->error = SOCKERR_OKAY;
+	return sock;
 }
