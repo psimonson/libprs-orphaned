@@ -89,7 +89,9 @@ pop_stack (ustack_t* stack)
     if(stack->top > 0) {
         return stack[--stack->top].data;
     } else {
+#ifdef DEBUG
         fprintf(stderr, "Warning: Stack empty.\n");
+#endif
     }
     return NULL;
 }
@@ -105,7 +107,9 @@ peek_stack (ustack_t* stack)
     if(stack->top > 0) {
         return stack[stack->top-1].data;
     } else {
+#ifdef DEBUG
         fprintf(stderr, "Warning: Stack empty.\n");
+#endif
     }
     return NULL;
 }
@@ -129,6 +133,14 @@ reset_top (ustack_t* stack)
 void
 free_stack (ustack_t* stack, void (*func)(void*))
 {
+    if((*func) == NULL) {
+	    printf("Please implement the destroy data function.\n"
+		"===============================================\n"
+		"static void destroy_data(void *data)\n"
+		"{\n/* TODO: Add destroy code here. */\n}\n"
+		"===============================================\n");
+	    return;
+    }
     if(stack != NULL) {
         reset_top(stack);
         while(stack->top > 0) {
