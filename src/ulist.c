@@ -50,7 +50,8 @@ PRS_EXPORT ulist_t *create_ulist(void)
 	return head;
 }
 
-PRS_EXPORT void set_attr_ulist(ulist_t *node, const char *name, void *data)
+PRS_EXPORT void set_attr_ulist(ulist_t *node, const char *name,
+	const void *data)
 {
 	if(node == NULL || name == NULL || data == NULL) return;
 	node->name = (char*)malloc(strlen(name)+1);
@@ -59,7 +60,7 @@ PRS_EXPORT void set_attr_ulist(ulist_t *node, const char *name, void *data)
 		return;
 	}
 	strcpy(node->name, name);
-	node->data = data;
+	node->data = (void*)data;
 }
 
 PRS_EXPORT void destroy_ulist(ulist_t **head, void (*func)(void *data),
@@ -110,7 +111,7 @@ PRS_EXPORT ulist_t *search_ulist(const ulist_t *head, const char *name)
 	return NULL;
 }
 
-PRS_EXPORT void add_ulist(ulist_t *head, const char *name, void *data)
+PRS_EXPORT void add_ulist(ulist_t *head, const char *name, const void *data)
 {
 	ulist_t *tmp;
 	if((head == NULL) | (name == NULL) | (data == NULL)) return;
@@ -189,7 +190,7 @@ PRS_EXPORT ulist_t *get_prev_ulist(const ulist_t *head, const ulist_t *node)
 	return NULL;
 }
 
-PRS_EXPORT ulist_t *get_next_ulist(ulist_t *node)
+PRS_EXPORT ulist_t *get_next_ulist(const ulist_t *node)
 {
 	return (ulist_t*)(node == NULL ? NULL : node->next);
 }

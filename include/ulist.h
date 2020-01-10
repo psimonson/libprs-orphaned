@@ -38,7 +38,7 @@ typedef struct ulist ulist_t;
 /** @brief Create a new ulist_t pointer. */
 ulist_t *create_ulist(void);
 /** @brief Set attributes for new node. */
-void set_attr_ulist(ulist_t *node, const char *name, void *data);
+void set_attr_ulist(ulist_t *node, const char *name, const void *data);
 /** @brief Destroys a ulist_t pointer. */
 void destroy_ulist(ulist_t **list, void (*func)(void *data),
 	unsigned char bdata);
@@ -46,7 +46,7 @@ void destroy_ulist(ulist_t **list, void (*func)(void *data),
 /** @brief Searches for the given list item name. */
 ulist_t *search_ulist(const ulist_t *head, const char *name);
 /** @brief Add a new item to the list. */
-void add_ulist(ulist_t *head, const char *name, void *data);
+void add_ulist(ulist_t *head, const char *name, const void *data);
 /** @brief Delete an item from the list. */
 void del_ulist(ulist_t **head, void (*func)(void *data));
 /** @brief Delete an item by it's name. */
@@ -60,7 +60,7 @@ const char *get_name_ulist(const ulist_t *node);
 /** @brief Gets the previous item in the list. */
 ulist_t *get_prev_ulist(const ulist_t *head, const ulist_t *node);
 /** @brief Gets the next item in the list, if any. */
-ulist_t *get_next_ulist(ulist_t *node);
+ulist_t *get_next_ulist(const ulist_t *node);
 
 /** @brief Gets the error string associated with the ulist error code. */
 const char *strerror_ulist(int errno);
