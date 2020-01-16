@@ -160,7 +160,6 @@ int server_socket(sock_t **sock, const char *port)
 
 	if(p == NULL) {
 		(*sock)->error = SOCKERR_BIND;
-		close_socket(*sock);
 		return 1;
 	}
 	freeaddrinfo(servinfo);		/* all done with this */
@@ -221,7 +220,6 @@ int client_socket(sock_t **sock, const char *addr, const char *port)
 
 	if(p==NULL) {
 		(*sock)->error = SOCKERR_CONNECT;
-		close_socket(*sock);
 		return 1;
 	} else {
 		memcpy(&(*sock)->addr, &p->ai_addr, sizeof(struct sockaddr_storage));
@@ -516,7 +514,7 @@ const char *get_addr_socket(sock_t *s)
 	static char addr[32];
 	memset(addr, 0, sizeof(addr));
 	sprintf(addr, "%ld.%ld.%ld.%ld",
-#if __BIG_ENDIAN__ == __LITTLE_ENDIAN
+#if __BYTE_ORDER == __LITTLE_ENDIAN
 	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF000000),
 	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF0000) >> 8,
 	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF00) >> 16,
@@ -559,9 +557,9 @@ sock_t *new_socket(void *addrinfo, SOCKET fd)
 	sock_t *sock;
 	sock = (sock_t*)malloc(sizeof(sock_t));
 	if(sock == NULL) return NULL;
-	if(addrinfo != NULL) memcpy(&sock->addr, addrinfo, sizeof(sock->addr));
-	else memset(&sock->addr, 0, sizeof(sock->addr));
+	if(sock->fd == INVALID_SOCKET) { free(sock); return NULL; }
 	sock->fd = fd;
+	if(addrinfo != NULL) memcpy(&sock->addr, addrinfo, sizeof(sock->addr));
 	sock->error = SOCKERR_OKAY;
 	return sock;
 }
