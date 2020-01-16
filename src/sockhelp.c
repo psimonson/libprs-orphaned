@@ -516,7 +516,7 @@ const char *get_addr_socket(sock_t *s)
 	static char addr[32];
 	memset(addr, 0, sizeof(addr));
 	sprintf(addr, "%ld.%ld.%ld.%ld",
-#if __BYTE_ORDER == __BIG_ENDIAN
+#if __BYTE_ORDER == __LITTLE_ENDIAN
 	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF000000),
 	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF0000) >> 8,
 	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF00) >> 16,
