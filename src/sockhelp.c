@@ -516,11 +516,17 @@ const char *get_addr_socket(sock_t *s)
 	static char addr[32];
 	memset(addr, 0, sizeof(addr));
 	sprintf(addr, "%ld.%ld.%ld.%ld",
+#if __BIG_ENDIAN__ == __LITTLE_ENDIAN
+	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF000000),
+	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF0000) >> 8,
+	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF00) >> 16,
+	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF) >> 24);
+#else
 	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF),
 	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF00) >> 8,
 	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF0000) >> 16,
-	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF000000) >> 24
-	);
+	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF000000) >> 24);
+#endif
 	return (const char *)addr;
 }
 /**
@@ -553,7 +559,8 @@ sock_t *new_socket(void *addrinfo, SOCKET fd)
 	sock_t *sock;
 	sock = (sock_t*)malloc(sizeof(sock_t));
 	if(sock == NULL) return NULL;
-	memcpy(&sock->addr, addrinfo, sizeof(sock->addr));
+	if(addrinfo != NULL) memcpy(&sock->addr, addrinfo, sizeof(sock->addr));
+	else memset(&sock->addr, 0, sizeof(sock->addr));
 	sock->fd = fd;
 	sock->error = SOCKERR_OKAY;
 	return sock;
