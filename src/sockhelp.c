@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <limits.h>
+#include <errno.h>
 
 /* Headers for socket programming */
 #ifdef _WIN32
@@ -183,9 +184,9 @@ int server_socket(sock_t **sock, const char *port)
 int client_socket(sock_t **sock, const char *addr, const char *port)
 {
 	struct addrinfo hints,*servinfo,*p;
-	int rv, copied;
+	int rv, copied, error;
 
-	copied = 0;
+	copied = error = 0;
 
 	/* create socket */
 	*sock = (sock_t*)malloc(sizeof(sock_t));
@@ -204,11 +205,13 @@ int client_socket(sock_t **sock, const char *addr, const char *port)
 
 	/* loop through all results */
 	for(p=servinfo; p!=NULL; p=p->ai_next) {
+		errno = 0;
 		if(((*sock)->fd = socket(p->ai_family, p->ai_socktype,
 				p->ai_protocol)) == INVALID_SOCKET) {
 			(*sock)->error = SOCKERR_CREATE;
 			continue;
 		}
+		errno = 0;
 		if(connect((*sock)->fd, p->ai_addr, p->ai_addrlen)
 				== SOCKET_ERROR) {
 			(*sock)->error = SOCKERR_CONNECT;
@@ -217,8 +220,9 @@ int client_socket(sock_t **sock, const char *addr, const char *port)
 		}
 		break;
 	}
+	error = errno;
 
-	if(p==NULL) {
+	if(!p) {
 		(*sock)->error = SOCKERR_CONNECT;
 		return 1;
 	} else {
@@ -227,12 +231,10 @@ int client_socket(sock_t **sock, const char *addr, const char *port)
 	}
 	freeaddrinfo(servinfo);
 	
-	if(copied) {
-		printf("Client: connecting to %s\n", get_addr_socket((*sock)));
+	if(copied && error == 0) {
 		(*sock)->error = SOCKERR_OKAY;
 		return 0;
 	}
-	printf("Client: %s failed to connect.\n", addr);
 	(*sock)->error = SOCKERR_CONNECT;
 	return 1;
 }
@@ -514,7 +516,7 @@ const char *get_addr_socket(sock_t *s)
 	static char addr[32];
 	memset(addr, 0, sizeof(addr));
 	sprintf(addr, "%ld.%ld.%ld.%ld",
-#if __BYTE_ORDER == __LITTLE_ENDIAN
+#if __BYTE_ORDER == __BIG_ENDIAN
 	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF000000),
 	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF0000) >> 8,
 	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF00) >> 16,
