@@ -100,7 +100,8 @@ ustack_data_t *peek_ustack(ustack_t *stack)
 {
 	if(stack != NULL) {
 		if(stack->data != NULL) {
-			return &stack->data[stack->top-1];
+			if(stack->top > 0)
+				return &stack->data[stack->top-1];
 		} else {
 			fprintf(stderr, "Warning: no stack data found.\n");
 		}
