@@ -1,154 +1,135 @@
 /**
- * @file ustack.c
+ * @file ustack.h
  * @author Philip R. Simonson
- * @date 24 May 2019
- * @brief Simple universal stack implementation.
- * @details
- *
- * Main source file for universal stack. Fully working stack that
- * all you need to do is create your own functions for data
- * handling. Also, a struct for the data if you need more than one
- * data type inside of one stack. This code remains the same for
- * everything. Or atleast that's how my design should be, let me
- * know if something don't let you add your data to this stack and
- * I'll fix it.
- ******************************************************************************
- * Functions:
- ******************************************************************************
- * init_stack() - create initial stack.
- * push_stack() - push element on top of stack.
- * pop_stack()  - pop element off top of stack.
- * peek_stack() - peek at top of stack.
- * reset_top()  - reset top of stack to last element.
- * free_stack() - free all memory and cleanup.
- ******************************************************************************
+ * @date 01/17/2020
+ * @brief Simple implementation of a universal stack.
+ **************************************************************************
+ * @details Stacks are a data type for storing data to push and pop.
+ * Assembler uses a stack for instance.
+ **************************************************************************
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "ustack.h"
 
-/**
- * @brief Initialize the a stack object.
- *
- * Returns: ustack_t*
+/* Universal stack data structure.
  */
-ustack_t*
-init_stack ()
+struct ustack_data {
+	unsigned int id;
+	void *data;
+};
+/* Universal stack structure.
+ */
+struct ustack {
+	unsigned int top;
+	unsigned int last;
+	ustack_data_t *data;
+};
+/* Create the initial stack.
+ */
+ustack_t *create_ustack(void)
 {
-    ustack_t *stack;
-    stack = (ustack_t*)malloc(sizeof(ustack_t)*STACKSIZE);
-    if(!stack) return NULL;
-    stack->data = NULL;
-    stack->size = STACKSIZE;
-    stack->top = 0;
-    stack->cur = 0;
-    return stack;
+	ustack_t *stack;
+	stack = (ustack_t*)malloc(sizeof(ustack_t));
+	if(stack == NULL) return NULL;
+	stack->top = 0;
+	stack->last = 0;
+	stack->data = NULL;
+	return stack;
 }
-
-/**
- * @brief Grow a stack object to add more objects.
- *
- * Returns: ustack_t*
+/* Grow the stack by one each time.
  */
-ustack_t*
-grow_stack (ustack_t* stack)
+static int grow_ustack(ustack_t *stack, const unsigned int id,
+	const void *data)
 {
-    ustack_t* nstack;
-    
-    stack->size += STACKSIZE;
-    nstack = (ustack_t*)realloc(stack, stack->size);
-    if(!nstack) return stack;
-    return nstack;
+	const int size = sizeof(ustack_data_t)*(stack->top+1);
+	stack->data = (ustack_data_t*)realloc(stack->data, size);
+	if(stack->data == NULL) return -1;
+	stack->data[stack->top].data = (void*)data;
+	stack->data[stack->top].id = id;
+	stack->top++, stack->last++;
+	return 0;
 }
-
-/**
- * @brief Push some data on the top of the given stack pointer.
- *
- * Returns: void
+/* Add some data to the top of the stack.
  */
-void
-push_stack (ustack_t* stack, void* data)
+int push_ustack(ustack_t *stack, const unsigned int id,
+	const void *data)
 {
-    if(stack->top >= stack->size) {
-        fprintf(stderr, "Warning: Stack to full, growing.\n");
-        stack = grow_stack(stack);
-    }
-    stack[stack->top++].data = data;
-    stack->cur++;
+	if(stack != NULL) {
+		return grow_ustack(stack, id, data);
+	}
+	return -1;
 }
-
-/**
- * @brief Pop top of stack off and return it.
- *
- * Returns: void*
+/* Destroy a stack free all memory.
  */
-void*
-pop_stack (ustack_t* stack)
+void destroy_ustack(ustack_t **stack, void (*destroy)(void *))
 {
-    if(stack->top > 0) {
-        return stack[--stack->top].data;
-    } else {
-#ifdef DEBUG
-        fprintf(stderr, "Warning: Stack empty.\n");
-#endif
-    }
-    return NULL;
+	if(*stack != NULL) {
+		unsigned int i;
+		reset_ustack(*stack);
+		for(i = 0; i < (*stack)->top; i++) {
+			ustack_data_t *tmp = pop_ustack(*stack);
+			if(tmp != NULL) {
+				if((*destroy) != NULL)
+					(*destroy)(tmp->data);
+				else
+					free(tmp->data);
+			}
+		}
+		free(*stack);
+		*stack = NULL;
+	}
 }
-
-/**
- * @brief Peek at the top of stack and return it.
- *
- * Returns: void*
+/* Pop off the last element on the stack.
  */
-void*
-peek_stack (ustack_t* stack)
+ustack_data_t *pop_ustack(ustack_t *stack)
 {
-    if(stack->top > 0) {
-        return stack[stack->top-1].data;
-    } else {
-#ifdef DEBUG
-        fprintf(stderr, "Warning: Stack empty.\n");
-#endif
-    }
-    return NULL;
+	if(stack != NULL) {
+		if(stack->data != NULL) {
+			return &stack->data[--stack->top];
+		} else {
+			fprintf(stderr, "Warning: no stack data found.\n");
+		}
+	}
+	return NULL;
 }
-
-/**
- * @brief Reset the top of the stack.
- *
- * Returns: void
+/* Peek at last element push on the stack.
  */
-void
-reset_top (ustack_t* stack)
+ustack_data_t *peek_ustack(ustack_t *stack)
 {
-    stack->top = stack->cur > 0 ? stack->cur : 0;
+	if(stack != NULL) {
+		if(stack->data != NULL) {
+			return &stack->data[stack->top-1];
+		} else {
+			fprintf(stderr, "Warning: no stack data found.\n");
+		}
+	}
+	return NULL;
 }
-
-/**
- * @brief Free the entire stack object given.
- *
- * Returns: void
+/* Used internally, reset top to current top.
  */
-void
-free_stack (ustack_t* stack, void (*func)(void*))
+void reset_ustack(ustack_t *stack)
 {
-    if((*func) == NULL) {
-	    printf("Please implement the destroy data function.\n"
-		"===============================================\n"
-		"static void destroy_data(void *data)\n"
-		"{\n/* TODO: Add destroy code here. */\n}\n"
-		"===============================================\n");
-	    return;
-    }
-    if(stack != NULL) {
-        reset_top(stack);
-        while(stack->top > 0) {
-            void* data = pop_stack(stack);
-            if(data == NULL) break;
-            (*func)(data);
-        }
-        stack->cur = 0;
-	free(stack);
-    }
+	if(stack != NULL) {
+		stack->top = stack->last;
+	}
+}
+/* Get id from stack.
+ */
+unsigned int get_id_ustack(ustack_data_t *data)
+{
+	if(data != NULL) {
+		return data->id;
+	}
+	return -1;
+}
+/* Get data from stack.
+ */
+void *get_data_ustack(ustack_data_t *data)
+{
+	if(data != NULL) {
+		return data->data;
+	}
+	return NULL;
 }

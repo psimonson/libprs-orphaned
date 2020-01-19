@@ -4,10 +4,8 @@
  * @date   2019/05/24
  * @brief Dynamic Universal Stack, make a stack that holds anything.
  **********************************************************************
- * @details
- *
- * Make a simple dynamic stack, handling everything from this library
- * with anything to do with the stack.
+ * @details Make a simple dynamic stack, handling everything from this
+ * library with anything to do with the stack.
  **********************************************************************
  */
 
@@ -20,22 +18,35 @@
 extern "C" {
 #endif
 
-#define STACKSIZE 255
+/** @brief Simple universal stack data struct. */
+typedef struct ustack_data ustack_data_t;
+/** @brief Simple universal stack type. */
+typedef struct ustack ustack_t;
 
-/** @brief Universal stack structure. */
-typedef struct ustack {
-    void* data;
-    int size;
-    int top;
-    int cur;
-} ustack_t;
+/* ------------------------ Normal Functions ------------------------- */
 
-PRS_EXPORT ustack_t* init_stack();
-PRS_EXPORT void push_stack(ustack_t* stack, void* data);
-PRS_EXPORT void* pop_stack(ustack_t* stack);
-PRS_EXPORT void* peek_stack(ustack_t* stack);
-PRS_EXPORT void reset_top(ustack_t* stack);
-PRS_EXPORT void free_stack(ustack_t* stack, void (*)(void*));
+/** @brief Create initial stack. (Run first) */
+PRS_EXPORT ustack_t *create_ustack(void);
+/** @brief Add some data to the stack. */
+PRS_EXPORT int push_ustack(ustack_t *stack, const unsigned int id,
+		const void *data);
+/** @brief Destroy all data from stack. */
+PRS_EXPORT void destroy_ustack(ustack_t **stack, void (*destroy_data)(void*));
+/** @brief Pop off top of stack. */
+PRS_EXPORT ustack_data_t *pop_ustack(ustack_t *stack);
+/** @brief Peek at top of stack. */
+PRS_EXPORT ustack_data_t *peek_ustack(ustack_t *stack);
+/** @brief Reset top to last element on stack. */
+PRS_EXPORT void reset_ustack(ustack_t *stack);
+
+/* ------------------------ Get/Set Functions ------------------------ */
+
+/** @brief Get top from stack. */
+PRS_EXPORT unsigned int get_top_ustack(ustack_t *stack);
+/** @brief Get id from stack. */
+PRS_EXPORT unsigned int get_id_ustack(ustack_data_t *data);
+/** @brief Get data from stack. */
+PRS_EXPORT void *get_data_ustack(ustack_data_t *data);
 
 #ifdef __cplusplus
 }
