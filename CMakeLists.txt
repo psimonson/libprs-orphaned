@@ -14,8 +14,9 @@ include_directories(
 	"${PROJECT_SOURCE_DIR}/include"
 )
 
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -std=c89 -Wall -Wextra -Werror -g")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -std=c89 -Wall -Wextra -Werror -O2")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89 -Wall -Wextra -Werror")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -Wno-return-type -g")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -Wno-return-type -O2")
 
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
 	if(WIN32)
@@ -44,8 +45,8 @@ configure_file(
 	@ONLY
 )
 if(WIN32)
-	add_library(prs SHARED src/file.c src/clogger.c src/bitmap.c src/bitfiddle.c src/sockhelp.c src/sockpoll.c src/ustack.c src/ulist.c)
-	add_library(prs_static STATIC src/file.c src/clogger.c src/bitmap.c src/bitfiddle.c src/sockhelp.c src/sockpoll.c src/ustack.c src/ulist.c)
+	add_library(prs SHARED src/file.c src/clogger.c src/bitmap.c src/bitfiddle.c src/sockhelp.c src/sockpoll.c src/ustack.c src/ulist.c src/utree.c src/uqueue.c)
+	add_library(prs_static STATIC src/file.c src/clogger.c src/bitmap.c src/bitfiddle.c src/sockhelp.c src/sockpoll.c src/ustack.c src/ulist.c src/utree.c src/uqueue.c)
 	target_link_libraries(prs ws2_32)
 	target_link_libraries(prs_static ws2_32)
 	set_target_properties(prs PROPERTIES PREFIX "")
@@ -53,8 +54,8 @@ if(WIN32)
 	install(TARGETS prs ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} COMPONENT library)
 	install(TARGETS prs_static ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} COMPONENT library)
 else(UNIX)
-	add_library(prs SHARED src/file.c src/clogger.c src/bitmap.c src/bitfiddle.c src/sockhelp.c src/sockpoll.c src/ustack.c src/ulist.c)
-	add_library(prs_static STATIC src/file.c src/clogger.c src/bitmap.c src/bitfiddle.c src/sockhelp.c src/sockpoll.c src/ustack.c src/ulist.c)
+	add_library(prs SHARED src/file.c src/clogger.c src/bitmap.c src/bitfiddle.c src/sockhelp.c src/sockpoll.c src/ustack.c src/ulist.c src/utree.c src/uqueue.c)
+	add_library(prs_static STATIC src/file.c src/clogger.c src/bitmap.c src/bitfiddle.c src/sockhelp.c src/sockpoll.c src/ustack.c src/ulist.c src/utree.c src/uqueue.c)
 	install(TARGETS prs ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} COMPONENT library)
 	install(TARGETS prs_static ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} COMPONENT library)
 	install(FILES ${CMAKE_BINARY_DIR}/prs.pc DESTINATION "${CMAKE_INSTALL_PREFIX}/share/pkgconfig")
