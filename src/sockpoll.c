@@ -32,6 +32,10 @@ static sock_t *_poll_server;
 static struct pollfd _poll_fds[POLL_MAXCONN];
 static int _poll_count;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ----------------------- Private Functions ---------------------- */
 
 /* Map poll() structures to file descriptor
@@ -146,7 +150,7 @@ static int default_handle_client(sock_t *sock, int *done)
 }
 /* Custom sleep function.
  */
-void psleep(int ms)
+static void psleep(int ms)
 {
 	time_t start, end;
 	start = end = time(NULL);
@@ -158,7 +162,7 @@ void psleep(int ms)
 
 /* Add a socket to the multiple poll fds.
  */
-void add_poll_fd(sock_t *sock)
+PRS_EXPORT void add_poll_fd(sock_t *sock)
 {
 	int count = (_poll_count >= 0 && _poll_count < POLL_MAXCONN)
 		? _poll_count : -1;
@@ -171,7 +175,7 @@ void add_poll_fd(sock_t *sock)
 }
 /* Del a socket from poll fds.
  */
-void del_poll_fd(sock_t *sock)
+PRS_EXPORT void del_poll_fd(sock_t *sock)
 {
 	int count = (_poll_count >= 0 && _poll_count < POLL_MAXCONN)
 		? _poll_count : -1;
@@ -194,32 +198,32 @@ void del_poll_fd(sock_t *sock)
 }
 /* Get poll file descriptors. Use only with poll_multiple_socket().
  */
-struct pollfd get_poll_fd(int idx)
+PRS_EXPORT struct pollfd get_poll_fd(int idx)
 {
 	return _poll_fds[(int)((idx >= 0 && idx < POLL_MAXCONN) ? idx : 0)];
 }
 /* Get poll file descriptor count. Use only with poll_multiple_socket().
  */
-int get_poll_count(void)
+PRS_EXPORT int get_poll_count(void)
 {
 	return _poll_count;
 }
 /* Get server socket.
  */
-const sock_t *get_server_socket(void)
+PRS_EXPORT const sock_t *get_server_socket(void)
 {
 	return (const sock_t *)(_poll_server != NULL ? _poll_server : NULL);
 }
 /* Set server socket.
  */
-void set_server_socket(sock_t *sock)
+PRS_EXPORT void set_server_socket(sock_t *sock)
 {
 	assert(sock != (sock_t*)NULL);
 	_poll_server = sock;
 }
 /* Poll events using select.
  */
-int poll_socket(struct pollfd *p_arr, nfds_t n_fds, int timeout)
+PRS_EXPORT int poll_socket(struct pollfd *p_arr, nfds_t n_fds, int timeout)
 {
 	fd_set read, write, except;
 	struct timeval stime, *ptime;
@@ -245,7 +249,7 @@ int poll_socket(struct pollfd *p_arr, nfds_t n_fds, int timeout)
 }
 /* Handle multiple connections to socket.
  */
-int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
+PRS_EXPORT int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
 	int (*func2)(sock_t*, int*))
 {
 	struct pollfd fds[POLL_MAXCONN];
@@ -345,3 +349,6 @@ int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
 	return 0;
 #undef POLL_MAXCONN
 }
+#ifdef __cplusplus
+}
+#endif

@@ -2,11 +2,10 @@
  * @file sockhelp.h
  * @author Philip R. Simonson
  * @date   2019/06/06
+ * @brief Simple wrapper library for Sockets in Linux/Windows.
  ********************************************************************
- * @details
- *
- * Simple socket library for Linux/Unix. I will be adding support for
- * Windows in the future.
+ * @details Simple socket library for Linux/Unix. It works with
+ * Windows now, will be extending in the future.
  ********************************************************************
  */
 

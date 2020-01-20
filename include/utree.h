@@ -21,28 +21,39 @@
 #ifndef _PRS_UTREE_H_
 #define _PRS_UTREE_H_
 
-typedef struct utree utree_t; /**< Universal Tree (typedef) */
+#include "export.h"
+
+/** @brief Universal tree type */
+typedef struct utree utree_t;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* ------------------------ Normal Functions ----------------------- */
 
 /** @brief Add a branch to the tree. */
-void add_utree(utree_t **tree, int id, const void *data);
+PRS_EXPORT void add_utree(utree_t **tree, int id, const void *data);
 /** @brief Searches tree for id. */
-utree_t *search_utree(utree_t *leaf, int id);
+PRS_EXPORT utree_t *search_utree(utree_t *leaf, int id);
 /** @brief Prints the tree in ascii form on screen. */
-void print_utree(utree_t *tree, int indent);
+PRS_EXPORT void print_utree(utree_t *tree, int indent);
 /** @brief Frees all allocated memory from tree. */
-void destroy_utree(utree_t **tree, void (*destroy_data)(void*));
+PRS_EXPORT void destroy_utree(utree_t **tree, void (*destroy_data)(void*));
 
 /* ------------------------ Get/Set Functions ---------------------- */
 
 /** @brief Gets the data from the tree. */
-void *get_data_utree(utree_t *tree);
+PRS_EXPORT void *get_data_utree(utree_t *tree);
 /** @brief Gets the id from the tree. */
-int get_id_utree(utree_t *leaf);
+PRS_EXPORT int get_id_utree(utree_t *leaf);
 /** @brief Gets the left limb of the tree. */
-utree_t *get_left_utree(utree_t *leaf);
+PRS_EXPORT utree_t *get_left_utree(utree_t *leaf);
 /** @brief Gets the right limb of the tree. */
-utree_t *get_right_utree(utree_t *leaf);
+PRS_EXPORT utree_t *get_right_utree(utree_t *leaf);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

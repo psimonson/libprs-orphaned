@@ -36,36 +36,37 @@ enum ULIST_ERROR {
 typedef struct ulist ulist_t;
 
 /** @brief Create a new ulist_t pointer. */
-ulist_t *create_ulist(void);
+PRS_EXPORT ulist_t *create_ulist(void);
 /** @brief Set attributes for new node. */
-void set_attr_ulist(ulist_t *node, const char *name, const void *data);
+PRS_EXPORT void set_attr_ulist(ulist_t *node, const char *name,
+	const void *data);
 /** @brief Destroys a ulist_t pointer. */
-void destroy_ulist(ulist_t **list, void (*func)(void *data),
+PRS_EXPORT void destroy_ulist(ulist_t **list, void (*func)(void *data),
 	unsigned char bdata);
 
 /** @brief Searches for the given list item name. */
-ulist_t *search_ulist(const ulist_t *head, const char *name);
+PRS_EXPORT ulist_t *search_ulist(const ulist_t *head, const char *name);
 /** @brief Add a new item to the list. */
-void add_ulist(ulist_t *head, const char *name, const void *data);
+PRS_EXPORT void add_ulist(ulist_t *head, const char *name, const void *data);
 /** @brief Delete an item from the list. */
-void del_ulist(ulist_t **head, void (*func)(void *data));
+PRS_EXPORT void del_ulist(ulist_t **head, void (*func)(void *data));
 /** @brief Delete an item by it's name. */
-void del_by_name_ulist(ulist_t **head, const char *name,
+PRS_EXPORT void del_by_name_ulist(ulist_t **head, const char *name,
 	void (*func)(void *data));
 
 /** @brief Gets data from the given ulist_t item. */
-void *get_data_ulist(const ulist_t *node);
+PRS_EXPORT void *get_data_ulist(const ulist_t *node);
 /** @brief Gets the name from a given ulist_t item. */
-const char *get_name_ulist(const ulist_t *node);
+PRS_EXPORT const char *get_name_ulist(const ulist_t *node);
 /** @brief Gets the previous item in the list. */
-ulist_t *get_prev_ulist(const ulist_t *head, const ulist_t *node);
+PRS_EXPORT ulist_t *get_prev_ulist(const ulist_t *head, const ulist_t *node);
 /** @brief Gets the next item in the list, if any. */
-ulist_t *get_next_ulist(const ulist_t *node);
+PRS_EXPORT ulist_t *get_next_ulist(const ulist_t *node);
 
 /** @brief Gets the error string associated with the ulist error code. */
-const char *strerror_ulist(int errno);
+PRS_EXPORT const char *strerror_ulist(int errno);
 /** @brief Get the error code from the last list function ran. */
-int get_error_ulist(void);
+PRS_EXPORT int get_error_ulist(void);
 
 #define get_error_number ((int)get_error_ulist()) /**< get error number */
 

@@ -44,13 +44,15 @@ static const char *_prs_file_errors[] = {
     "Cannot tell size of file."
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ------------------------- standard functions ------------------------ */
 
-/**
- * @brief Open a file by (path, mode).
+/* Open a file by (path, mode).
  */
-file_t*
-open_file(const char* filename, const char* mode)
+PRS_EXPORT file_t *open_file(const char *filename, const char *mode)
 {
     file_t *file;
     file = (file_t*)malloc(sizeof(file_t));
@@ -86,12 +88,9 @@ open_file(const char* filename, const char* mode)
     fseek(file->fp, 0, SEEK_SET);
     return file;
 }
-
-/**
- * @brief Reopen file with different mode.
+/* Reopen file with different mode.
  */
-file_t*
-reopen_file(file_t *file, const char* mode)
+PRS_EXPORT file_t *reopen_file(file_t *file, const char *mode)
 {
     if(file != NULL &&
              (file->fp = freopen(file->name, mode, file->fp)) == NULL) {
@@ -122,32 +121,23 @@ reopen_file(file_t *file, const char* mode)
     fseek(file->fp, 0, SEEK_SET);
     return file;
 }
-
-/**
- * @brief Gets the error string associated with error code.
+/* Gets the error string associated with error code.
  */
-const char*
-strerror_file (int err)
+PRS_EXPORT const char *strerror_file(int err)
 {
     return _prs_file_errors[err];
 }
-
-/**
- * @brief Gets the error code from file.
+/* Gets the error code from file.
  */
-int
-get_error_file (void)
+PRS_EXPORT int get_error_file(void)
 {
     int error = _errno_file;
     _errno_file = FILE_ERROR_OKAY;
     return error;
 }
-
-/**
- * @brief Uninitialize the file structure; closing file.
+/* Uninitialize the file structure; closing file.
  */
-void
-close_file(file_t* file)
+PRS_EXPORT void close_file(file_t *file)
 {
     if(file->fp != NULL) fclose(file->fp);
     memset(file->name, 0, MAX_PATH);
@@ -159,33 +149,28 @@ close_file(file_t* file)
 
 /* ------------------------- handling functions ------------------------ */
 
-/**
- * @brief Read file into buf; of size
+/* Read file into buf; of size
  */
-int
-read_file (file_t* file, void* buf, size_t nmem, size_t size)
+PRS_EXPORT int read_file(file_t *file, void *buf, size_t nmem, size_t size)
 {
     int bytes;
     if((bytes = fread(buf, nmem, size, file->fp)) < 0)
         _errno_file = FILE_ERROR_READ;
     return bytes;
 }
-/**
- * @brief Write into file from buf; of size
+/* Write into file from buf; of size
  */
-int
-write_file (file_t* file, const void* buf, size_t nmem, size_t size)
+PRS_EXPORT int write_file(file_t *file, const void *buf, size_t nmem,
+	size_t size)
 {
     int bytes;
     if((bytes = fwrite(buf, nmem, size, file->fp)) < 0)
         _errno_file = FILE_ERROR_WRITE;
     return bytes;
 }
-/**
- * @brief Write formatted into file
+/* Write formatted into file
  */
-int
-writef_file (file_t* file, const char* buf, ...)
+PRS_EXPORT int writef_file(file_t *file, const char *buf, ...)
 {
     int res;
     va_list ap;
@@ -196,35 +181,27 @@ writef_file (file_t* file, const char* buf, ...)
         _errno_file = FILE_ERROR_WRITE;
     return res;
 }
-/**
- * @brief Write formatted into file; using va_list
+/* Write formatted into file; using va_list
  */
-int
-vwritef_file (file_t* file, const char* buf, va_list ap)
+PRS_EXPORT int vwritef_file(file_t *file, const char *buf, va_list ap)
 {
     return vfprintf(file->fp, buf, ap);
 }
-/**
- * @brief Read a line of text from file
+/* Read a line of text from file
  */
-char*
-gets_file (file_t* file, char* buf, long size)
+PRS_EXPORT char *gets_file(file_t *file, char *buf, long size)
 {
 	return fgets(buf, size, file->fp);
 }
-/**
- * @brief Put a line of text to file
+/* Put a line of text to file
  */
-int
-puts_file (file_t* file, const char* buf)
+PRS_EXPORT int puts_file(file_t *file, const char *buf)
 {
 	return fputs(buf, file->fp);
 }
-/**
- * @brief Read formatted from file
+/* Read formatted from file
  */
-int
-readf_file (file_t* file, const char* buf, ...)
+PRS_EXPORT int readf_file(file_t *file, const char *buf, ...)
 {
     int res;
     va_list ap;
@@ -235,11 +212,9 @@ readf_file (file_t* file, const char* buf, ...)
         _errno_file = FILE_ERROR_READ;
     return res;
 }
-/**
- * @brief Gets one byte from the file
+/* Gets one byte from the file
  */
-int
-getc_file (file_t* file)
+PRS_EXPORT int getc_file(file_t *file)
 {
     int c;
     
@@ -249,33 +224,27 @@ getc_file (file_t* file)
         _errno_file = FILE_ERROR_READ;
     return c;
 }
-/**
- * @brief Puts one byte into the file
+/* Puts one byte into the file.
  */
-void
-putc_file (file_t* file, int c)
+PRS_EXPORT void putc_file(file_t *file, int c)
 {
     errno = 0;
     fputc(c, file->fp);
     if(errno != 0)
         _errno_file = FILE_ERROR_WRITE;
 }
-/**
- * @brief Puts one byte back onto file stream.
+/* Puts one byte back onto file stream.
  */
-void
-ungetc_file (file_t* file, int c)
+PRS_EXPORT void ungetc_file(file_t *file, int c)
 {
     errno = 0;
     ungetc(c, file->fp);
     if(errno != 0)
         _errno_file = FILE_ERROR_WRITE;
 }
-/**
- * @brief Seek through file by bytes.
+/* Seek through file by bytes.
  */
-int
-seek_file (file_t* file, long bytes, int seek)
+PRS_EXPORT int seek_file(file_t *file, long bytes, int seek)
 {
     int res;
     errno = 0;
@@ -284,19 +253,15 @@ seek_file (file_t* file, long bytes, int seek)
         _errno_file = FILE_ERROR_SEEK;
     return res;
 }
-/**
- * @brief Rewind file back to start.
+/* Rewind file back to start.
  */
-void
-rewind_file (file_t* file)
+PRS_EXPORT void rewind_file(file_t *file)
 {
 	rewind(file->fp);
 }
-/**
- * @brief Tell size of file; returns size in bytes.
+/* Tell size of file; returns size in bytes.
  */
-long
-tell_file (file_t* file)
+PRS_EXPORT long tell_file(file_t *file)
 {
     long size;
     errno = 0;
@@ -305,53 +270,44 @@ tell_file (file_t* file)
         _errno_file = FILE_ERROR_TELL;
     return size;
 }
-/**
- * @brief Flushs a file.
+/* Flush the file stream.
  */
-int
-flush_file (file_t* file)
+PRS_EXPORT int flush_file(file_t *file)
 {
     return fflush(file->fp);
 }
 
 /* --------------------------- helper funtions ------------------------- */
 
-/**
- * @brief Gets the handle for a given file; returns FILE pointer.
+/* Gets the handle for a given file; returns FILE pointer.
  */
-FILE*
-get_handle_file (file_t* file)
+PRS_EXPORT FILE *get_handle_file(file_t *file)
 {
     return (file->fp == NULL) ? NULL : file->fp;
 }
-/**
- * @brief Gets the name of the file passed in.
+/* Gets the name of the file passed in.
  */
-const char*
-get_name_file (file_t* file)
+PRS_EXPORT const char *get_name_file(file_t *file)
 {
     return file->name;
 }
-/**
- * @brief Gets the size of the current file.
+/* Gets the size of the current file.
  */
-long
-get_size_file (file_t* file)
+PRS_EXPORT long get_size_file(file_t *file)
 {
-    long size,cur_pos;
+    long size, cur_pos;
     cur_pos = ftell(file->fp);
     fseek(file->fp, 0, SEEK_END);
+    errno = 0;
     size = ftell(file->fp);
-    fseek(file->fp, cur_pos, SEEK_SET);
-    if(size < 0)
+    if(errno != 0)
         _errno_file = FILE_ERROR_SIZE;
+    fseek(file->fp, cur_pos, SEEK_SET);
     return size;
 }
-/**
- * @brief Gets the line count of the current file.
+/* Gets the line count of the current file.
  */
-int
-get_lines_file (file_t* file)
+PRS_EXPORT int get_lines_file(file_t *file)
 {
     int nl,c;
     fseek(file->fp, 0, SEEK_SET);
@@ -361,3 +317,6 @@ get_lines_file (file_t* file)
     fseek(file->fp, 0, SEEK_SET);
     return nl;
 }
+#ifdef __cplusplus
+}
+#endif

@@ -26,9 +26,12 @@ struct uqueue {
 	unsigned int bottom;
 	uqueue_data_t *data;
 };
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* Create the initial queue.
  */
-uqueue_t *create_uqueue(void)
+PRS_EXPORT uqueue_t *create_uqueue(void)
 {
 	uqueue_t *queue;
 	queue = (uqueue_t*)malloc(sizeof(uqueue_t));
@@ -53,7 +56,7 @@ static int grow_uqueue(uqueue_t *queue, const unsigned int id,
 }
 /* Add some data to the top of the queue.
  */
-int add_uqueue(uqueue_t *queue, const unsigned int id,
+PRS_EXPORT int add_uqueue(uqueue_t *queue, const unsigned int id,
 	const void *data)
 {
 	if(queue != NULL) {
@@ -63,7 +66,7 @@ int add_uqueue(uqueue_t *queue, const unsigned int id,
 }
 /* Destroy a queue free all memory.
  */
-void destroy_uqueue(uqueue_t **queue, void (*destroy)(void *))
+PRS_EXPORT void destroy_uqueue(uqueue_t **queue, void (*destroy)(void *))
 {
 	if(*queue != NULL) {
 		unsigned int i;
@@ -79,7 +82,7 @@ void destroy_uqueue(uqueue_t **queue, void (*destroy)(void *))
 }
 /* Get first element of data from the bottom of the queue.
  */
-uqueue_data_t *get_start_uqueue(uqueue_t *queue)
+PRS_EXPORT uqueue_data_t *get_start_uqueue(uqueue_t *queue)
 {
 	if(queue != NULL) {
 		if(queue->data != NULL) {
@@ -93,7 +96,7 @@ uqueue_data_t *get_start_uqueue(uqueue_t *queue)
 }
 /* Get data from bottom of the queue.
  */
-uqueue_data_t *get_next_uqueue(uqueue_t *queue)
+PRS_EXPORT uqueue_data_t *get_next_uqueue(uqueue_t *queue)
 {
 	if(queue != NULL) {
 		if(queue->data != NULL) {
@@ -109,7 +112,7 @@ uqueue_data_t *get_next_uqueue(uqueue_t *queue)
 }
 /* Search uqueue from bottom to top.
  */
-uqueue_data_t *search_uqueue(uqueue_t *queue, const unsigned int id)
+PRS_EXPORT uqueue_data_t *search_uqueue(uqueue_t *queue, const unsigned int id)
 {
 	if(queue != NULL) {
 		uqueue_data_t *tmp;
@@ -123,19 +126,19 @@ uqueue_data_t *search_uqueue(uqueue_t *queue, const unsigned int id)
 }
 /* Get top of queue.
  */
-unsigned int get_top_uqueue(uqueue_t *queue)
+PRS_EXPORT unsigned int get_top_uqueue(uqueue_t *queue)
 {
 	return queue->top;
 }
 /* Get bottom of queue.
  */
-unsigned int get_bottom_uqueue(uqueue_t *queue)
+PRS_EXPORT unsigned int get_bottom_uqueue(uqueue_t *queue)
 {
 	return queue->bottom;
 }
 /* Get id from queue.
  */
-unsigned int get_id_uqueue(uqueue_data_t *data)
+PRS_EXPORT unsigned int get_id_uqueue(uqueue_data_t *data)
 {
 	if(data != NULL) {
 		return data->id;
@@ -144,10 +147,13 @@ unsigned int get_id_uqueue(uqueue_data_t *data)
 }
 /* Get data from queue.
  */
-void *get_data_uqueue(uqueue_data_t *data)
+PRS_EXPORT void *get_data_uqueue(uqueue_data_t *data)
 {
 	if(data != NULL) {
 		return data->data;
 	}
 	return NULL;
 }
+#ifdef __cplusplus
+}
+#endif

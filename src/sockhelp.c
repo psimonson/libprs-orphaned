@@ -55,6 +55,10 @@ struct socket {
 	int error;			/**< Error code storage */
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @brief Internally used function: clears a socket structure. */
 static void clear_socket(sock_t *sock);
 
@@ -63,7 +67,7 @@ static void clear_socket(sock_t *sock);
 /**
  * @brief Initialize sockets in Windows/Linux.
  */
-int socket_startup()
+PRS_EXPORT int socket_startup(void)
 {
 #ifdef _WIN32
 	WSADATA wsaData;
@@ -81,7 +85,7 @@ int socket_startup()
 /**
  * @brief Shutdown sockets in windows/linux.
  */
-int socket_shutdown()
+PRS_EXPORT int socket_shutdown(void)
 {
 #ifdef _WIN32
 	return WSACleanup();
@@ -97,7 +101,7 @@ int socket_shutdown()
  *
  * Returns: void*
  */
-void *get_in_addr(struct sockaddr *sa)
+PRS_EXPORT void *get_in_addr(struct sockaddr *sa)
 {
 	if(sa->sa_family == AF_INET)
 		return &(((struct sockaddr_in*)sa)->sin_addr);
@@ -108,7 +112,7 @@ void *get_in_addr(struct sockaddr *sa)
  *
  * Returns: 1=failure, 0=success
  */
-int server_socket(sock_t **sock, const char *port)
+PRS_EXPORT int server_socket(sock_t **sock, const char *port)
 {
 	struct addrinfo hints,*servinfo,*p;
 #ifdef _WIN32
@@ -181,7 +185,7 @@ int server_socket(sock_t **sock, const char *port)
  *
  * Returns: 1=failure, 0=success
  */
-int client_socket(sock_t **sock, const char *addr, const char *port)
+PRS_EXPORT int client_socket(sock_t **sock, const char *addr, const char *port)
 {
 	struct addrinfo hints,*servinfo,*p;
 	int rv, copied, error;
@@ -243,7 +247,7 @@ int client_socket(sock_t **sock, const char *addr, const char *port)
  *
  * Returns: sock_t
  */
-sock_t *accept_socket(sock_t *server)
+PRS_EXPORT sock_t *accept_socket(sock_t *server)
 {
 	socklen_t sin_size = sizeof(struct sockaddr_storage);
 	sock_t *sock;
@@ -267,7 +271,7 @@ sock_t *accept_socket(sock_t *server)
  *
  * Returns: void
  */
-void destroy_socket(sock_t *sock)
+PRS_EXPORT void destroy_socket(sock_t *sock)
 {
 	if(sock != NULL) {
 		if(sock->fd != INVALID_SOCKET) close_socket(sock);
@@ -282,7 +286,7 @@ void destroy_socket(sock_t *sock)
  *
  * Returns: char*
  */
-const char *get_error_socket(sock_t *sock)
+PRS_EXPORT const char *get_error_socket(sock_t *sock)
 {
 	static const char *errmsg[] = {
 		"Unknown error occured.",
@@ -301,7 +305,7 @@ const char *get_error_socket(sock_t *sock)
  *
  * Returns: int
  */
-int get_errori_socket(sock_t *sock)
+PRS_EXPORT int get_errori_socket(sock_t *sock)
 {
 	if(sock->error < 0 || sock->error >= SOCKERR_COUNT)
 		return SOCKERR_UNKNOWN;
@@ -312,7 +316,7 @@ int get_errori_socket(sock_t *sock)
  *
  * Returns: 1=failure,0=success
  */
-int close_socket(sock_t *sock)
+PRS_EXPORT int close_socket(sock_t *sock)
 {
 	int res = 0;
 #ifdef _WIN32
@@ -340,7 +344,7 @@ int close_socket(sock_t *sock)
  *
  * Returns: true=failure, false=success
  */
-int blocking_socket(sock_t *sock, int bmode)
+PRS_EXPORT int blocking_socket(sock_t *sock, int bmode)
 {
 #ifdef _WIN32
 	long unsigned int mode = bmode ? 0 : 1;
@@ -360,7 +364,7 @@ int blocking_socket(sock_t *sock, int bmode)
  *
  * Returns: bytes sent (long int)
  */
-long send_data(sock_t *sock, const void *data, long size, int flags)
+PRS_EXPORT long send_data(sock_t *sock, const void *data, long size, int flags)
 {
 #ifdef _WIN32
 	int addrlen = sizeof(struct sockaddr);
@@ -375,7 +379,7 @@ long send_data(sock_t *sock, const void *data, long size, int flags)
  *
  * Returns: bytes received (long int)
  */
-long recv_data(sock_t *sock, void *data, long size, int flags)
+PRS_EXPORT long recv_data(sock_t *sock, void *data, long size, int flags)
 {
 #ifdef _WIN32
 	int addrlen = sizeof(struct sockaddr);
@@ -388,7 +392,7 @@ long recv_data(sock_t *sock, void *data, long size, int flags)
 /**
  * @brief Reverse string in place.
  */
-void reverse(char *s)
+PRS_EXPORT void reverse(char *s)
 {
 	int i, j, c;
 	for(i=0, j=strlen(s)-1; i < j; ++i,--j) {
@@ -401,7 +405,7 @@ void reverse(char *s)
 /**
  * @brief Convert decimal number into string.
  */
-void itoa(int x, char *buf)
+PRS_EXPORT void itoa(int x, char *buf)
 {
 	int i, sign;
 	if((sign = x) < 0)
@@ -421,7 +425,7 @@ void itoa(int x, char *buf)
  *
  * Returns: bytes written (int)
  */
-int writef_socket(sock_t *sock, const char *format, ...)
+PRS_EXPORT int writef_socket(sock_t *sock, const char *format, ...)
 {
 	va_list ap;
 	int written;
@@ -511,7 +515,7 @@ int writef_socket(sock_t *sock, const char *format, ...)
 /**
  * @brief Get address from socket.
  */
-const char *get_addr_socket(sock_t *s)
+PRS_EXPORT const char *get_addr_socket(sock_t *s)
 {
 	static char addr[32];
 	memset(addr, 0, sizeof(addr));
@@ -540,21 +544,21 @@ static void clear_socket(sock_t *sock)
 /**
  * @brief Get socket descriptor.
  */
-SOCKET get_socket(sock_t *sock)
+PRS_EXPORT SOCKET get_socket(sock_t *sock)
 {
 	return (sock != NULL ? sock->fd : INVALID_SOCKET);
 }
 /**
  * @brief Get address information from socket.
  */
-void *get_addr_info(sock_t *sock)
+PRS_EXPORT void *get_addr_info(sock_t *sock)
 {
 	return (void*)&sock->addr;
 }
 /**
  * @brief Set socket descriptor.
  */
-sock_t *new_socket(void *addrinfo, SOCKET fd)
+PRS_EXPORT sock_t *new_socket(void *addrinfo, SOCKET fd)
 {
 	sock_t *sock;
 	sock = (sock_t*)malloc(sizeof(sock_t));
@@ -565,3 +569,6 @@ sock_t *new_socket(void *addrinfo, SOCKET fd)
 	sock->error = SOCKERR_OKAY;
 	return sock;
 }
+#ifdef __cplusplus
+}
+#endif

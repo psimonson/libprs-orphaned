@@ -18,21 +18,18 @@
 
 int _bitmap_errno; /**< Current error code from bitmap library. */
 
-/**
- * @brief Create a new bitmap
- *
- * Prototype:
- *   Bitmap *create_bitmap(int width, int height)
+#ifdef __cplusplus
+extern "C" {
+#endif
+/* Create a new bitmap
  */
-Bitmap*
-create_bitmap (int width, int height)
+PRS_EXPORT Bitmap *create_bitmap(int width, int height)
 {
 	Bitmap* bitmap = malloc(sizeof(Bitmap));
-	if (!bitmap) {
+	if(!bitmap) {
 		_bitmap_errno = BMP_MALLOC_ERROR;
 		return NULL;
 	}
-
 	memset(&bitmap->info, 0, sizeof(BitmapInfo));
 	/* init file header */
 	bitmap->info.type = 0x4D42;
@@ -54,7 +51,7 @@ create_bitmap (int width, int height)
 	bitmap->info.impcolors = 0;
 
 	bitmap->data = malloc(bitmap->info.isize);
-	if (!bitmap->data) {
+	if(!bitmap->data) {
 		_bitmap_errno = BMP_MALLOC_ERROR;
 		destroy_bitmap(bitmap);
 		return NULL;
@@ -62,25 +59,19 @@ create_bitmap (int width, int height)
 	memset(bitmap->data, 0x00, bitmap->info.isize);
 	return bitmap;
 }
-
-/**
- * @brief Gets the data from a bitmap object.
- *
- * Prototype:
- *   Bitmap *load_bitmap(const char *filename)
+/* Gets the data from a bitmap object.
  */
-Bitmap*
-load_bitmap (const char *filename)
+PRS_EXPORT Bitmap *load_bitmap(const char *filename)
 {
 	Bitmap *bmp;
 	file_t *file;
 
 	file = open_file(filename, "rb");
-	if (file == NULL)
+	if(file == NULL)
 		return NULL;
 
 	bmp = malloc(sizeof(Bitmap));
-	if (bmp == NULL) {
+	if(bmp == NULL) {
 		_bitmap_errno = BMP_MALLOC_ERROR;
 		close_file(file);
 		return NULL;
@@ -104,7 +95,7 @@ load_bitmap (const char *filename)
 	read_file(file, &bmp->info.palette, 4, 1);
 	read_file(file, &bmp->info.impcolors, 4, 1);
 
-	if (bmp->info.type != 0x4D42 && bmp->info.fsize != bmp->info.isize) {
+	if(bmp->info.type != 0x4D42 && bmp->info.fsize != bmp->info.isize) {
 		_bitmap_errno = BMP_TYPE_ERROR;
 		close_file(file);
 		return NULL;
@@ -112,7 +103,7 @@ load_bitmap (const char *filename)
 
 	/* load bitmap data */
 	bmp->data = malloc(bmp->info.isize);
-	if (bmp->data == NULL) {
+	if(bmp->data == NULL) {
 		_bitmap_errno = BMP_MALLOC_ERROR;
 		free(bmp);
 		close_file(file);
@@ -124,31 +115,25 @@ load_bitmap (const char *filename)
 	close_file(file);
 	return bmp;
 }
-
-/**
- * @brief Writes blank Bitmap image if not data has been given.
- *
- * Prototype:
- *   int write_bitmap(Bitmap *bmp, const char *filename)
+/* Writes blank Bitmap image if not data has been given.
  */
-int
-write_bitmap (Bitmap *bmp, const char *filename)
+PRS_EXPORT int write_bitmap(Bitmap *bmp, const char *filename)
 {
 	file_t *file;
 	int res;
 
 	file = open_file(filename, "wb");
-	if (file == NULL)
+	if(file == NULL)
 		return 1;
 
 	res = write_file(file, &bmp->info, 1, sizeof(BitmapInfo));
-	if (res < (int)sizeof(BitmapInfo)) {
+	if(res < (int)sizeof(BitmapInfo)) {
 		_bitmap_errno = BMP_FILE_ERROR;
 		close_file(file);
 		return 1;
 	}
 	res = write_file(file, bmp->data, 1, bmp->info.isize);
-	if (res < bmp->info.isize) {
+	if(res < bmp->info.isize) {
 		_bitmap_errno = BMP_FILE_ERROR;
 		close_file(file);
 		return 1;
@@ -156,32 +141,21 @@ write_bitmap (Bitmap *bmp, const char *filename)
 	close_file(file);
 	return 0;
 }
-
-/**
- * @brief Checks for valid pixels before plotting.
- *
- * Function used internally doesn't export.
+/* Checks for valid pixels before plotting.
  */
-static int
-_check_pixel_bitmap (Bitmap *bmp, int y, int x)
+static int _check_pixel_bitmap(Bitmap *bmp, int y, int x)
 {
-	if (x < 0 || x > bmp->info.width)
+	if(x < 0 || x > bmp->info.width)
 		return 1;
-	if (y < 0 || y > bmp->info.height)
+	if(y < 0 || y > bmp->info.height)
 		return 1;
 	return 0;
 }
-
-/**
- * @brief Get a pixel at (x,y) coordinates r, g, b values.
- *
- * Prototype:
- *   void get_pixel_bitmap(Bitmap *bmp, int y, int x, Color *pixel)
+/* Get a pixel at (x,y) coordinates r, g, b values.
  */
-void
-get_pixel_bitmap (Bitmap *bmp, int y, int x, Color *pixel)
+PRS_EXPORT void get_pixel_bitmap(Bitmap *bmp, int y, int x, Color *pixel)
 {
-	if (_check_pixel_bitmap(bmp, y, x)) {
+	if(_check_pixel_bitmap(bmp, y, x)) {
 		_bitmap_errno = BMP_PIXEL_ERROR;
 		return;
 	}
@@ -189,17 +163,11 @@ get_pixel_bitmap (Bitmap *bmp, int y, int x, Color *pixel)
 	pixel->g = bmp->data[(bmp->info.width*y+x)*3+1];
 	pixel->r = bmp->data[(bmp->info.width*y+x)*3+2];
 }
-
-/**
- * @brief Put a pixel at (x,y) coordinates r, g, b values.
- *
- * Prototype:
- *   void set_pixel_bitmap(Bitmap *bmp, int y, int x, Color pixel)
+/* Put a pixel at (x,y) coordinates r, g, b values.
  */
-void
-set_pixel_bitmap (Bitmap *bmp, int y, int x, Color pixel)
+PRS_EXPORT void set_pixel_bitmap(Bitmap *bmp, int y, int x, Color pixel)
 {
-	if (_check_pixel_bitmap(bmp, y, x)) {
+	if(_check_pixel_bitmap(bmp, y, x)) {
 		_bitmap_errno = BMP_PIXEL_ERROR;
 		return;
 	}
@@ -207,15 +175,9 @@ set_pixel_bitmap (Bitmap *bmp, int y, int x, Color pixel)
 	bmp->data[(bmp->info.width*y+x)*3+1] = pixel.g;
 	bmp->data[(bmp->info.width*y+x)*3+2] = pixel.r;
 }
-
-/**
- * @brief Fill an entire bitmap with a color.
- *
- * Prototype:
- *   void fill_bitmap(Bitmap *bmp, Color pixel)
+/* Fill an entire bitmap with a color.
  */
-void
-fill_bitmap (Bitmap *bmp, Color pixel)
+PRS_EXPORT void fill_bitmap(Bitmap *bmp, Color pixel)
 {
 	int x,y;
 
@@ -223,19 +185,16 @@ fill_bitmap (Bitmap *bmp, Color pixel)
 		for(x=0; x<bmp->info.width; x++)
 			set_pixel_bitmap(bmp, y, x, pixel);
 }
-
-/**
- * @brief Draws a line horizontal or vertical.
+/* Draws a line horizontal or vertical.
  */
-void
-draw_line_bitmap (Bitmap *bmp, int start, char flipped,
-		char vertical, int len, Color col)
+PRS_EXPORT void draw_line_bitmap(Bitmap *bmp, int start, char flipped,
+	char vertical, int len, Color col)
 {
 	int i;
 
-	if (len >= bmp->info.width || len >= bmp->info.height)
+	if(len >= bmp->info.width || len >= bmp->info.height)
 		return;
-	if (flipped) {
+	if(flipped) {
 		for(i=start+len; i>=start; i--)
 			if (vertical)
 				set_pixel_bitmap(bmp, i, start+len, col);
@@ -249,14 +208,10 @@ draw_line_bitmap (Bitmap *bmp, int start, char flipped,
 				set_pixel_bitmap(bmp, start, i, col);
 	}
 }
-
-
-
-/**
- * @brief Draws a circle from start to given radius.
+/* Draws a circle from start to given radius.
  */
-void
-draw_circle_bitmap (Bitmap *bmp, int x_centre, int y_centre, int r, Color pixel)
+PRS_EXPORT void draw_circle_bitmap(Bitmap *bmp, int x_centre, int y_centre,
+	int r, Color pixel)
 {
 	int x,y;
 	int P;
@@ -267,7 +222,7 @@ draw_circle_bitmap (Bitmap *bmp, int x_centre, int y_centre, int r, Color pixel)
 	printf("(%d, %d) ", y+y_centre, x+x_centre);
 	set_pixel_bitmap(bmp, y+y_centre, x+x_centre, pixel);
 
-	if (r > 0) {
+	if(r > 0) {
 		printf("(%d, %d) ", -y+y_centre, x+x_centre);
 		printf("(%d, %d) ", x+y_centre, y+x_centre);
 		printf("(%d, %d)\n", x+y_centre, -y+x_centre);
@@ -278,7 +233,7 @@ draw_circle_bitmap (Bitmap *bmp, int x_centre, int y_centre, int r, Color pixel)
 	}
 
 	P = 1 - r;
-	while (x > y) {
+	while(x > y) {
 		y++;
 		if (P <= 0)
 			P = P + 2*y + 1;
@@ -287,7 +242,7 @@ draw_circle_bitmap (Bitmap *bmp, int x_centre, int y_centre, int r, Color pixel)
 			P = P + 2*y - 2*x + 1;
 		}
 
-		if (x < y)
+		if(x < y)
 			break;
 
 		printf("(%d, %d) ", y+y_centre, x+x_centre);
@@ -300,7 +255,7 @@ draw_circle_bitmap (Bitmap *bmp, int x_centre, int y_centre, int r, Color pixel)
 		set_pixel_bitmap(bmp, -y+y_centre, x+x_centre, pixel);
 		set_pixel_bitmap(bmp, -y+y_centre, -x+x_centre, pixel);
 
-		if (x != y) {
+		if(x != y) {
 			printf("(%d, %d) ", y+x_centre, x+y_centre);
 			printf("(%d, %d) ", -y+x_centre, x+y_centre);
 			printf("(%d, %d) ", y+x_centre, -x+y_centre);
@@ -313,16 +268,13 @@ draw_circle_bitmap (Bitmap *bmp, int x_centre, int y_centre, int r, Color pixel)
 		}
 	}
 }
-
-/**
- * @brief Draws a set amount of squares diagonally.
+/* Draws a set amount of squares diagonally.
  */
-void
-draw_squares_bitmap (Bitmap *bmp, int start, int count,
-		Color pixel)
+PRS_EXPORT void draw_squares_bitmap(Bitmap *bmp, int start, int count,
+	Color pixel)
 {
 	int i;
-	for (i=1; i<=count; i++) {
+	for(i=1; i<=count; i++) {
 		/* draw lines */
 		draw_line_bitmap(bmp, start*i, 0, 1, start, pixel);
 		draw_line_bitmap(bmp, start*i, 0, 0, start, pixel);
@@ -330,24 +282,21 @@ draw_squares_bitmap (Bitmap *bmp, int start, int count,
 		draw_line_bitmap(bmp, start*i, 1, 0, start, pixel);
 	}
 }
-
-/**
- * @brief Flip image upside down.
+/* Flip image upside down.
  */
-void
-flip_vertical_bitmap (Bitmap **bitmap)
+PRS_EXPORT void flip_vertical_bitmap(Bitmap **bitmap)
 {
 	Bitmap *bmp;
 	int x,y;
 
 	bmp = malloc(sizeof(Bitmap));
-	if (!bmp) {
+	if(!bmp) {
 		_bitmap_errno = BMP_MALLOC_ERROR;
 		destroy_bitmap(*bitmap);
 		return;
 	}
 	bmp->data = malloc((*bitmap)->info.isize);
-	if (!bmp->data) {
+	if(!bmp->data) {
 		_bitmap_errno = BMP_MALLOC_ERROR;
 		destroy_bitmap(*bitmap);
 		free(bmp);
@@ -367,16 +316,13 @@ flip_vertical_bitmap (Bitmap **bitmap)
 	destroy_bitmap(*bitmap);
 	*bitmap = bmp;
 }
-
-/**
- * @brief Sets all pixels random in bitmap image.
+/* Sets all pixels random in bitmap image.
  */
-void
-randomise_bitmap (Bitmap *bmp)
+PRS_EXPORT void randomise_bitmap(Bitmap *bmp)
 {
 	int i,j;
 
-	if (!bmp) {
+	if(!bmp) {
 		printf("Error: Bitmap object doesn't exist.\n");
 		return;
 	}
@@ -387,14 +333,11 @@ randomise_bitmap (Bitmap *bmp)
 			set_pixel_bitmap(bmp, i, j, pixel);
 		}
 }
-
-/**
- * @brief Convert a bitmap to greyscale.
+/* Convert a bitmap to greyscale.
  */
-void
-bitmap_to_greyscale (Bitmap *bmp)
+PRS_EXPORT void bitmap_to_greyscale(Bitmap *bmp)
 {
-	int x,y;
+	int x, y;
 
 	for(y=0; y<bmp->info.height; y++)
 		for(x=0; x<bmp->info.width; x++) {
@@ -409,21 +352,18 @@ bitmap_to_greyscale (Bitmap *bmp)
 			set_pixel_bitmap(bmp, y, x, pixel);
 		}
 }
-
-/**
- * @brief Embeds text into a bitmap.
+/* Embeds text into a bitmap.
  */
-void
-encode_steganograph (Bitmap *bmp, const char *msg)
+PRS_EXPORT void encode_steganograph(Bitmap *bmp, const char *msg)
 {
 	long offset = 0;
 	unsigned char byte = 0xfb;
 	int i, j, len = strlen(msg);
 
-	if (!bmp || !msg)
+	if(!bmp || !msg)
 		return;
 
-	if ((int)(strlen(msg)+sizeof(int)+sizeof(char)) > bmp->info.isize) {
+	if((int)(strlen(msg)+sizeof(int)+sizeof(char)) > bmp->info.isize) {
 		printf("Error: image size not big enough.\n");
 		return;
 	}
@@ -439,19 +379,16 @@ encode_steganograph (Bitmap *bmp, const char *msg)
 		}
 	}
 }
-
-/**
- * @brief Gets the embedded text from a bitmap.
+/* Gets the embedded text from a bitmap.
  */
-char*
-decode_steganograph(Bitmap *bmp)
+PRS_EXPORT char *decode_steganograph(Bitmap *bmp)
 {
 	char *data;
 	int i, j, len = 0;
 	long offset = 0;
 	unsigned char byte;
 
-	if (!bmp)
+	if(!bmp)
 		return NULL;
 
 	byte = 0;
@@ -479,22 +416,16 @@ decode_steganograph(Bitmap *bmp)
 	data[i] = '\0';
 	return data;
 }
-
-/**
- * @brief Free up all memory for bitmap.
+/* Free up all memory for bitmap.
  */
-void
-destroy_bitmap (Bitmap *bitmap)
+PRS_EXPORT void destroy_bitmap(Bitmap *bitmap)
 {
 	free(bitmap->data);
 	free(bitmap);
 }
-
-/**
- * @brief Gets last error code from my library.
+/* Gets last error code from my library.
  */
-int
-get_last_error_bitmap ()
+PRS_EXPORT int get_last_error_bitmap()
 {
 	int bitmap_errno = _bitmap_errno;
 	_bitmap_errno = 0;
@@ -532,3 +463,6 @@ get_last_error_bitmap ()
 	}
 	return bitmap_errno;
 }
+#ifdef __cplusplus
+}
+#endif

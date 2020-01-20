@@ -23,9 +23,12 @@ struct utree {
 	struct utree *left;	/**< Left limb */
 	struct utree *right;	/**< Right limb */
 };
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* Add a limb to the universal tree.
  */
-void add_utree(utree_t **leaf, int id, const void *data)
+PRS_EXPORT void add_utree(utree_t **leaf, int id, const void *data)
 {
 	if(*leaf == NULL) {
 		*leaf = (utree_t*)malloc(sizeof(utree_t));
@@ -42,7 +45,7 @@ void add_utree(utree_t **leaf, int id, const void *data)
 }
 /* Destroy a universal tree.
  */
-void destroy_utree(utree_t **leaf, void (*destroy)(void *))
+PRS_EXPORT void destroy_utree(utree_t **leaf, void (*destroy)(void *))
 {
 	if(*leaf != NULL) {
 		destroy_utree(&(*leaf)->left, (*destroy));
@@ -54,7 +57,7 @@ void destroy_utree(utree_t **leaf, void (*destroy)(void *))
 }
 /* Print ascii utree to console.
  */
-void print_utree(utree_t *leaf, int indent)
+PRS_EXPORT void print_utree(utree_t *leaf, int indent)
 {
 	if(leaf != NULL) {
 		printf("%*d\n", indent, leaf->id);
@@ -64,7 +67,7 @@ void print_utree(utree_t *leaf, int indent)
 }
 /* Search utree to find specific id.
  */
-utree_t *search_utree(utree_t *leaf, int id)
+PRS_EXPORT utree_t *search_utree(utree_t *leaf, int id)
 {
 	if(leaf != NULL) {
 		if(id == leaf->id)
@@ -79,7 +82,7 @@ utree_t *search_utree(utree_t *leaf, int id)
 }
 /* Get the data from a branch.
  */
-void *get_data_utree(utree_t *leaf)
+PRS_EXPORT void *get_data_utree(utree_t *leaf)
 {
 	if(leaf != NULL) {
 		return leaf->data;
@@ -88,7 +91,7 @@ void *get_data_utree(utree_t *leaf)
 }
 /* Get the id from a branch.
  */
-int get_id_utree(utree_t *leaf)
+PRS_EXPORT int get_id_utree(utree_t *leaf)
 {
 	if(leaf != NULL) {
 		return leaf->id;
@@ -97,7 +100,7 @@ int get_id_utree(utree_t *leaf)
 }
 /* Get the left branch of a leaf.
  */
-utree_t *get_left_utree(utree_t *leaf)
+PRS_EXPORT utree_t *get_left_utree(utree_t *leaf)
 {
 	if(leaf != NULL) {
 		return leaf->left;
@@ -106,10 +109,13 @@ utree_t *get_left_utree(utree_t *leaf)
 }
 /* Get the right branch of a leaf.
  */
-utree_t *get_right_utree(utree_t *leaf)
+PRS_EXPORT utree_t *get_right_utree(utree_t *leaf)
 {
 	if(leaf != NULL) {
 		return leaf->right;
 	}
 	return NULL;
 }
+#ifdef __cplusplus
+}
+#endif

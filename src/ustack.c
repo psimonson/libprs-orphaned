@@ -26,9 +26,12 @@ struct ustack {
 	unsigned int last;
 	ustack_data_t *data;
 };
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* Create the initial stack.
  */
-ustack_t *create_ustack(void)
+PRS_EXPORT ustack_t *create_ustack(void)
 {
 	ustack_t *stack;
 	stack = (ustack_t*)malloc(sizeof(ustack_t));
@@ -53,7 +56,7 @@ static int grow_ustack(ustack_t *stack, const unsigned int id,
 }
 /* Add some data to the top of the stack.
  */
-int push_ustack(ustack_t *stack, const unsigned int id,
+PRS_EXPORT int push_ustack(ustack_t *stack, const unsigned int id,
 	const void *data)
 {
 	if(stack != NULL) {
@@ -63,7 +66,7 @@ int push_ustack(ustack_t *stack, const unsigned int id,
 }
 /* Destroy a stack free all memory.
  */
-void destroy_ustack(ustack_t **stack, void (*destroy)(void *))
+PRS_EXPORT void destroy_ustack(ustack_t **stack, void (*destroy)(void *))
 {
 	if(*stack != NULL) {
 		unsigned int i;
@@ -83,7 +86,7 @@ void destroy_ustack(ustack_t **stack, void (*destroy)(void *))
 }
 /* Pop off the last element on the stack.
  */
-ustack_data_t *pop_ustack(ustack_t *stack)
+PRS_EXPORT ustack_data_t *pop_ustack(ustack_t *stack)
 {
 	if(stack != NULL) {
 		if(stack->data != NULL) {
@@ -96,7 +99,7 @@ ustack_data_t *pop_ustack(ustack_t *stack)
 }
 /* Peek at last element push on the stack.
  */
-ustack_data_t *peek_ustack(ustack_t *stack)
+PRS_EXPORT ustack_data_t *peek_ustack(ustack_t *stack)
 {
 	if(stack != NULL) {
 		if(stack->data != NULL) {
@@ -110,7 +113,7 @@ ustack_data_t *peek_ustack(ustack_t *stack)
 }
 /* Used internally, reset top to current top.
  */
-void reset_ustack(ustack_t *stack)
+PRS_EXPORT void reset_ustack(ustack_t *stack)
 {
 	if(stack != NULL) {
 		stack->top = stack->last;
@@ -118,7 +121,7 @@ void reset_ustack(ustack_t *stack)
 }
 /* Get id from stack.
  */
-unsigned int get_id_ustack(ustack_data_t *data)
+PRS_EXPORT unsigned int get_id_ustack(ustack_data_t *data)
 {
 	if(data != NULL) {
 		return data->id;
@@ -127,10 +130,13 @@ unsigned int get_id_ustack(ustack_data_t *data)
 }
 /* Get data from stack.
  */
-void *get_data_ustack(ustack_data_t *data)
+PRS_EXPORT void *get_data_ustack(ustack_data_t *data)
 {
 	if(data != NULL) {
 		return data->data;
 	}
 	return NULL;
 }
+#ifdef __cplusplus
+}
+#endif

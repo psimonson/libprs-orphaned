@@ -31,10 +31,17 @@ struct CLOG {
 struct CLOG _logs[MAX_LOGS];  /**< Global variable for storing log info */
 char init_var;                /**< Global variable for logger initialization */
 
-void close_log(int);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static void
-_logger_exit_func ()
+/* Close a log file.
+ */
+PRS_EXPORT void close_log(int);
+
+/* Exit function, clean up log files.
+ */
+static void _logger_exit_func(void)
 {
 	int i;
 
@@ -42,14 +49,9 @@ _logger_exit_func ()
 		if (get_status_log(i))
 			close_log(i);
 }
-
-/**
- * @brief Initialize logger system.
- *
- * Returns: void
+/* Initialize logger system.
  */
-void
-init_logger ()
+PRS_EXPORT void init_logger(void)
 {
 	if(init_var == 0) {
 		int i;
@@ -66,14 +68,9 @@ init_logger ()
 		printf("C_Logger is already initialized!\n");
 	}
 }
-
-/**
- * @brief Opens a log file of name.
- *
- * Returns: void
+/* Opens a log file of name.
  */
-void
-open_log (int logNum, const char *name)
+PRS_EXPORT void open_log(int logNum, const char *name)
 {
 	if(init_var) {
 		if(get_status_log(logNum) == CLOGERR_CLOSE) {
@@ -89,14 +86,9 @@ open_log (int logNum, const char *name)
 	}
 	printf("Please use init_logger() first.\n");
 }
-
-/**
- * @brief Reads a log file into buf of size.
- *
- * Returns: int
+/* Reads a log file into buf of size.
  */
-int
-read_log(int logNum, char *buf, int size)
+PRS_EXPORT int read_log(int logNum, char *buf, int size)
 {
 	if(init_var) {
 		if(get_status_log(logNum) == CLOGERR_OKAY) {
@@ -129,14 +121,9 @@ read_log(int logNum, char *buf, int size)
 	printf("Please use init_logger() first.\n");
 	return -1;
 }
-
-/**
- * @brief Formatted output (writing to log file).
- *
- * Returns: void
+/* Formatted output (writing to log file).
  */
-void
-write_log(int logNum, const char *data, ...)
+PRS_EXPORT void write_log(int logNum, const char *data, ...)
 {
 	if(init_var) {
 		if(get_status_log(logNum) == CLOGERR_OKAY) {
@@ -162,14 +149,9 @@ write_log(int logNum, const char *data, ...)
 	}
 	printf("Please use init_logger() first.\n");
 }
-
-/**
- * @brief Close a log file.
- *
- * Returns: void
+/* Close a log file.
  */
-void
-close_log(int logNum)
+PRS_EXPORT void close_log(int logNum)
 {
 	if(init_var) {
 		if(get_status_log(logNum) == CLOGERR_OKAY) {
@@ -183,14 +165,9 @@ close_log(int logNum)
 	}
 	printf("Please use init_logger() first.\n");
 }
-
-/**
- * @brief Print status of log file.
- *
- * Returns: void
+/* Print status of log file.
  */
-void
-print_status_log(int logNum)
+PRS_EXPORT void print_status_log(int logNum)
 {
 	if(init_var) {
 		const char *_err_codes[] = {
@@ -204,31 +181,24 @@ print_status_log(int logNum)
 	}
 	printf("Please use init_logger() first.\n");
 }
-
-/**
- * @brief Gets the status number from log file.
- *
- * Returns: int (status)
+/* Gets the status number from log file.
  */
-int
-get_status_log(int logNum)
+PRS_EXPORT int get_status_log(int logNum)
 {
 	if(init_var)
 		return _logs[logNum].status;
 	printf("Please use init_logger() first.\n");
 	return 0;
 }
-
-/**
- * @brief Gets the file name from given log file.
- *
- * Returns: const char*
+/* Gets the file name from given log file.
  */
-const char*
-get_name_log(int logNum)
+PRS_EXPORT const char* get_name_log(int logNum)
 {
 	if(init_var)
 		return get_name_file(_logs[logNum].file);
 	printf("Please use init_logger() first.\n");
 	return 0;
 }
+#ifdef __cplusplus
+}
+#endif
