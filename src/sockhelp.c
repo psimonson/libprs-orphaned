@@ -521,7 +521,7 @@ PRS_EXPORT const char *get_addr_socket(sock_t *s)
 	static char addr[32];
 	unsigned int b1, b2, b3, b4;
 	memset(addr, 0, sizeof(addr));
-	if(check_endian() == LITTLE_ENDIAN) {
+	if(check_endian() == BIG_ENDIAN) {
 		b1 = 0xFF000000;
 		b2 = 0x00FF0000;
 		b3 = 0x0000FF00;
