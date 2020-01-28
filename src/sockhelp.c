@@ -44,6 +44,7 @@
 #endif
 
 #include "sockhelp.h"
+#include "endian.h"
 #include "unused.h"
 
 #define BACKLOG 32       /**< Backlog define for server socket. */
@@ -518,19 +519,24 @@ PRS_EXPORT int writef_socket(sock_t *sock, const char *format, ...)
 PRS_EXPORT const char *get_addr_socket(sock_t *s)
 {
 	static char addr[32];
+	unsigned int b1, b2, b3, b4;
 	memset(addr, 0, sizeof(addr));
+	if(check_endian() == LITTLE_ENDIAN) {
+		b1 = 0xFF000000;
+		b2 = 0x00FF0000;
+		b3 = 0x0000FF00;
+		b4 = 0x000000FF;
+	} else {
+		b1 = 0x000000FF;
+		b2 = 0x0000FF00;
+		b3 = 0x00FF0000;
+		b4 = 0xFF000000;
+	}
 	sprintf(addr, "%ld.%ld.%ld.%ld",
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF000000),
-	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF0000) >> 8,
-	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF00) >> 16,
-	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF) >> 24);
-#else
-	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF),
-	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF00) >> 8,
-	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF0000) >> 16,
-	(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & 0xFF000000) >> 24);
-#endif
+		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b1),
+		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b2) >> 8,
+		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b3) >> 16,
+		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b4) >> 24);
 	return (const char *)addr;
 }
 /**
