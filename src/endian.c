@@ -6,6 +6,8 @@
  ***********************************************************************
  */
 
+#include <stddef.h>
+#include <stdint.h>
 #include "endian.h"
 
 /* Checks for endianess at runtime.
@@ -14,7 +16,7 @@ int check_endian(void)
 {
 	static const union {
 		unsigned char bytes[4];
-		unsigned long value;
+		uint32_t value;
 	} _host_order = {
 		{ 0, 1, 2, 3 }
 	};
