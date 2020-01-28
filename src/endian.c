@@ -12,6 +12,11 @@
  */
 int check_endian(void)
 {
-	unsigned short var = 0x1000;
-	return (var & 1) ? LITTLE_ENDIAN : BIG_ENDIAN;
+	static const union {
+		unsigned char bytes[4];
+		unsigned long value;
+	} _host_order = {
+		{ 0, 1, 2, 3 }
+	};
+	return _host_order.value;
 }

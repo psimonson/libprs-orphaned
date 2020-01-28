@@ -11,8 +11,10 @@
 
 /** @brief Enumeration for endianess */
 enum _prs_endian {
-	BIG_ENDIAN,
-	LITTLE_ENDIAN
+	LITTLE_ENDIAN = 0x03020100ul,	/**< LITTLE_ENDIAN */
+	BIG_ENDIAN = 0x00010203ul,		/**< BIG_ENDIAN */
+	PDP_ENDIAN = 0x01000302ul,		/**< PDP-11 */
+	HONEYWELL_ENDIAN = 0x02030001ul /**< honeywell */
 };
 
 /** @brief Test for endianess, returns enumeration. */
