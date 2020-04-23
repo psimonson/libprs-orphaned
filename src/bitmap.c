@@ -50,7 +50,7 @@ PRS_EXPORT Bitmap *create_bitmap(int width, int height)
 	bitmap->info.palette = 0;
 	bitmap->info.impcolors = 0;
 
-	bitmap->data = malloc(bitmap->info.isize);
+	bitmap->data = (Color *)malloc(bitmap->info.isize);
 	if(!bitmap->data) {
 		_bitmap_errno = BMP_MALLOC_ERROR;
 		destroy_bitmap(bitmap);
@@ -102,7 +102,7 @@ PRS_EXPORT Bitmap *load_bitmap(const char *filename)
 	}
 
 	/* load bitmap data */
-	bmp->data = malloc(bmp->info.isize);
+	bmp->data = (Color *)malloc(bmp->info.isize);
 	if(bmp->data == NULL) {
 		_bitmap_errno = BMP_MALLOC_ERROR;
 		free(bmp);
@@ -159,9 +159,21 @@ PRS_EXPORT void get_pixel_bitmap(Bitmap *bmp, int y, int x, Color *pixel)
 		_bitmap_errno = BMP_PIXEL_ERROR;
 		return;
 	}
-	pixel->b = bmp->data[(bmp->info.width*y+x)*3];
-	pixel->g = bmp->data[(bmp->info.width*y+x)*3+1];
-	pixel->r = bmp->data[(bmp->info.width*y+x)*3+2];
+	switch(check_endian()) {
+	case BIG_ENDIAN:
+		pixel->r = bmp->data[(bmp->info.width*y+x)*3].r;
+		pixel->g = bmp->data[(bmp->info.width*y+x)*3].g;
+		pixel->b = bmp->data[(bmp->info.width*y+x)*3].b;
+	break;
+	case BIG_ENDIAN:
+		pixel->r = bmp->data[(bmp->info.width*y+x)*3].b;
+		pixel->g = bmp->data[(bmp->info.width*y+x)*3].g;
+		pixel->b = bmp->data[(bmp->info.width*y+x)*3].r;
+	break;
+	default:
+		printf("Endian not supported.\n");
+	break;
+	}
 }
 /* Put a pixel at (x,y) coordinates r, g, b values.
  */
@@ -171,9 +183,21 @@ PRS_EXPORT void set_pixel_bitmap(Bitmap *bmp, int y, int x, Color pixel)
 		_bitmap_errno = BMP_PIXEL_ERROR;
 		return;
 	}
-	bmp->data[(bmp->info.width*y+x)*3] = pixel.b;
-	bmp->data[(bmp->info.width*y+x)*3+1] = pixel.g;
-	bmp->data[(bmp->info.width*y+x)*3+2] = pixel.r;
+	switch(check_endian()) {
+	case BIG_ENDIAN:
+		bmp->data[(bmp->info.width*y+x)*3].r = pixel.r;
+		bmp->data[(bmp->info.width*y+x)*3].g = pixel.g;
+		bmp->data[(bmp->info.width*y+x)*3].b = pixel.b;
+	break;
+	case BIG_ENDIAN:
+		bmp->data[(bmp->info.width*y+x)*3].b = pixel.r;
+		bmp->data[(bmp->info.width*y+x)*3].g = pixel.g;
+		bmp->data[(bmp->info.width*y+x)*3].r = pixel.b;
+	break;
+	default:
+		printf("Endian not supported.\n");
+	break;
+	}
 }
 /* Fill an entire bitmap with a color.
  */
