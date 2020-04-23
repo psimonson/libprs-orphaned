@@ -166,7 +166,7 @@ PRS_EXPORT void get_pixel_bitmap(Bitmap *bmp, int y, int x, Color *pixel)
 		pixel->g = bmp->data[(bmp->info.width*y+x)*3].g;
 		pixel->b = bmp->data[(bmp->info.width*y+x)*3].b;
 	break;
-	case BIG_ENDIAN:
+	case LITTLE_ENDIAN:
 		pixel->r = bmp->data[(bmp->info.width*y+x)*3].b;
 		pixel->g = bmp->data[(bmp->info.width*y+x)*3].g;
 		pixel->b = bmp->data[(bmp->info.width*y+x)*3].r;
@@ -190,7 +190,7 @@ PRS_EXPORT void set_pixel_bitmap(Bitmap *bmp, int y, int x, Color pixel)
 		bmp->data[(bmp->info.width*y+x)*3].g = pixel.g;
 		bmp->data[(bmp->info.width*y+x)*3].b = pixel.b;
 	break;
-	case BIG_ENDIAN:
+	case LITTLE_ENDIAN:
 		bmp->data[(bmp->info.width*y+x)*3].b = pixel.r;
 		bmp->data[(bmp->info.width*y+x)*3].g = pixel.g;
 		bmp->data[(bmp->info.width*y+x)*3].r = pixel.b;
@@ -381,26 +381,25 @@ PRS_EXPORT void bitmap_to_greyscale(Bitmap *bmp)
  */
 PRS_EXPORT void encode_steganograph(Bitmap *bmp, const char *msg)
 {
-	long offset = 0;
-	unsigned char byte = 0xfb;
-	int i, j, len = strlen(msg);
+	int x, y, i, len = strlen(msg);
 
 	if(!bmp || !msg)
 		return;
 
-	if((int)(strlen(msg)+sizeof(int)+sizeof(char)) > bmp->info.isize) {
+	if((int)(strlen(msg)*sizeof(char)/sizeof(Color)) > bmp->info.isize) {
 		printf("Error: image size not big enough.\n");
 		return;
 	}
-	for(i=0; i<=7; ++i,++offset) {
-		bmp->data[offset] = (GET_BIT(byte, i) ? SET_BIT(bmp->data[offset], 0) : CLR_BIT(bmp->data[offset], 0));
-	}
-	for(j=0; j<=(int)(sizeof(int)); ++j,++offset) {
-		bmp->data[offset] = (GET_BIT(len, j) ? SET_BIT(bmp->data[offset], 0) : CLR_BIT(bmp->data[offset], 0));
-	}
-	for(i=0; i<=(int)strlen(msg); ++i) {
-		for(j=0; j<=7; ++j,++offset) {
-			bmp->data[offset] = (GET_BIT(msg[i], j) ? SET_BIT(bmp->data[offset], 0) : CLR_BIT(bmp->data[offset], 0));
+	for(i = 0; i < (len*8); i++) {
+		for(y = 0; y < bmp->info.height; y++) {
+			for(x = 0; x < bmp->info.width; x++) {
+				Color pixel;
+				get_pixel_bitmap(bmp, y, x, &pixel);
+				pixel.r = GET_BIT(pixel.r, 0) | GET_BIT(msg[i], i);
+				pixel.g = GET_BIT(pixel.g, 0) | GET_BIT(msg[i], i);
+				pixel.b = GET_BIT(pixel.b, 0) | GET_BIT(msg[i], i);
+				set_pixel_bitmap(bmp, y, x, pixel);
+			}
 		}
 	}
 }
@@ -409,24 +408,19 @@ PRS_EXPORT void encode_steganograph(Bitmap *bmp, const char *msg)
 PRS_EXPORT char *decode_steganograph(Bitmap *bmp)
 {
 	char *data;
-	int i, j, len = 0;
-	long offset = 0;
-	unsigned char byte;
+	int len = 0;
+/*	long offset = 0;
+ */	unsigned char byte;
 
 	if(!bmp)
 		return NULL;
 
 	byte = 0;
-	for(i=0; i<=7; ++i,++offset) {
-		byte = (GET_BIT(bmp->data[offset], 0) ? SET_BIT(byte, i) : CLR_BIT(byte, i));
-	}
+	/* TODO: Decode for byte */
 	if(byte != 0xfb) {
 		_bitmap_errno = BMP_DECODE_ERROR;
 		destroy_bitmap(bmp);
 		return NULL;
-	}
-	for(j=0; j<=(int)(sizeof(int)); ++j,++offset) {
-		len = (GET_BIT(bmp->data[offset], 0) ? SET_BIT(len, j) : CLR_BIT(len, j));
 	}
 	data = (char*)malloc(len+1);
 	if(data == NULL) {
@@ -435,10 +429,7 @@ PRS_EXPORT char *decode_steganograph(Bitmap *bmp)
 		return NULL;
 	}
 	memset(data, 0, len+1);
-	for(i=0; i<=len; ++i)
-		for(j=0; j<=7; ++j,++offset)
-			data[i] = (GET_BIT(bmp->data[offset], 0) ? SET_BIT(data[i], j) : CLR_BIT(data[i], j));
-	data[i] = '\0';
+	/* TODO: Decode text from image. */
 	return data;
 }
 /* Free up all memory for bitmap.
