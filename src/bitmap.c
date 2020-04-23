@@ -15,6 +15,7 @@
 #include "file.h"
 #include "bitmap.h"
 #include "bitfiddle.h"
+#include "endian.h"
 
 int _bitmap_errno; /**< Current error code from bitmap library. */
 
