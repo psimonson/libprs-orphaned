@@ -119,6 +119,15 @@ PRS_EXPORT void reset_ustack(ustack_t *stack)
 		stack->top = stack->last;
 	}
 }
+/* Get the top of the stack.
+ */
+PRS_EXPORT unsigned int get_top_ustack(ustack_t *stack)
+{
+	if(stack != NULL) {
+		return stack->top;
+	}
+	return -1;
+}
 /* Get id from stack.
  */
 PRS_EXPORT unsigned int get_id_ustack(ustack_data_t *data)

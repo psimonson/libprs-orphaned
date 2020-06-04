@@ -34,16 +34,17 @@ int
 main ()
 {
     ustack_t *stack;
-    stack = init_stack();
+    stack = create_ustack();
     if(stack != NULL) {
-        push_stack(stack, (void*)data_new("Hello World!"));
-        push_stack(stack, (void*)data_new("This is a test."));
-        push_stack(stack, (void*)data_new("Final test."));
+        push_ustack(stack, 0, (void*)data_new("Hello World!"));
+        push_ustack(stack, 1, (void*)data_new("This is a test."));
+        push_ustack(stack, 2, (void*)data_new("Final test."));
         
-        while(stack->top > 0)
-            printf("%s\n", (char*)((data_t*)pop_stack(stack))->line);
-        printf("%p: stack pointer.\n", peek_stack(stack));
-        free_stack(stack, data_free);
+        while(get_top_ustack(stack) > 0)
+            printf("%s\n", (char*)((data_t*)pop_ustack(stack))->line);
+        printf("%p: stack pointer.\n", peek_ustack(stack));
+				reset_ustack(stack);
+        destroy_ustack(&stack, data_free);
         return 0;
     }
     return 1;

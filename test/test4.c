@@ -29,14 +29,14 @@ main ()
     strcpy(str3, "This is another test.");
     
     /* initialize and push to stack */
-    stack = init_stack();
+    stack = create_ustack();
     if(stack == NULL) { free(str1); free(str2); free(str3); return 2; }
-    push_stack(stack, str1);
-    push_stack(stack, str2);
-    push_stack(stack, str3);
-    while(stack->top > 0)
-        printf("String: %s\n", (char*)pop_stack(stack));
-    reset_top(stack);
-    free_stack(stack, free_data);
+    push_ustack(stack, 0, str1);
+    push_ustack(stack, 1, str2);
+    push_ustack(stack, 2, str3);
+    while(get_top_ustack(stack) > 0)
+        printf("String: %s\n", (char*)pop_ustack(stack));
+    reset_ustack(stack);
+    destroy_ustack(&stack, free_data);
     return 0;
 }

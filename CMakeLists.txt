@@ -108,4 +108,3 @@ else(DOXYGEN_FOUND)
 	message("Doxygen not found")
 endif(DOXYGEN_FOUND)
 
-

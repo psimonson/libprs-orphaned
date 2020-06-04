@@ -17,124 +17,96 @@
 #include <stdlib.h>
 #include <assert.h>
 
-/**
- * @brief For internal use only.
- */
-#define vector_set_capacity(vec, size) \
-({ \
-	if(vec) { \
-		((size_t*)(vec))[-1] = (size); \
-	} \
-})
+#define vector_set_capacity(vec, size) ((size_t*)(vec))[-1] = (size)
+#define vector_set_size(vec, size) ((size_t*)(vec))[-2] = (size)
 
-/**
- * @brief For internal use only.
- */
-#define vector_set_size(vec, size) ({ \
-	if(vec) { \
-		((size_t*)(vec))[-2] = (size); \
-	} \
-})
-
-/**
- * @brief Gets the current capacity of the vector.
- */
+/** @brief Get the total capacity of the vector. */
 #define vector_capacity(vec) ((vec) ? ((size_t*)(vec))[-1] : (size_t)0)
-
-/**
- * @brief Gets the current size of the vector.
- */
+/** @brief Get the size of the vector. */
 #define vector_size(vec) ((vec) ? ((size_t*)(vec))[-2] : (size_t)0)
-
-/**
- * @brief Returns non-zero if the vector is empty.
- */
+/** @brief Get the whether the vector is empty. */
 #define vector_empty(vec) (vector_size(vec) == 0)
 
-/**
- * @brief For internal use only, grows vector.
+/** @brief
+ * Grow the vector in capacity.
  */
-#define vector_grow(vec, count) ({ \
+#define vector_grow(vec, count) do { \
 	if(!(vec)) { \
-		size_t *__p; \
-		__p = malloc((count)*sizeof(*(vec))+(sizeof(size_t)*2)); \
-		assert(__p); \
-		(vec) = (void*)(&__p[2]); \
+		size_t *_p; \
+		_p = malloc((count)*sizeof(*(vec))+(sizeof(size_t)*2)); \
+		assert(_p); \
+		(vec) = (void*)(&_p[2]); \
 		vector_set_capacity((vec), (count)); \
 		vector_set_size((vec), 0); \
 	} else { \
-		size_t *__p1,*__p2; \
-		__p1 = &((size_t*)(vec))[-2]; \
-		__p2 = \
-		realloc(__p1, ((count)*sizeof(*(vec))+(sizeof(size_t)*2))); \
-		assert(__p2); \
-		(vec) = (void*)(&__p2[2]); \
+		size_t *_p1, *_p2; \
+		_p1 = &((size_t*)(vec))[-2]; \
+		_p2 = \
+		realloc(_p1, (count)*sizeof(*(vec))+(sizeof(size_t)*2)); \
+		assert(_p2); \
+		(vec) = (void*)(&_p2[2]); \
 		vector_set_capacity((vec), (count)); \
 	} \
-})
+} while(0)
 
-/**
- * @brief Removes the last element from the vector.
- */
-#define vector_pop_back(vec) (vector_set_size((vec), vector_size(vec)-1))
+/** @brief Pop off the end and remove it from the vector. (WIP) */
+#define vector_pop_back(vec) vector_set_capacity((vec), vector_size(vec)-1)
 
-/**
- * @brief Removes the element at i index from the vector.
- */
-#define vector_erase(vec, i) ({ \
+/** @brief Delete an element at i position. */
+#define vector_erase(vec, i) do { \
 	if(vec) { \
 		const size_t __sz = vector_size(vec); \
 		if((i) < __sz) { \
 			size_t __x; \
 			vector_set_size((vec), __sz-1); \
-			for(__x=(i); __x < (__sz-1); ++__x) { \
+			for(__x = (i); __x < (__sz-1); ++__x) { \
 				(vec)[__x] = (vec)[__x+1]; \
 			} \
 		} \
 	} \
-})
+} while(0)
 
-/**
- * @brief Frees all memory associated with the vector.
- */
-#define vector_free(vec) ({ \
+/** @brief Release resources of a vector. */
+#define vector_free(vec) do { \
 	if(vec) { \
 		size_t *p1 = &((size_t*)(vec))[-2]; \
 		free(p1); \
 	} \
-})
+} while(0)
 
-/**
- * @brief Returns an iterator to first element of the vector.
- */
-#define vector_begin(vec) (vec)
+/** @brief Get start of vector as a pointer. */
+#define vector_begin(vec) ((vec) ? &(vec)[0] : NULL)
 
-/**
- * @brief Returns an iterator one past the last element of the vector.
- */
-#define vector_end(vec) ((vec) ? &((vec)[vector_size(vec)]) : NULL)
+/** @brief Get end of vector as a pointer. */
+#define vector_end(vec) ((vec) ? &(vec)[vector_capacity(vec)] : NULL)
 
-/**
- * @brief Adds an element to the end of the vector.
- */
+/** @brief Append an element to the end of a vector. */
 #ifdef LOGARITHMIC_GROWTH
-#define vector_push_back(vec, value) ({ \
+#define vector_push_back(vec, value) do { \
 	size_t __cap = vector_capacity(vec); \
 	if(__cap <= vector_size(vec)) { \
 		vector_grow((vec), !__cap ? __cap+1 : __cap*2); \
 	} \
 	vec[vector_size(vec)] = (value); \
 	vector_set_size((vec), vector_size(vec)+1); \
-})
+} while(0)
 #else
-#define vector_push_back(vec, value) ({ \
+#define vector_push_back(vec, value) do { \
 	size_t __cap = vector_capacity(vec); \
 	if(__cap <= vector_size(vec)) { \
 		vector_grow((vec), __cap+1); \
 	} \
 	vec[vector_size(vec)] = (value); \
 	vector_set_size((vec), vector_size(vec)+1); \
-})
+} while(0)
 #endif
+
+/** @breif Copy vector (from) to vector (to). */
+#define vector_copy(from, to) do { \
+	size_t __i, __cur_size = vector_size(from); \
+	for(__i = 0; __i < __cur_size; __i++) { \
+		vector_push_back(to, from[__i]); \
+	} \
+} while(0)
 
 #endif
