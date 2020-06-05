@@ -108,3 +108,13 @@ else(DOXYGEN_FOUND)
 	message("Doxygen not found")
 endif(DOXYGEN_FOUND)
 
+set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "0")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6")
+set(CPACK_PACKAGE_DESCRIPTION "Just a handful of libraries to make common tasks quicker.")
+set(CPACK_PACKAGE_CONTACT "Philip Simonson")
+set(CPACK_MAINTAINER "Philip Simonson")
+
+include("CPack")
