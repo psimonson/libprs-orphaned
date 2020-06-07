@@ -1,28 +1,20 @@
 #include <stdio.h>
 #include "file.h"
 
-/* program to test file operations and getter functions */
-int
-main ()
+int main()
 {
-    file_t *file;
-    int c, err;
-    
-    file = open_file("test6.c", "rt");
-    if(file == NULL) {
-	return 1;
-    } else if((err = get_error_file()) != FILE_ERROR_OKAY) {
-        fprintf(stderr, "Error: %s\n", strerror_file(err));
-        return 1;
-    }
-    printf("File Pointer: %p\n", get_handle_file(file));
-    printf("Name of File: %s\n", get_name_file(file));
-    printf("File Size: %ld\nNumber of lines in file: %d\n",
-            get_size_file(file), get_lines_file(file));
-    printf("\t>>> File contents below <<<\n"
-            "=============================\n");
-    while((c = getc_file(file)) != EOF)
-        putchar(c);
-    close_file(file);
-    return 0;
+	char buf[15];
+	file_t *f;
+	f = open_file("test6.txt", "wt");
+	if(get_error_file() != FILE_ERROR_OKAY)
+		return 1;
+	writef_file(f, "Hello world!\n");
+	f = reopen_file(f, "rt");
+	if(get_error_file() != FILE_ERROR_OKAY)
+		return 1;
+	read_file(f, buf, 1, 13);
+	buf[13] = 0;
+	printf("Data: %s", buf);
+	close_file(f);
+	return 0;
 }

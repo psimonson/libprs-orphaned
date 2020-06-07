@@ -56,7 +56,7 @@ PRS_EXPORT void set_server_socket(sock_t *sock);
 PRS_EXPORT int poll_socket(struct pollfd *p_arr, nfds_t n_fds, int timeout);
 /** @brief Poll server socket for multiple connections. */
 PRS_EXPORT int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
-	int (*func2)(sock_t *sock, int *done));
+	int (*func2)(sock_t *sock, int *done), void (*func3)(sock_t*, int*));
 
 #ifdef __cplusplus
 }

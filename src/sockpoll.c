@@ -145,6 +145,11 @@ static int default_handle_client(sock_t *UNUSED(sock), int *UNUSED(done))
 	);
 	return 0;
 }
+/* Handle client disconnect.
+ */
+static void default_handle_close(sock_t *UNUSED(sock), int *UNUSED(done))
+{
+}
 /* Custom sleep function.
  */
 static void psleep(int ms)
@@ -247,7 +252,7 @@ PRS_EXPORT int poll_socket(struct pollfd *p_arr, nfds_t n_fds, int timeout)
 /* Handle multiple connections to socket.
  */
 PRS_EXPORT int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
-	int (*func2)(sock_t*, int*))
+	int (*func2)(sock_t*, int*), void (*func3)(sock_t*, int*))
 {
 	struct pollfd fds[POLL_MAXCONN];
 	int bytes, i, done;
@@ -318,12 +323,14 @@ PRS_EXPORT int poll_multiple_socket(sock_t *sock, void (*func1)(sock_t*),
 								perror("send failed");
 							}
 						break;
-						case 0: {
+						case 0:
 							/* remove socket from set */
-							printf("Server: Client [%s] disconnected!\n",
+							printf("Server: Client [%s] disconnected.\n",
 								get_addr_socket(fds[i].sock));
+							if((*func3) == NULL) default_handle_close(fds[i].sock, &done);
+							else (*func3)(fds[i].sock, &done);
 							del_poll_fd(fds[i].sock);
-						} break;
+						break;
 						default:
 							printf("Client: received %d bytes.\n", bytes);
 						break;

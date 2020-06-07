@@ -138,6 +138,6 @@ int main()
 		return 0;
 	}
 #endif
-	return main_loop(NULL);
+	return main_loop(server);
 }
 
