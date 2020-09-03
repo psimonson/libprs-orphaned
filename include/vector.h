@@ -49,9 +49,6 @@
 	} \
 } while(0)
 
-/** @brief Pop off the end and remove it from the vector. (WIP) */
-#define vector_pop_back(vec) vector_set_capacity((vec), vector_size(vec)-1)
-
 /** @brief Delete an element at i position. */
 #define vector_erase(vec, i) do { \
 	if(vec) { \
@@ -62,6 +59,7 @@
 			for(__x = (i); __x < (__sz-1); ++__x) { \
 				(vec)[__x] = (vec)[__x+1]; \
 			} \
+			vector_set_capacity((vec), __sz-1); \
 		} \
 	} \
 } while(0)
@@ -75,10 +73,10 @@
 } while(0)
 
 /** @brief Get start of vector as a pointer. */
-#define vector_begin(vec) ((vec) ? &(vec)[0] : NULL)
+#define vector_begin(vec) ((vec) ? (vec) : NULL)
 
 /** @brief Get end of vector as a pointer. */
-#define vector_end(vec) ((vec) ? &(vec)[vector_capacity(vec)] : NULL)
+#define vector_end(vec) ((vec) ? &(vec)[vector_size(vec)] : NULL)
 
 /** @brief Append an element to the end of a vector. */
 #ifdef LOGARITHMIC_GROWTH
@@ -108,5 +106,15 @@
 		vector_push_back(to, from[__i]); \
 	} \
 } while(0)
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void *vector_pop_back(void *vec);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
