@@ -20,7 +20,7 @@
 #define vector_set_capacity(vec, size) ((size_t*)(vec))[-1] = (size)
 #define vector_set_size(vec, size) ((size_t*)(vec))[-2] = (size)
 
-/** @brief Get the total capacity of the vector. */
+/** @brief Get the total capacity of the vector. (Internal use ONLY) */
 #define vector_capacity(vec) ((vec) ? ((size_t*)(vec))[-1] : (size_t)0)
 /** @brief Get the size of the vector. */
 #define vector_size(vec) ((vec) ? ((size_t*)(vec))[-2] : (size_t)0)
@@ -28,7 +28,7 @@
 #define vector_empty(vec) (vector_size(vec) == 0)
 
 /** @brief
- * Grow the vector in capacity.
+ * Grow the vector in capacity. (Internal use ONLY)
  */
 #define vector_grow(vec, count) do { \
 	if(!(vec)) { \
@@ -59,7 +59,6 @@
 			for(__x = (i); __x < (__sz-1); ++__x) { \
 				(vec)[__x] = (vec)[__x+1]; \
 			} \
-			vector_set_capacity((vec), __sz-1); \
 		} \
 	} \
 } while(0)
