@@ -72,10 +72,10 @@
 } while(0)
 
 /** @brief Get start of vector as a pointer. */
-#define vector_begin(vec) ((vec) ? (vec) : NULL)
+#define vector_begin(vec) (!(vector_empty()) ? (vec)[0] : NULL)
 
 /** @brief Get end of vector as a pointer. */
-#define vector_end(vec) ((vec) ? &(vec)[vector_size(vec)] : NULL)
+#define vector_end(vec) (!(vector_empty()) ? &(vec)[vector_size(vec)] : NULL)
 
 /** @brief Append an element to the end of a vector. */
 #ifdef LOGARITHMIC_GROWTH
@@ -98,7 +98,7 @@
 } while(0)
 #endif
 
-/** @breif Copy vector (from) to vector (to). */
+/** @brief Copy vector (from) to vector (to). */
 #define vector_copy(from, to) do { \
 	size_t __i, __cur_size = vector_size(from); \
 	for(__i = 0; __i < __cur_size; __i++) { \
