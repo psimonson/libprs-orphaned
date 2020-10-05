@@ -72,7 +72,7 @@
 } while(0)
 
 /** @brief Get start of vector as a pointer. */
-#define vector_begin(vec) ((vec) ? (vec)[0] : NULL)
+#define vector_begin(vec) ((vec) ? &(vec)[0] : NULL)
 
 /** @brief Get end of vector as a pointer. */
 #define vector_end(vec) ((vec) ? &(vec)[vector_size(vec)] : NULL)
