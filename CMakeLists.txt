@@ -14,7 +14,7 @@ include_directories(
 	"${PROJECT_SOURCE_DIR}/include"
 )
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89 -Wall -Wextra -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89 -Wall -Wextra -Werror -fPIC")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -Wno-return-type -g")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -Wno-return-type -O2")
 
