@@ -532,11 +532,11 @@ PRS_EXPORT const char *get_addr_socket(sock_t *s)
 		b3 = 0x00FF0000;
 		b4 = 0xFF000000;
 	}
-	sprintf(addr, "%ld.%ld.%ld.%ld",
-		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b1),
-		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b2) >> 8,
-		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b3) >> 16,
-		(long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b4) >> 24);
+	sprintf(addr, "%d.%d.%d.%d",
+		(unsigned char)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b1),
+		(unsigned char)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b2) >> 8,
+		(unsigned char)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b3) >> 16,
+		(unsigned char)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b4) >> 24);
 	return (const char *)addr;
 }
 /**

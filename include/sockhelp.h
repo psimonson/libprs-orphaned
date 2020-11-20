@@ -20,8 +20,8 @@ extern "C" {
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
-#include <windows.h>
 #include <winsock2.h>
+#include <windows.h>
 #else
 #define SOCKET int
 #define SOCKET_ERROR -1
