@@ -19,9 +19,6 @@ extern "C" {
 #endif
 
 #ifdef _WIN32
-#undef _WIN32_WINNT
-#define WINVER 0x0700
-#define _WIN32_WINNT 0x0700
 #include <winsock2.h>
 #include <windows.h>
 #else
