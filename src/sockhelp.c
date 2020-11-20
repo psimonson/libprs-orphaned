@@ -24,25 +24,6 @@
 #include <limits.h>
 #include <errno.h>
 
-/* Headers for socket programming */
-#ifdef _WIN32
-#undef _WIN32_WINNT
-#define WINVER 0x0700
-#define _WIN32_WINNT 0x0700
-#include <winsock2.h>
-#include <windows.h>
-#include <ws2tcpip.h>
-#else
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <fcntl.h>
-#endif
-
 #include "sockhelp.h"
 #include "endian.h"
 #include "unused.h"
@@ -532,11 +513,11 @@ PRS_EXPORT const char *get_addr_socket(sock_t *s)
 		b3 = 0x00FF0000;
 		b4 = 0xFF000000;
 	}
-	sprintf(addr, "%d.%d.%d.%d",
-		(unsigned char)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b1),
-		(unsigned char)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b2) >> 8,
-		(unsigned char)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b3) >> 16,
-		(unsigned char)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b4) >> 24);
+	sprintf(addr, "%lu.%lu.%lu.%lu",
+		(unsigned long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b1),
+		(unsigned long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b2) >> 8,
+		(unsigned long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b3) >> 16,
+		(unsigned long)(((struct sockaddr_in*)&s->addr)->sin_addr.s_addr & b4) >> 24);
 	return (const char *)addr;
 }
 /**
