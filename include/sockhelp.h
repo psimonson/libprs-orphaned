@@ -18,7 +18,13 @@
 extern "C" {
 #endif
 
-#ifndef _WIN32
+#ifdef _WIN32
+#undef _WIN32_WINNT
+#define WINVER 0x0700
+#define _WIN32_WINNT 0x0700
+#include <winsock2.h>
+#include <windows.h>
+#else
 #define SOCKET int
 #define SOCKET_ERROR -1
 #define INVALID_SOCKET SOCKET_ERROR
