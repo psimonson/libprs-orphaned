@@ -18,25 +18,10 @@
 extern "C" {
 #endif
 
-#ifdef _WIN32
-#undef _WIN32_WINNT
-#define WINVER 0x0700
-#define _WIN32_WINNT 0x0700
-#include <winsock2.h>
-#include <windows.h>
-#include <ws2tcpip.h>
-#else
+#ifndef _WIN32
 #define SOCKET int
 #define SOCKET_ERROR -1
 #define INVALID_SOCKET SOCKET_ERROR
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <fcntl.h>
 #endif
 
 /** @brief socket type definition */

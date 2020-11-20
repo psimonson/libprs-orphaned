@@ -24,6 +24,24 @@
 #include <limits.h>
 #include <errno.h>
 
+#ifdef _WIN32
+#undef _WIN32_WINNT
+#define WINVER 0x0700
+#define _WIN32_WINNT 0x0700
+#include <winsock2.h>
+#include <windows.h>
+#include <ws2tcpip.h>
+#else
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <fcntl.h>
+#endif
+
 #include "sockhelp.h"
 #include "endian.h"
 #include "unused.h"
