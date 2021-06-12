@@ -59,9 +59,6 @@ struct socket {
 extern "C" {
 #endif
 
-/** @brief Internally used function: clears a socket structure. */
-static void clear_socket(sock_t *sock);
-
 /* ------------------------- Init Functions --------------------- */
 
 /**
@@ -123,10 +120,10 @@ PRS_EXPORT int server_socket(sock_t **sock, const char *port)
 	int rv;
 
 	/* create socket */
-	*sock = (sock_t*)malloc(sizeof(sock_t));
+	*sock = (sock_t*)calloc(1, sizeof(sock_t));
 	if((*sock) == NULL)
 		return 1;
-	clear_socket(*sock);
+    
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
@@ -193,10 +190,9 @@ PRS_EXPORT int client_socket(sock_t **sock, const char *addr, const char *port)
 	copied = error = 0;
 
 	/* create socket */
-	*sock = (sock_t*)malloc(sizeof(sock_t));
+	*sock = (sock_t*)calloc(1, sizeof(sock_t));
 	if((*sock) == NULL)
 		return 1;
-	clear_socket(*sock);
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
@@ -253,10 +249,10 @@ PRS_EXPORT sock_t *accept_socket(sock_t *server)
 	sock_t *sock;
 
 	/* create socket */
-	sock = (sock_t*)malloc(sizeof(sock_t));
+	sock = (sock_t*)calloc(1, sizeof(sock_t));
 	if(sock == NULL)
 		return NULL;
-	clear_socket(sock);
+
 	sock->fd = accept(server->fd, (struct sockaddr*)&sock->addr,
 			&sin_size);
 	if(sock->fd == INVALID_SOCKET) {
@@ -276,7 +272,7 @@ PRS_EXPORT void destroy_socket(sock_t *sock)
 	if(sock != NULL) {
 		if(sock->fd != INVALID_SOCKET) close_socket(sock);
 		if(sock != NULL) {
-			clear_socket(sock);
+			memset(sock, 0, sizeof(sock_t));
 			free(sock);
 		}
 	}
@@ -539,14 +535,6 @@ PRS_EXPORT const char *get_addr_socket(sock_t *s)
 	return (const char *)addr;
 }
 /**
- * @brief Clears socket structure, makes fd = INVALID_SOCKET
- */
-static void clear_socket(sock_t *sock)
-{
-	memset(sock, 0, sizeof(sock_t));
-	sock->fd = INVALID_SOCKET;
-}
-/**
  * @brief Get socket descriptor.
  */
 PRS_EXPORT SOCKET get_socket(sock_t *sock)
@@ -559,20 +547,6 @@ PRS_EXPORT SOCKET get_socket(sock_t *sock)
 PRS_EXPORT void *get_addr_info(sock_t *sock)
 {
 	return (void*)&sock->addr;
-}
-/**
- * @brief Set socket descriptor.
- */
-PRS_EXPORT sock_t *new_socket(void *addrinfo, SOCKET fd)
-{
-	sock_t *sock;
-	sock = (sock_t*)malloc(sizeof(sock_t));
-	if(sock == NULL) return NULL;
-	if(sock->fd == INVALID_SOCKET) { free(sock); return NULL; }
-	sock->fd = fd;
-	if(addrinfo != NULL) memcpy(&sock->addr, addrinfo, sizeof(sock->addr));
-	sock->error = SOCKERR_OKAY;
-	return sock;
 }
 #ifdef __cplusplus
 }

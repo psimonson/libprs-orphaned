@@ -67,8 +67,6 @@ PRS_EXPORT const char *get_addr_socket(sock_t *sock);
 PRS_EXPORT SOCKET get_socket(sock_t *sock);
 /** @brief Gets address information from socket object. */
 PRS_EXPORT void *get_addr_info(sock_t *sock);
-/** @brief Sets socket descriptor to socket object. */
-PRS_EXPORT sock_t *new_socket(void *addrinfo, SOCKET fd);
 /** @brief Does nothing right now. */
 PRS_EXPORT int blocking_socket(sock_t *sock, int);
 /** @brief Sends data to a socket. */
